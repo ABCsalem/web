@@ -1,0 +1,207 @@
+﻿/*body*/
+*{
+    margin: 0;
+    padding: 0;
+}
+::selection{
+  background-color: #198754;
+  color: #fff;
+}
+body::-webkit-scrollbar {
+  width: 8px;
+}
+body::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 10px;
+}
+body::-webkit-scrollbar-thumb {
+  background-color: #198754;
+  border-radius: 10px;
+}
+body{
+    background: none;
+    font-family: 'Droid Arabic Kufi', sans-serif;
+}
+a{
+  color:inherit;
+  text-decoration:none;
+  -moz-transition: all 250ms linear;
+  -webkit-transition: all 250ms linear;
+  -o-transition: all 250ms linear;
+}
+a:hover{
+  color: rgb(230, 62, 62) !important;
+  transition: all 0.5s;
+}
+#totop {
+  display: none;
+  position:fixed;
+  bottom: 10px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  z-index: 210;
+  border: none;
+  outline: none; 
+  background-color: #198754;
+  cursor: pointer; 
+  border-radius: 40px;
+  -moz-transition: all 250ms linear;
+  -webkit-transition: all 250ms linear;
+  -o-transition: all 250ms linear;
+}
+#totop i{
+    line-height: 40px;
+    font-size: 17px;
+    color: #fff;
+}
+#totop:hover {
+    background-color: rgb(230, 62, 62);
+    transition: all 0.5s;
+}
+#rasha{
+  padding-bottom: 1em;
+}
+button:not(:disabled), [type=button]:not(:disabled), [type=reset]:not(:disabled), [type=submit]:not(:disabled) {
+  color:#fff;
+}
+#r{
+  padding-bottom: 1em;
+}
+#ra{
+  padding-bottom: 1em;
+}
+#ras{
+  padding-bottom: 1em;
+}
+#rash{
+  padding-bottom: 1em;
+}
+#text-ras{
+  margin-top: -2em;
+}
+.btn-fullpquran{
+  display: none;
+}
+footer .btn-group a:hover{
+  color: #fff !important;
+}
+/*dark-mode*/
+.dark-theme .quran-ari{
+  background-color: #282C34 !important;
+  color: #ABB2BF;
+}
+.dark-theme .quran-ari img{
+  filter: invert(100%);
+}
+.dark-theme .text-success{
+  color: #ABB2BF !important;
+}
+.dark-theme .text-one{
+  color: #ABB2BF !important;
+}
+.dark-theme a:hover{
+  color: rgb(230, 62, 62) !important;
+  transition: all 0.5s;
+}
+.dark-theme .table > :not(caption) > * > * {
+  color: #ABB2BF !important;
+  border-color: #ABB2BF !important;
+}
+.dark-theme .border {
+  border-color: #ABB2BF !important;
+}
+.dark-theme footer .btn-group .btn-outline-success{
+  color: #ABB2BF;
+  border-color: #ABB2BF;
+}
+.dark-theme footer .btn-group .btn-outline-success:hover , .dark-theme footer .btn-group .btn-success{
+  color: #282C34 !important;
+  background: #ABB2BF;
+  border-color: #ABB2BF;
+}
+.btn-group .btn-outline-success:hover, .btn-group .btn-success, .btn-group .btn-success:hover{
+  color: #198754 !important;
+  background: 	#ffffff;
+  border-color: #c9cdd0;
+}
+.btn-group .btn-outline-success{
+  color: #198754 !important;
+  background: 	#f8f9fa;
+  border-color: #c9cdd0;
+}
+.text-quran {
+        color:  #28241e;
+}
+.dark-theme .text-quran {
+        color: #e1e1ff;
+}
+.dark-theme footer .btn-group .btn-outline-success{
+  color: #ABB2BF !important;
+  background: 	#282C34;
+  border-color: #ABB2BF;
+}
+/*dark-mode*/
+
+.fullpagequran header {
+  display: none;
+}
+.fullpagequran .btn-fullpquran{
+  display: block;
+}
+.fullpagequran footer {
+  display: none;
+}
+.fullpagequran .card-header {
+  display: none;
+}
+.fullpagequran .card-footer {
+  display: none;
+}
+@media (min-width: 100px) {
+  .btn-group > .btn:not(:first-child), .btn-group > .btn-group:not(:first-child) {
+    margin-top: -1px;
+    margin-left: 0;
+  }
+  .btn-group > .btn:not(:last-child):not(.dropdown-toggle), .btn-group > .btn.dropdown-toggle-split:first-child, .btn-group > .btn-group:not(:last-child) > .btn {
+    margin-top: -1px;
+    margin-left: 0;
+  }
+  .st{
+    border-radius: 0;
+    margin-left: 0;
+    border-top-left-radius: 3px !important;
+    border-top-right-radius: 3px !important;
+  }
+  .end{
+    border-radius: 0;
+    margin-left: 0;
+    border-bottom-left-radius: 3px !important;
+    border-bottom-right-radius: 3px !important;
+  }
+}
+@media (min-width: 768px) {
+  .btn-group > .btn:not(:first-child), .btn-group > .btn-group:not(:first-child) {
+    margin-top: unset;
+    margin-left: -1px;
+  }
+  .btn-group > .btn:not(:last-child):not(.dropdown-toggle), .btn-group > .btn.dropdown-toggle-split:first-child, .btn-group > .btn-group:not(:last-child) > .btn {
+    margin-top: unset;
+    margin-left: -1px;
+  }
+  .st{
+    border-radius: 0;
+    border-top-left-radius: 0px !important;
+    border-top-right-radius: 3px !important;
+    border-bottom-right-radius: 3px !important;
+  }
+  .end{
+    border-radius: 0;
+    border-top-left-radius: 3px !important;
+    border-bottom-left-radius: 3px !important;
+    border-bottom-right-radius: 0px !important;
+  }
+}
+
+
+
