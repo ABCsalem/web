@@ -10,40 +10,65 @@
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 </head>
 <body>
-  <div class="container">
-    <div class="header-actions">
-      <div>
-        <h1>نظام إدارة وأتمتة التحضير</h1>
-        <div class="developer">مطور النظام: م/سالم صلاح</div>
-      </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button id="reset-btn" class="btn-reset">🗑️ مسح</button>
-        <button id="export-btn" class="btn-export">📥 تصدير Excel</button>
+  <!-- شاشة تسجيل الدخول -->
+  <div id="login-screen" class="login-overlay">
+    <div class="login-box">
+      <h2>🔐 تسجيل الدخول</h2>
+      <p>نظام إدارة وأتمتة التحضير</p>
+      <div class="login-form">
+        <div class="form-group">
+          <label>اسم المستخدم</label>
+          <input type="text" id="login-username" placeholder="أدخل اسم المستخدم" value="admin">
+        </div>
+        <div class="form-group">
+          <label>كلمة المرور</label>
+          <input type="password" id="login-password" placeholder="أدخل كلمة المرور" value="123456">
+        </div>
+        <button id="login-btn" class="btn-login">دخول</button>
+        <div id="login-error" class="login-error" style="display:none;">❌ اسم المستخدم أو كلمة المرور غير صحيحة</div>
       </div>
     </div>
+  </div>
 
-    <div class="table-section">
-      <h2>تعبئة أعداد المقاتلين والموظفين</h2>
-      <table id="stats-table">
-        <thead>
-          <tr>
-            <th>الرتبة</th><th>الملاك</th><th>المعسكر</th><th>موقع</th><th>إجازة</th><th>مستشفى</th><th>مهمة</th><th>مكلف</th><th>مستأذن</th><th>دورة</th><th>مرافقين</th><th>متأخر</th><th>غياب</th><th>سجن</th><th>اسرى</th><th>شهداء</th><th>جرحى</th><th>إعاقة</th><th>الهروب</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr id="row-officers"><td class="row-title">ضباط</td><td><input type="number" class="quota-input" value="10" min="0"></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td></tr>
-          <tr id="row-soldiers"><td class="row-title">أفراد مقاتلين</td><td><input type="number" class="quota-input" value="170" min="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td></tr>
-          <tr id="row-employees"><td class="row-title">موظف</td><td><input type="number" class="quota-input" value="170" min="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="table-section">
-      <div class="table-header-actions">
-        <h2>تحديث حالات الموظفين</h2>
-        <button id="add-person-btn" class="btn-add">➕ إضافة موظف</button>
+  <!-- المحتوى الرئيسي (يظهر فقط بعد تسجيل الدخول) -->
+  <div id="main-content" style="display:none;">
+    <div class="container">
+      <div class="header-actions">
+        <div>
+          <h1>نظام إدارة وأتمتة التحضير</h1>
+          <div class="developer">مطور النظام: م/سالم صلاح</div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+          <span id="user-display" style="font-weight:bold; color:#2563eb;"></span>
+          <button id="logout-btn" class="btn-logout">🚪 تسجيل خروج</button>
+          <button id="reset-btn" class="btn-reset">🗑️ مسح</button>
+          <button id="export-btn" class="btn-export">📥 تصدير Excel</button>
+        </div>
       </div>
-      <table id="personnel-table"><thead><tr><th>#</th><th>الاسم</th><th>النقطة</th><th>الوظيفة</th><th>الحالة</th><th>حذف</th></tr></thead><tbody></tbody></table>
+
+      <div class="table-section">
+        <h2>تعبئة أعداد المقاتلين والموظفين</h2>
+        <table id="stats-table">
+          <thead>
+            <tr>
+              <th>الرتبة</th><th>الملاك</th><th>المعسكر</th><th>موقع</th><th>إجازة</th><th>مستشفى</th><th>مهمة</th><th>مكلف</th><th>مستأذن</th><th>دورة</th><th>مرافقين</th><th>متأخر</th><th>غياب</th><th>سجن</th><th>اسرى</th><th>شهداء</th><th>جرحى</th><th>إعاقة</th><th>الهروب</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="row-officers"><td class="row-title">ضباط</td><td><input type="number" class="quota-input" value="10" min="0"></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td></tr>
+            <tr id="row-soldiers"><td class="row-title">أفراد مقاتلين</td><td><input type="number" class="quota-input" value="170" min="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td></tr>
+            <tr id="row-employees"><td class="row-title">موظف</td><td><input type="number" class="quota-input" value="170" min="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-section">
+        <div class="table-header-actions">
+          <h2>تحديث حالات الموظفين</h2>
+          <button id="add-person-btn" class="btn-add">➕ إضافة موظف</button>
+        </div>
+        <table id="personnel-table"><thead><tr><th>#</th><th>الاسم</th><th>النقطة</th><th>الوظيفة</th><th>الحالة</th><th>حذف</th></tr></thead><tbody></tbody></table>
+      </div>
     </div>
   </div>
 
@@ -60,10 +85,9 @@
     </div>
   </div>
 
-  <!-- تسجيل الـ Service Worker (تم تحسينه) -->
+  <!-- Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
-      // حذف الـ Cache القديم عند التحديث لمنع التعليق
       caches.keys().then(function(names) {
         for (let name of names) caches.delete(name);
       });
