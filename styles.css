@@ -78,23 +78,7 @@
   font-weight: bold;
 }
 
-/* زر تسجيل الخروج */
-.btn-logout {
-  background: #ef4444;
-  color: white;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 1rem;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-.btn-logout:active {
-  transform: scale(0.95);
-}
-
-/* باقي الأنماط (كما كانت) */
+/* ----- الأنماط العامة ----- */
 body { 
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
   background: #f1f5f9; 
@@ -117,7 +101,7 @@ body {
 }
 h1 { color: #dc2626; margin: 0; font-size: 1.4rem; }
 .developer { font-size: 0.9rem; color: #64748b; margin-top: 3px; font-weight: 500; }
-.btn-export, .btn-add, .btn-reset, .btn-cancel, .btn-save, .btn-del { 
+.btn-export, .btn-add, .btn-reset, .btn-cancel, .btn-save, .btn-del, .btn-logout { 
   padding: 12px 16px; 
   font-size: 1rem; 
   border-radius: 8px; 
@@ -125,25 +109,132 @@ h1 { color: #dc2626; margin: 0; font-size: 1.4rem; }
   font-weight: bold; 
   border: none; 
   box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+  transition: 0.2s;
 }
 .btn-export { background: #2563eb; color: white; }
 .btn-export:active { transform: scale(0.95); background: #1d4ed8; }
 .btn-add { background: #16a34a; color: white; }
 .btn-reset { background: #f59e0b; color: white; }
 .btn-del { background: #ef4444; color: white; }
+.btn-logout { background: #ef4444; color: white; }
+.btn-logout:active { transform: scale(0.95); }
+
+/* ----- بطاقات الإحصائيات ----- */
+#stats-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.stats-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  border: 1px solid #e2e8f0;
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.rank-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #1e293b;
+}
+.quota-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.quota-group label {
+  font-weight: bold;
+  color: #475569;
+}
+.quota-input {
+  width: 70px;
+  padding: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 1rem;
+  background: white;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+.stat-label {
+  font-weight: 500;
+  color: #475569;
+  font-size: 0.9rem;
+}
+.stat-val {
+  font-weight: bold;
+  color: #1e293b;
+  min-width: 30px;
+  text-align: center;
+}
+.stat-input {
+  width: 60px;
+  padding: 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 1rem;
+  background: white;
+}
+/* تنسيق placeholder للحقول الفارغة */
+.stat-input::placeholder {
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+@media (max-width: 600px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .stat-item {
+    padding: 8px 12px;
+  }
+  .quota-input {
+    width: 60px;
+  }
+  .stat-input {
+    width: 60px;
+  }
+}
+
+/* ----- جدول الموظفين ----- */
 .table-section { 
   background: white; 
   padding: 12px; 
   border-radius: 12px; 
   box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
   margin-bottom: 20px; 
+}
+.table-responsive {
   overflow-x: auto;
 }
 table { 
   width: 100%; 
   border-collapse: collapse; 
   font-size: 0.85rem; 
-  min-width: 650px;
+  min-width: 600px;
 }
 th, td { 
   border: 1px solid #e2e8f0; 
@@ -152,7 +243,7 @@ th, td {
   vertical-align: middle; 
 }
 th { background: #f8fafc; color: #334155; }
-.stat-input, .quota-input, .p-input, select { 
+.p-input, select { 
   padding: 8px 4px; 
   border: 1px solid #cbd5e1; 
   border-radius: 6px; 
@@ -165,7 +256,8 @@ th { background: #f8fafc; color: #334155; }
 }
 .p-input { min-width: 80px; }
 select { appearance: auto; cursor: pointer; }
-.stat-val { display: inline-block; padding: 4px 0; color: #334155; font-weight: bold; }
+
+/* ----- مودال الإضافة ----- */
 .modal-overlay { 
   position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
   background: rgba(0,0,0,0.6); 

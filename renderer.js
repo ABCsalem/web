@@ -9,11 +9,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const loginError = document.getElementById('login-error');
     const userDisplay = document.getElementById('user-display');
 
-    // بيانات الدخول الثابتة (تم تعديلها حسب الطلب)
     const VALID_USER = 'شعبة القوى البشرية';
     const VALID_PASS = '010203';
 
-    // التحقق من حالة الجلسة
     function checkLogin() {
         const logged = sessionStorage.getItem('loggedIn');
         if (logged === 'true') {
@@ -37,11 +35,9 @@ document.addEventListener('DOMContentLoaded', function() {
         mainContent.style.display = 'block';
         const username = sessionStorage.getItem('username') || 'شعبة القوى البشرية';
         userDisplay.textContent = '👤 ' + username;
-        // بعد تسجيل الدخول، نقوم بتهيئة التطبيق (تحميل البيانات، إلخ)
         initApp();
     }
 
-    // معالج تسجيل الدخول
     function handleLogin() {
         const user = loginUsername.value.trim();
         const pass = loginPassword.value.trim();
@@ -57,15 +53,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // تسجيل الخروج
     function handleLogout() {
         sessionStorage.removeItem('loggedIn');
         sessionStorage.removeItem('username');
-        // إعادة تحميل الصفحة لإعادة ضبط الحالة
         location.reload();
     }
 
-    // ربط الأحداث
     loginBtn.addEventListener('click', handleLogin);
     loginPassword.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') handleLogin();
@@ -75,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     logoutBtn.addEventListener('click', handleLogout);
 
-    // ----- منطق التطبيق الأصلي (يتم تشغيله بعد تسجيل الدخول) -----
+    // ----- منطق التطبيق -----
     function initApp() {
         const personnelTbody = document.querySelector('#personnel-table tbody');
         const exportBtn = document.getElementById('export-btn');
@@ -211,32 +204,53 @@ document.addEventListener('DOMContentLoaded', function() {
         function validate() {
             let errors = [];
             try {
+                // حساب مجموع الضباط من قائمة الموظفين
                 const officerStats = {'حاضر':0,'إجازة':0,'مستشفى':0,'مهمة':0,'مكلف':0,'مستأذن':0,'دورة':0,'مرافق':0,'متأخر':0,'غياب':0,'سجن':0,'اسرى':0,'شهداء':0,'جرحى':0,'اعاقة':0,'هروب':0};
                 personnelData.forEach(p => { if(p.status && officerStats[p.status] !== undefined) officerStats[p.status]++; });
                 let officerSum = 0; Object.values(officerStats).forEach(v => officerSum += v);
                 
+                // التحقق لكل صف
                 document.querySelectorAll('#row-officers, #row-soldiers, #row-employees').forEach(row => {
-                    const title = row.querySelector('.row-title').innerText;
+                    const title = row.querySelector('.rank-title') ? row.querySelector('.rank-title').innerText : row.querySelector('.row-title')?.innerText || '';
                     const quota = parseInt(row.querySelector('.quota-input').value) || 0;
                     let sum = 0;
-                    if(title.includes('ضباط')) { sum = officerSum; }
-                    else { row.querySelectorAll('.stat-input').forEach(inp => sum += parseInt(inp.value)||0); }
+                    if(title.includes('ضباط')) {
+                        sum = officerSum;
+                    } else {
+                        // جمع القيم المدخلة (معاملة الفارغ كـ 0)
+                        row.querySelectorAll('.stat-input').forEach(inp => {
+                            const val = parseInt(inp.value);
+                            if (!isNaN(val)) sum += val;
+                        });
+                    }
                     if(sum !== quota) errors.push(`صف "${title}" غير متطابق! الملاك: ${quota}، المدخل: ${sum}`);
                 });
             } catch (e) { errors.push('خطأ في التحقق'); }
 
-            if(errors.length > 0) { alert('⛔ منع التصدير:\n' + errors.join('\n')); return false; }
+            if(errors.length > 0) {
+                alert('⛔ منع التصدير:\n' + errors.join('\n'));
+                return false;
+            }
             return true;
         }
 
         async function exportExcel() {
-            if(!validate()) return;
+            if(!validate()) return;  // تم إعادة تفعيل التحقق
+
             try {
                 const officerStats = {'حاضر':0,'إجازة':0,'مستشفى':0,'مهمة':0,'مكلف':0,'مستأذن':0,'دورة':0,'مرافق':0,'متأخر':0,'غياب':0,'سجن':0,'اسرى':0,'شهداء':0,'جرحى':0,'اعاقة':0,'هروب':0};
                 personnelData.forEach(p => { if(p.status && officerStats[p.status] !== undefined) officerStats[p.status]++; });
                 const officerRow = [officerStats['حاضر']||0,0,officerStats['إجازة']||0,officerStats['مستشفى']||0,officerStats['مهمة']||0,officerStats['مكلف']||0,officerStats['مستأذن']||0,officerStats['دورة']||0,officerStats['مرافق']||0,officerStats['متأخر']||0,officerStats['غياب']||0,officerStats['سجن']||0,officerStats['اسرى']||0,officerStats['شهداء']||0,officerStats['جرحى']||0,officerStats['اعاقة']||0,officerStats['هروب']||0];
-                const soldiers = Array.from(document.querySelectorAll('#row-soldiers .stat-input')).map(i => parseInt(i.value)||0);
-                const employees = Array.from(document.querySelectorAll('#row-employees .stat-input')).map(i => parseInt(i.value)||0);
+                
+                // جمع قيم الأفراد والموظفين (معاملة الفارغ كـ 0)
+                const soldiers = Array.from(document.querySelectorAll('#row-soldiers .stat-input')).map(inp => {
+                    const val = parseInt(inp.value);
+                    return isNaN(val) ? 0 : val;
+                });
+                const employees = Array.from(document.querySelectorAll('#row-employees .stat-input')).map(inp => {
+                    const val = parseInt(inp.value);
+                    return isNaN(val) ? 0 : val;
+                });
                 const quotas = Array.from(document.querySelectorAll('#row-officers, #row-soldiers, #row-employees')).map(r => parseInt(r.querySelector('.quota-input').value)||0);
 
                 const wb = new ExcelJS.Workbook(); 
@@ -279,8 +293,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         loadData();
-    } // نهاية initApp
+    }
 
-    // عند التحميل، نتحقق من حالة الدخول
     checkLogin();
 });

@@ -18,11 +18,11 @@
       <div class="login-form">
         <div class="form-group">
           <label>اسم المستخدم</label>
-          <input type="text" id="login-username" placeholder="أدخل اسم المستخدم" value="admin">
+          <input type="text" id="login-username" placeholder="أدخل اسم المستخدم" value="شعبة القوى البشرية">
         </div>
         <div class="form-group">
           <label>كلمة المرور</label>
-          <input type="password" id="login-password" placeholder="أدخل كلمة المرور" value="123456">
+          <input type="password" id="login-password" placeholder="أدخل كلمة المرور" value="010203">
         </div>
         <button id="login-btn" class="btn-login">دخول</button>
         <div id="login-error" class="login-error" style="display:none;">❌ اسم المستخدم أو كلمة المرور غير صحيحة</div>
@@ -30,7 +30,7 @@
     </div>
   </div>
 
-  <!-- المحتوى الرئيسي (يظهر فقط بعد تسجيل الدخول) -->
+  <!-- المحتوى الرئيسي -->
   <div id="main-content" style="display:none;">
     <div class="container">
       <div class="header-actions">
@@ -46,28 +46,116 @@
         </div>
       </div>
 
+      <!-- قسم تعبئة الأعداد (عرض عمودي) -->
       <div class="table-section">
         <h2>تعبئة أعداد المقاتلين والموظفين</h2>
-        <table id="stats-table">
-          <thead>
-            <tr>
-              <th>الرتبة</th><th>الملاك</th><th>المعسكر</th><th>موقع</th><th>إجازة</th><th>مستشفى</th><th>مهمة</th><th>مكلف</th><th>مستأذن</th><th>دورة</th><th>مرافقين</th><th>متأخر</th><th>غياب</th><th>سجن</th><th>اسرى</th><th>شهداء</th><th>جرحى</th><th>إعاقة</th><th>الهروب</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr id="row-officers"><td class="row-title">ضباط</td><td><input type="number" class="quota-input" value="10" min="0"></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td><td><span class="stat-val">0</span></td></tr>
-            <tr id="row-soldiers"><td class="row-title">أفراد مقاتلين</td><td><input type="number" class="quota-input" value="170" min="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td></tr>
-            <tr id="row-employees"><td class="row-title">موظف</td><td><input type="number" class="quota-input" value="170" min="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td><td><input type="number" class="stat-input" value="0"></td></tr>
-          </tbody>
-        </table>
+        <div id="stats-container">
+          
+          <!-- ضباط (مرتبط بتحضير الموظفين) -->
+          <div id="row-officers" class="stats-card">
+            <div class="card-header">
+              <span class="rank-title">ضباط</span>
+              <div class="quota-group">
+                <label>الملاك:</label>
+                <input type="number" class="quota-input" value="10" min="0">
+              </div>
+            </div>
+            <div class="stats-grid">
+              <div class="stat-item"><span class="stat-label">المعسكر</span><span class="stat-val">0</span></div>
+              <div class="stat-item"><span class="stat-label">موقع</span><span class="stat-val">0</span></div>
+              <div class="stat-item"><span class="stat-label">إجازة</span><span class="stat-val">0</span></div>
+              <div class="stat-item"><span class="stat-label">مستشفى</span><span class="stat-val">0</span></div>
+              <div class="stat-item"><span class="stat-label">مهمة</span><span class="stat-val">0</span></div>
+              <div class="stat-item"><span class="stat-label">مكلف</span><span class="stat-val">0</span></div>
+              <div class="stat-item"><span class="stat-label">مستأذن</span><span class="stat-val">0</span></div>
+              <div class="stat-item"><span class="stat-label">دورة</span><span class="stat-val">0</span></div>
+              <div class="stat-item"><span class="stat-label">مرافقين</span><span class="stat-val">0</span></div>
+              <div class="stat-item"><span class="stat-label">متأخر</span><span class="stat-val">0</span></div>
+              <div class="stat-item"><span class="stat-label">غياب</span><span class="stat-val">0</span></div>
+              <div class="stat-item"><span class="stat-label">سجن</span><span class="stat-val">0</span></div>
+              <div class="stat-item"><span class="stat-label">اسرى</span><span class="stat-val">0</span></div>
+              <div class="stat-item"><span class="stat-label">شهداء</span><span class="stat-val">0</span></div>
+              <div class="stat-item"><span class="stat-label">جرحى</span><span class="stat-val">0</span></div>
+              <div class="stat-item"><span class="stat-label">إعاقة</span><span class="stat-val">0</span></div>
+              <div class="stat-item"><span class="stat-label">الهروب</span><span class="stat-val">0</span></div>
+            </div>
+          </div>
+
+          <!-- أفراد مقاتلين (حقول فارغة) -->
+          <div id="row-soldiers" class="stats-card">
+            <div class="card-header">
+              <span class="rank-title">أفراد مقاتلين</span>
+              <div class="quota-group">
+                <label>الملاك:</label>
+                <input type="number" class="quota-input" value="170" min="0">
+              </div>
+            </div>
+            <div class="stats-grid">
+              <div class="stat-item"><span class="stat-label">المعسكر</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">موقع</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">إجازة</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">مستشفى</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">مهمة</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">مكلف</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">مستأذن</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">دورة</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">مرافقين</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">متأخر</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">غياب</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">سجن</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">اسرى</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">شهداء</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">جرحى</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">إعاقة</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">الهروب</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+            </div>
+          </div>
+
+          <!-- موظف (حقول فارغة) -->
+          <div id="row-employees" class="stats-card">
+            <div class="card-header">
+              <span class="rank-title">موظف</span>
+              <div class="quota-group">
+                <label>الملاك:</label>
+                <input type="number" class="quota-input" value="170" min="0">
+              </div>
+            </div>
+            <div class="stats-grid">
+              <div class="stat-item"><span class="stat-label">المعسكر</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">موقع</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">إجازة</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">مستشفى</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">مهمة</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">مكلف</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">مستأذن</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">دورة</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">مرافقين</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">متأخر</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">غياب</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">سجن</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">اسرى</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">شهداء</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">جرحى</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">إعاقة</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">الهروب</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+            </div>
+          </div>
+
+        </div>
       </div>
 
+      <!-- جدول الموظفين -->
       <div class="table-section">
         <div class="table-header-actions">
           <h2>تحديث حالات الموظفين</h2>
           <button id="add-person-btn" class="btn-add">➕ إضافة موظف</button>
         </div>
-        <table id="personnel-table"><thead><tr><th>#</th><th>الاسم</th><th>النقطة</th><th>الوظيفة</th><th>الحالة</th><th>حذف</th></tr></thead><tbody></tbody></table>
+        <div class="table-responsive">
+          <table id="personnel-table">
+            <thead><tr><th>#</th><th>الاسم</th><th>النقطة</th><th>الوظيفة</th><th>الحالة</th><th>حذف</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -85,7 +173,6 @@
     </div>
   </div>
 
-  <!-- Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       caches.keys().then(function(names) {
@@ -96,7 +183,6 @@
       });
     }
   </script>
-
   <script src="renderer.js"></script>
 </body>
 </html>
