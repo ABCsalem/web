@@ -275,3 +275,5 @@ select { appearance: auto; cursor: pointer; }
 .modal-actions { display: flex; justify-content: space-between; gap: 10px; }
 .btn-cancel { flex: 1; background: #e2e8f0; color: #334155; }
 .btn-save { flex: 1; background: #2563eb; color: white; }
+.btn-add-vacant { background: #8b5cf6; color: white; }
+.btn-add-vacant:active { transform: scale(0.95); }

@@ -46,18 +46,17 @@
         </div>
       </div>
 
-      <!-- قسم تعبئة الأعداد (عرض عمودي) -->
+      <!-- قسم تعبئة الأعداد -->
       <div class="table-section">
         <h2>تعبئة أعداد المقاتلين والموظفين</h2>
         <div id="stats-container">
-          
-          <!-- ضباط (مرتبط بتحضير الموظفين) -->
+          <!-- ضباط -->
           <div id="row-officers" class="stats-card">
             <div class="card-header">
               <span class="rank-title">ضباط</span>
               <div class="quota-group">
                 <label>الملاك:</label>
-                <input type="number" class="quota-input" value="10" min="0">
+                <input type="number" class="quota-input" value="10" min="0" data-row="officers">
               </div>
             </div>
             <div class="stats-grid">
@@ -81,66 +80,65 @@
             </div>
           </div>
 
-          <!-- أفراد مقاتلين (حقول فارغة) -->
+          <!-- أفراد مقاتلين -->
           <div id="row-soldiers" class="stats-card">
             <div class="card-header">
               <span class="rank-title">أفراد مقاتلين</span>
               <div class="quota-group">
                 <label>الملاك:</label>
-                <input type="number" class="quota-input" value="170" min="0">
+                <input type="number" class="quota-input" value="170" min="0" data-row="soldiers">
               </div>
             </div>
             <div class="stats-grid">
-              <div class="stat-item"><span class="stat-label">المعسكر</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">موقع</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">إجازة</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">مستشفى</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">مهمة</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">مكلف</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">مستأذن</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">دورة</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">مرافقين</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">متأخر</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">غياب</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">سجن</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">اسرى</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">شهداء</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">جرحى</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">إعاقة</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">الهروب</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">المعسكر</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">موقع</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">إجازة</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">مستشفى</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">مهمة</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">مكلف</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">مستأذن</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">دورة</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">مرافقين</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">متأخر</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">غياب</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">سجن</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">اسرى</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">شهداء</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">جرحى</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">إعاقة</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">الهروب</span><input type="number" class="stat-input" value=""></div>
             </div>
           </div>
 
-          <!-- موظف (حقول فارغة) -->
+          <!-- موظف -->
           <div id="row-employees" class="stats-card">
             <div class="card-header">
               <span class="rank-title">موظف</span>
               <div class="quota-group">
                 <label>الملاك:</label>
-                <input type="number" class="quota-input" value="170" min="0">
+                <input type="number" class="quota-input" value="170" min="0" data-row="employees">
               </div>
             </div>
             <div class="stats-grid">
-              <div class="stat-item"><span class="stat-label">المعسكر</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">موقع</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">إجازة</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">مستشفى</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">مهمة</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">مكلف</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">مستأذن</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">دورة</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">مرافقين</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">متأخر</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">غياب</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">سجن</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">اسرى</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">شهداء</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">جرحى</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">إعاقة</span><input type="number" class="stat-input" value="" placeholder="0"></div>
-              <div class="stat-item"><span class="stat-label">الهروب</span><input type="number" class="stat-input" value="" placeholder="0"></div>
+              <div class="stat-item"><span class="stat-label">المعسكر</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">موقع</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">إجازة</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">مستشفى</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">مهمة</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">مكلف</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">مستأذن</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">دورة</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">مرافقين</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">متأخر</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">غياب</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">سجن</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">اسرى</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">شهداء</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">جرحى</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">إعاقة</span><input type="number" class="stat-input" value=""></div>
+              <div class="stat-item"><span class="stat-label">الهروب</span><input type="number" class="stat-input" value=""></div>
             </div>
           </div>
-
         </div>
       </div>
 
@@ -148,7 +146,10 @@
       <div class="table-section">
         <div class="table-header-actions">
           <h2>تحديث حالات الموظفين</h2>
-          <button id="add-person-btn" class="btn-add">➕ إضافة موظف</button>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button id="add-person-btn" class="btn-add">➕ إضافة موظف</button>
+            <button id="add-vacant-btn" class="btn-add-vacant">➕ إضافة شاغر</button>
+          </div>
         </div>
         <div class="table-responsive">
           <table id="personnel-table">
@@ -160,7 +161,7 @@
     </div>
   </div>
 
-  <!-- مودال الإضافة -->
+  <!-- مودال إضافة موظف عادي -->
   <div id="add-modal" class="modal-overlay" style="display: none;">
     <div class="modal-box">
       <h3>➕ إضافة موظف جديد</h3>
@@ -173,6 +174,20 @@
     </div>
   </div>
 
+  <!-- مودال إضافة شاغر (فقط النقطة والوظيفة) -->
+  <div id="add-vacant-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+      <h3>➕ إضافة شاغر</h3>
+      <p style="color:#64748b; font-size:0.9rem;">(الاسم سيترك فارغاً)</p>
+      <div class="modal-form">
+        <div class="form-group"><label>النقطة:</label><input type="text" id="vacant-point" placeholder="أدخل النقطة"></div>
+        <div class="form-group"><label>الوظيفة:</label><input type="text" id="vacant-job" placeholder="أدخل الوظيفة"></div>
+        <div class="modal-actions"><button id="vacant-modal-cancel" class="btn-cancel">إلغاء</button><button id="vacant-modal-save" class="btn-save">حفظ وإضافة</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       caches.keys().then(function(names) {

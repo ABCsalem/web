@@ -73,13 +73,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const personnelTbody = document.querySelector('#personnel-table tbody');
         const exportBtn = document.getElementById('export-btn');
         const addBtn = document.getElementById('add-person-btn');
+        const addVacantBtn = document.getElementById('add-vacant-btn');
         const resetBtn = document.getElementById('reset-btn');
+
+        // مودال الإضافة العادي
         const modal = document.getElementById('add-modal');
         const newName = document.getElementById('new-name');
         const newPoint = document.getElementById('new-point');
         const newJob = document.getElementById('new-job');
         const modalCancel = document.getElementById('modal-cancel');
         const modalSave = document.getElementById('modal-save');
+
+        // مودال إضافة الشاغر
+        const vacantModal = document.getElementById('add-vacant-modal');
+        const vacantPoint = document.getElementById('vacant-point');
+        const vacantJob = document.getElementById('vacant-job');
+        const vacantCancel = document.getElementById('vacant-modal-cancel');
+        const vacantSave = document.getElementById('vacant-modal-save');
 
         const defaultData = [
             { name: 'سالم صلاح سالم', point: 'قيادة الفرقة', job: 'ضابط امن سيبراني', status: 'حاضر' },
@@ -88,6 +98,35 @@ document.addEventListener('DOMContentLoaded', function() {
         ];
         let personnelData = [];
 
+        // ----- إدارة الملاك (Quota) -----
+        function loadQuotas() {
+            const saved = localStorage.getItem('saryaQuotas');
+            if (saved) {
+                try {
+                    const quotas = JSON.parse(saved);
+                    document.querySelectorAll('.quota-input').forEach(input => {
+                        const row = input.dataset.row;
+                        if (quotas[row] !== undefined) input.value = quotas[row];
+                    });
+                } catch (e) {}
+            }
+        }
+
+        function saveQuotas() {
+            const quotas = {};
+            document.querySelectorAll('.quota-input').forEach(input => {
+                quotas[input.dataset.row] = input.value;
+            });
+            localStorage.setItem('saryaQuotas', JSON.stringify(quotas));
+        }
+
+        // ربط تغيير الملاك بالحفظ
+        document.querySelectorAll('.quota-input').forEach(input => {
+            input.addEventListener('change', saveQuotas);
+            input.addEventListener('input', saveQuotas);
+        });
+
+        // ----- تحميل وحفظ بيانات الموظفين -----
         function saveData() { 
             try { localStorage.setItem('saryaData', JSON.stringify(personnelData)); } catch (e) {}
         }
@@ -109,6 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updateStats();
         }
 
+        // ----- عرض الجدول -----
         function renderTable() {
             personnelTbody.innerHTML = '';
             personnelData.forEach((item, idx) => {
@@ -130,6 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <option value="مستأذن" ${item.status==='مستأذن'?'selected':''}>مستأذن</option>
                             <option value="غياب" ${item.status==='غياب'?'selected':''}>غياب</option>
                             <option value="سجن" ${item.status==='سجن'?'selected':''}>سجن</option>
+                            <option value="شاغر" ${item.status==='شاغر'?'selected':''}>شاغر</option>
                         </select>
                     </td>
                     <td><button class="btn-del" data-idx="${idx}">حذف</button></td>
@@ -159,6 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
+        // ----- إضافة موظف عادي -----
         function openModal() { 
             newName.value=''; newPoint.value=''; newJob.value=''; 
             modal.style.display='flex'; 
@@ -185,10 +227,47 @@ document.addEventListener('DOMContentLoaded', function() {
             saveData();
         };
 
+        // ----- إضافة شاغر (مودال خاص) -----
+        function openVacantModal() {
+            vacantPoint.value = '';
+            vacantJob.value = '';
+            vacantModal.style.display = 'flex';
+            setTimeout(() => vacantPoint.focus(), 100);
+        }
+        function closeVacantModal() {
+            vacantModal.style.display = 'none';
+        }
+
+        addVacantBtn.onclick = openVacantModal;
+        vacantCancel.onclick = closeVacantModal;
+        vacantModal.onclick = (e) => { if(e.target === vacantModal) closeVacantModal(); };
+
+        vacantSave.onclick = () => {
+            const point = vacantPoint.value.trim();
+            const job = vacantJob.value.trim();
+            // يمكن إضافة تحقق إذا أردت
+            personnelData.push({ 
+                name: '',        // الاسم فارغ تماماً
+                point: point,
+                job: job,
+                status: 'شاغر'
+            });
+            closeVacantModal();
+            renderTable();
+            updateStats();
+            saveData();
+        };
+
+        // ----- تحديث إحصائيات الضباط -----
         function updateStats() {
             try {
                 const stats = {'حاضر':0,'إجازة':0,'مستشفى':0,'مهمة':0,'مكلف':0,'مستأذن':0,'دورة':0,'مرافق':0,'متأخر':0,'غياب':0,'سجن':0,'اسرى':0,'شهداء':0,'جرحى':0,'اعاقة':0,'هروب':0};
-                personnelData.forEach(p => { if(p.status && stats[p.status] !== undefined) stats[p.status]++; });
+                personnelData.forEach(p => {
+                    // تجاهل الشواغر تماماً
+                    if (p.status && p.status !== 'شاغر' && stats[p.status] !== undefined) {
+                        stats[p.status]++;
+                    }
+                });
                 const map = ['حاضر',0,'إجازة','مستشفى','مهمة','مكلف','مستأذن','دورة','مرافق','متأخر','غياب','سجن','اسرى','شهداء','جرحى','اعاقة','هروب'];
                 const rowOfficers = document.getElementById('row-officers');
                 if(rowOfficers) {
@@ -201,56 +280,48 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (e) {}
         }
 
+        // ----- التحقق من صحة البيانات -----
         function validate() {
             let errors = [];
             try {
-                // حساب مجموع الضباط من قائمة الموظفين
                 const officerStats = {'حاضر':0,'إجازة':0,'مستشفى':0,'مهمة':0,'مكلف':0,'مستأذن':0,'دورة':0,'مرافق':0,'متأخر':0,'غياب':0,'سجن':0,'اسرى':0,'شهداء':0,'جرحى':0,'اعاقة':0,'هروب':0};
-                personnelData.forEach(p => { if(p.status && officerStats[p.status] !== undefined) officerStats[p.status]++; });
+                personnelData.forEach(p => {
+                    if (p.status && p.status !== 'شاغر' && officerStats[p.status] !== undefined) {
+                        officerStats[p.status]++;
+                    }
+                });
                 let officerSum = 0; Object.values(officerStats).forEach(v => officerSum += v);
                 
-                // التحقق لكل صف
                 document.querySelectorAll('#row-officers, #row-soldiers, #row-employees').forEach(row => {
                     const title = row.querySelector('.rank-title') ? row.querySelector('.rank-title').innerText : row.querySelector('.row-title')?.innerText || '';
                     const quota = parseInt(row.querySelector('.quota-input').value) || 0;
                     let sum = 0;
-                    if(title.includes('ضباط')) {
-                        sum = officerSum;
-                    } else {
-                        // جمع القيم المدخلة (معاملة الفارغ كـ 0)
-                        row.querySelectorAll('.stat-input').forEach(inp => {
-                            const val = parseInt(inp.value);
-                            if (!isNaN(val)) sum += val;
-                        });
+                    if(title.includes('ضباط')) { 
+                        sum = officerSum; 
+                    } else { 
+                        row.querySelectorAll('.stat-input').forEach(inp => sum += parseInt(inp.value)||0); 
                     }
                     if(sum !== quota) errors.push(`صف "${title}" غير متطابق! الملاك: ${quota}، المدخل: ${sum}`);
                 });
             } catch (e) { errors.push('خطأ في التحقق'); }
 
-            if(errors.length > 0) {
-                alert('⛔ منع التصدير:\n' + errors.join('\n'));
-                return false;
-            }
+            if(errors.length > 0) { alert('⛔ منع التصدير:\n' + errors.join('\n')); return false; }
             return true;
         }
 
+        // ----- تصدير Excel -----
         async function exportExcel() {
-            if(!validate()) return;  // تم إعادة تفعيل التحقق
-
+            if(!validate()) return;
             try {
                 const officerStats = {'حاضر':0,'إجازة':0,'مستشفى':0,'مهمة':0,'مكلف':0,'مستأذن':0,'دورة':0,'مرافق':0,'متأخر':0,'غياب':0,'سجن':0,'اسرى':0,'شهداء':0,'جرحى':0,'اعاقة':0,'هروب':0};
-                personnelData.forEach(p => { if(p.status && officerStats[p.status] !== undefined) officerStats[p.status]++; });
+                personnelData.forEach(p => {
+                    if (p.status && p.status !== 'شاغر' && officerStats[p.status] !== undefined) {
+                        officerStats[p.status]++;
+                    }
+                });
                 const officerRow = [officerStats['حاضر']||0,0,officerStats['إجازة']||0,officerStats['مستشفى']||0,officerStats['مهمة']||0,officerStats['مكلف']||0,officerStats['مستأذن']||0,officerStats['دورة']||0,officerStats['مرافق']||0,officerStats['متأخر']||0,officerStats['غياب']||0,officerStats['سجن']||0,officerStats['اسرى']||0,officerStats['شهداء']||0,officerStats['جرحى']||0,officerStats['اعاقة']||0,officerStats['هروب']||0];
-                
-                // جمع قيم الأفراد والموظفين (معاملة الفارغ كـ 0)
-                const soldiers = Array.from(document.querySelectorAll('#row-soldiers .stat-input')).map(inp => {
-                    const val = parseInt(inp.value);
-                    return isNaN(val) ? 0 : val;
-                });
-                const employees = Array.from(document.querySelectorAll('#row-employees .stat-input')).map(inp => {
-                    const val = parseInt(inp.value);
-                    return isNaN(val) ? 0 : val;
-                });
+                const soldiers = Array.from(document.querySelectorAll('#row-soldiers .stat-input')).map(i => parseInt(i.value)||0);
+                const employees = Array.from(document.querySelectorAll('#row-employees .stat-input')).map(i => parseInt(i.value)||0);
                 const quotas = Array.from(document.querySelectorAll('#row-officers, #row-soldiers, #row-employees')).map(r => parseInt(r.querySelector('.quota-input').value)||0);
 
                 const wb = new ExcelJS.Workbook(); 
@@ -287,11 +358,13 @@ document.addEventListener('DOMContentLoaded', function() {
         exportBtn.onclick = exportExcel;
         resetBtn.onclick = () => { 
             if(confirm('مسح البيانات والعودة للافتراضي؟')) { 
-                localStorage.removeItem('saryaData'); 
+                localStorage.removeItem('saryaData');
+                localStorage.removeItem('saryaQuotas');
                 location.reload(); 
             } 
         };
         
+        loadQuotas();
         loadData();
     }
 
