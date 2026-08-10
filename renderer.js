@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loginScreen.style.display = 'none';
         mainContent.style.display = 'block';
         const username = sessionStorage.getItem('username') || 'شعبة القوى البشرية';
-        userDisplay.textContent = '👤 ' + username;
+        userDisplay.textContent = 'مرحباً بك في نظام  ' + username;
         initApp();
     }
 
