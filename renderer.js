@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <option value="مرافق" ${item.status==='مرافق'?'selected':''}>مرافق</option>
                             <option value="مستشفى" ${item.status==='مستشفى'?'selected':''}>مستشفى</option>
                             <option value="مكلف" ${item.status==='مكلف'?'selected':''}>مكلف</option>
-                            <option value="مستأذن" ${item.status==='مستأذن'?'selected':''}>مستأذن</option>
+                            <option value="مستاذن" ${item.status==='مستاذن'?'selected':''}>مستاذن</option>
                             <option value="غياب" ${item.status==='غياب'?'selected':''}>غياب</option>
                             <option value="سجن" ${item.status==='سجن'?'selected':''}>سجن</option>
                             <option value="شاغر" ${item.status==='شاغر'?'selected':''}>شاغر</option>
@@ -327,13 +327,32 @@ document.addEventListener('DOMContentLoaded', function() {
         // ----- تحديث إحصائيات الضباط -----
         function updateStats() {
             try {
-                const stats = {'حاضر':0,'إجازة':0,'مستشفى':0,'مهمة':0,'مكلف':0,'مستأذن':0,'دورة':0,'مرافق':0,'متأخر':0,'غياب':0,'سجن':0,'اسرى':0,'شهداء':0,'جرحى':0,'اعاقة':0,'هروب':0};
+                // تم تعديل المفاتيح هنا لتطابق الأسماء الجديدة
+                const stats = {
+                    'حاضر':0,
+                    'إجازة':0,
+                    'مستشفى':0,
+                    'مهمة':0,
+                    'مكلف':0,
+                    'مستاذن':0,
+                    'دورة':0,
+                    'مرافق':0,
+                    'متأخر':0,
+                    'غياب':0,
+                    'سجن':0,
+                    'الاسرى':0,
+                    'شهداء':0,
+                    'جرحى':0,
+                    'الإعاقة الدائمة':0,
+                    'هروب':0
+                };
                 personnelData.forEach(p => {
                     if (p.status && p.status !== 'شاغر' && stats[p.status] !== undefined) {
                         stats[p.status]++;
                     }
                 });
-                const map = ['حاضر',0,'إجازة','مستشفى','مهمة','مكلف','مستأذن','دورة','مرافق','متأخر','غياب','سجن','اسرى','شهداء','جرحى','اعاقة','هروب'];
+                // تم تعديل المصفوفة map لتطابق المفاتيح الجديدة
+                const map = ['حاضر',0,'إجازة','مستشفى','مهمة','مكلف','مستاذن','دورة','مرافق','متأخر','غياب','سجن','الاسرى','شهداء','جرحى','الإعاقة الدائمة','هروب'];
                 const rowOfficers = document.getElementById('row-officers');
                 if(rowOfficers) {
                     const spans = rowOfficers.querySelectorAll('.stat-val');
@@ -349,7 +368,25 @@ document.addEventListener('DOMContentLoaded', function() {
         function validate() {
             let errors = [];
             try {
-                const officerStats = {'حاضر':0,'إجازة':0,'مستشفى':0,'مهمة':0,'مكلف':0,'مستأذن':0,'دورة':0,'مرافق':0,'متأخر':0,'غياب':0,'سجن':0,'اسرى':0,'شهداء':0,'جرحى':0,'اعاقة':0,'هروب':0};
+                // تم تعديل المفاتيح هنا
+                const officerStats = {
+                    'حاضر':0,
+                    'إجازة':0,
+                    'مستشفى':0,
+                    'مهمة':0,
+                    'مكلف':0,
+                    'مستاذن':0,
+                    'دورة':0,
+                    'مرافق':0,
+                    'متأخر':0,
+                    'غياب':0,
+                    'سجن':0,
+                    'الاسرى':0,
+                    'شهداء':0,
+                    'جرحى':0,
+                    'الإعاقة الدائمة':0,
+                    'هروب':0
+                };
                 personnelData.forEach(p => {
                     if (p.status && p.status !== 'شاغر' && officerStats[p.status] !== undefined) {
                         officerStats[p.status]++;
@@ -374,51 +411,87 @@ document.addEventListener('DOMContentLoaded', function() {
             return true;
         }
 
-        // ----- تصدير Excel -----
-        async function exportExcel() {
-            if(!validate()) return;
-            try {
-                const officerStats = {'حاضر':0,'إجازة':0,'مستشفى':0,'مهمة':0,'مكلف':0,'مستأذن':0,'دورة':0,'مرافق':0,'متأخر':0,'غياب':0,'سجن':0,'اسرى':0,'شهداء':0,'جرحى':0,'اعاقة':0,'هروب':0};
-                personnelData.forEach(p => {
-                    if (p.status && p.status !== 'شاغر' && officerStats[p.status] !== undefined) {
-                        officerStats[p.status]++;
-                    }
-                });
-                const officerRow = [officerStats['حاضر']||0,0,officerStats['إجازة']||0,officerStats['مستشفى']||0,officerStats['مهمة']||0,officerStats['مكلف']||0,officerStats['مستأذن']||0,officerStats['دورة']||0,officerStats['مرافق']||0,officerStats['متأخر']||0,officerStats['غياب']||0,officerStats['سجن']||0,officerStats['اسرى']||0,officerStats['شهداء']||0,officerStats['جرحى']||0,officerStats['اعاقة']||0,officerStats['هروب']||0];
-                const soldiers = Array.from(document.querySelectorAll('#row-soldiers .stat-input')).map(i => parseInt(i.value)||0);
-                const employees = Array.from(document.querySelectorAll('#row-employees .stat-input')).map(i => parseInt(i.value)||0);
-                const quotas = Array.from(document.querySelectorAll('#row-officers, #row-soldiers, #row-employees')).map(r => parseInt(r.querySelector('.quota-input').value)||0);
+       // ----- تصدير Excel -----
+async function exportExcel() {
+    if(!validate()) return;
+    try {
+        const officerStats = {
+            'حاضر':0,
+            'إجازة':0,
+            'مستشفى':0,
+            'مهمة':0,
+            'مكلف':0,
+            'مستاذن':0,
+            'دورة':0,
+            'مرافق':0,
+            'متأخر':0,
+            'غياب':0,
+            'سجن':0,
+            'الاسرى':0,
+            'شهداء':0,
+            'جرحى':0,
+            'الإعاقة الدائمة':0,
+            'هروب':0
+        };
+        personnelData.forEach(p => {
+            if (p.status && p.status !== 'شاغر' && officerStats[p.status] !== undefined) {
+                officerStats[p.status]++;
+            }
+        });
+        const officerRow = [
+            officerStats['حاضر']||0,
+            0,
+            officerStats['إجازة']||0,
+            officerStats['مستشفى']||0,
+            officerStats['مهمة']||0,
+            officerStats['مكلف']||0,
+            officerStats['مستاذن']||0,
+            officerStats['دورة']||0,
+            officerStats['مرافق']||0,
+            officerStats['متأخر']||0,
+            officerStats['غياب']||0,
+            officerStats['سجن']||0,
+            officerStats['الاسرى']||0,
+            officerStats['شهداء']||0,
+            officerStats['جرحى']||0,
+            officerStats['الإعاقة الدائمة']||0,
+            officerStats['هروب']||0
+        ];
+        const soldiers = Array.from(document.querySelectorAll('#row-soldiers .stat-input')).map(i => parseInt(i.value)||0);
+        const employees = Array.from(document.querySelectorAll('#row-employees .stat-input')).map(i => parseInt(i.value)||0);
+        const quotas = Array.from(document.querySelectorAll('#row-officers, #row-soldiers, #row-employees')).map(r => parseInt(r.querySelector('.quota-input').value)||0);
 
-                const wb = new ExcelJS.Workbook(); 
-                const ws = wb.addWorksheet('سرية القناصة');
-                const headers = ['الرتبة','الملاك','في المعسكر','موقع','إجازة','مستشفى','مهمة','مكلف','مستأذن','دورة','مرافقين','متأخر','غياب','سجن','اسرى','شهداء','جرحى','إعاقة','الهروب','المجموع'];
-                ws.addRow(headers).font = { bold: true };
-                
-                const titles = ['ضباط','أفراد مقاتلين','موظف'];
-                titles.forEach((t,i) => {
-                    const r = ws.addRow([t, quotas[i], ...(i===0?officerRow:(i===1?soldiers:employees))]);
-                    r.getCell(20).value = { formula: `SUM(C${r.number}:S${r.number})` };
-                });
-                
-                const total = ws.addRow(['الإجمالي']);
-                for(let c=2;c<=19;c++) total.getCell(c).value = { formula: `SUM(${ws.getCell(2,c).address}:${ws.getCell(4,c).address})` };
-                total.getCell(20).value = { formula: `SUM(C${total.number}:S${total.number})` };
-                
-                ws.addRow([]); ws.addRow(['م','الاسم','النقطة','الوظيفة','الحالة']);
-                personnelData.forEach((p,i) => ws.addRow([i+1, p.name, p.point, p.job, p.status]));
+        const wb = new ExcelJS.Workbook(); 
+        const ws = wb.addWorksheet('سرية القناصة');
+        const headers = ['الرتبة','الملاك','في المعسكر','موقع دفاعي','إجازة','مستشفى','مهمة','مكلف','مستاذن','دورة','مرافقين','متأخر','غياب','سجن','الاسرى','شهداء','جرحى','الإعاقة الدائمة','الهروب','المجموع'];
+        ws.addRow(headers).font = { bold: true };
+        
+        const titles = ['ضباط','أفراد مقاتلين','موظف'];
+        titles.forEach((t,i) => {
+            const r = ws.addRow([t, quotas[i], ...(i===0?officerRow:(i===1?soldiers:employees))]);
+            r.getCell(20).value = { formula: `SUM(C${r.number}:S${r.number})` };
+        });
+        
+        const total = ws.addRow(['الإجمالي']);
+        for(let c=2;c<=19;c++) total.getCell(c).value = { formula: `SUM(${ws.getCell(2,c).address}:${ws.getCell(4,c).address})` };
+        total.getCell(20).value = { formula: `SUM(C${total.number}:S${total.number})` };
+        
+        // تم إزالة الصف الفارغ (ws.addRow([])) وأضفت عناوين الأسماء مباشرة
+        ws.addRow(['م','الاسم','النقطة','الوظيفة','الحالة']);
+        personnelData.forEach((p,i) => ws.addRow([i+1, p.name, p.point, p.job, p.status]));
 
-                const buf = await wb.xlsx.writeBuffer();
-                const blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-                const link = document.createElement('a'); 
-                link.href = URL.createObjectURL(blob); 
-                link.download = 'تقرير_السرية.xlsx';
-                document.body.appendChild(link); 
-                link.click(); 
-                document.body.removeChild(link); 
-                URL.revokeObjectURL(link.href);
-                alert('✅ تم تصدير وتنزيل الإكسيل بنجاح!');
-            } catch (e) { alert('حدث خطأ أثناء التصدير: ' + e.message); }
-        }
+        const buf = await wb.xlsx.writeBuffer();
+        const blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+        const link = document.createElement('a'); 
+        link.href = URL.createObjectURL(blob); 
+        link.download = 'تقرير_السرية.xlsx';
+        document.body.appendChild(link); 
+        link.click(); 
+        document.body.removeChild(link); 
+        URL.revokeObjectURL(link.href);
+        alert('✅ تم تصدير وتنزيل الإكسيل بنجاح!');
+    } catch (e) { alert('حدث خطأ أثناء التصدير: ' + e.message); }
+}
 
         exportBtn.onclick = exportExcel;
 
