@@ -92,9 +92,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const vacantSave = document.getElementById('vacant-modal-save');
 
         const defaultData = [
-            { name: 'سالم صلاح سالم', point: 'قيادة الفرقة', job: 'مطور برمجيات  ', status: 'حاضر' },
-            { name: 'سالم صلاح سالم', point: 'اللواء 34', job: 'منهدس برمجيات = ', status: 'حاضر' },
-            { name: 'سالم صلاح سالم', point: 'اللواء 33', job: 'خبير في التقنية  ', status: 'دورة' }
+            { name: 'سالم صلاح سالم', point: 'قيادة الفرقة', job: 'مهندس  ', status: 'حاضر' },
+            { name: 'سالم صلاح سالم', point: 'اللواء 34', job: ' مبرمج ', status: 'حاضر' },
+            { name: 'سالم صلاح سالم', point: 'اللواء 33', job: 'مطور', status: 'دورة' }
         ];
         let personnelData = [];
 
@@ -245,9 +245,8 @@ document.addEventListener('DOMContentLoaded', function() {
         vacantSave.onclick = () => {
             const point = vacantPoint.value.trim();
             const job = vacantJob.value.trim();
-            // يمكن إضافة تحقق إذا أردت
             personnelData.push({ 
-                name: '',        // الاسم فارغ تماماً
+                name: '',
                 point: point,
                 job: job,
                 status: 'شاغر'
@@ -263,7 +262,6 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 const stats = {'حاضر':0,'إجازة':0,'مستشفى':0,'مهمة':0,'مكلف':0,'مستأذن':0,'دورة':0,'مرافق':0,'متأخر':0,'غياب':0,'سجن':0,'اسرى':0,'شهداء':0,'جرحى':0,'اعاقة':0,'هروب':0};
                 personnelData.forEach(p => {
-                    // تجاهل الشواغر تماماً
                     if (p.status && p.status !== 'شاغر' && stats[p.status] !== undefined) {
                         stats[p.status]++;
                     }
@@ -356,12 +354,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         exportBtn.onclick = exportExcel;
-        resetBtn.onclick = () => { 
-            if(confirm('مسح البيانات والعودة للافتراضي؟')) { 
+
+        // ----- زر المسح (تم تعديله) -----
+        resetBtn.onclick = async () => {
+            if (confirm('مسح البيانات والعودة للافتراضي؟ سيتم حذف الكاش لتحديث الموقع.')) {
+                // حذف بيانات التطبيق
                 localStorage.removeItem('saryaData');
                 localStorage.removeItem('saryaQuotas');
-                location.reload(); 
-            } 
+                
+                // حذف جميع كاشات Service Worker
+                if ('caches' in window) {
+                    try {
+                        const keys = await caches.keys();
+                        await Promise.all(keys.map(key => caches.delete(key)));
+                        console.log('تم مسح الكاش بنجاح');
+                    } catch (e) {
+                        console.warn('فشل مسح الكاش:', e);
+                    }
+                }
+                
+                // إعادة تحميل الصفحة من الخادم (تجاوز الكاش)
+                location.reload(true);
+            }
         };
         
         loadQuotas();
