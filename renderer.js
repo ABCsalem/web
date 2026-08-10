@@ -92,9 +92,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const vacantSave = document.getElementById('vacant-modal-save');
 
         const defaultData = [
-            { name: 'سالم صلاح سالم', point: 'قيادة الفرقة', job: 'ضابط امن سيبراني', status: 'حاضر' },
-            { name: 'سالم صلاح سالم', point: 'اللواء 34', job: 'ضابط امن سيبراني', status: 'حاضر' },
-            { name: 'سالم صلاح سالم', point: 'اللواء 33', job: 'ضابط امن سيبراني', status: 'دورة' }
+            { name: 'سالم صلاح سالم', point: 'قيادة الفرقة', job: 'مطور برمجيات  ', status: 'حاضر' },
+            { name: 'سالم صلاح سالم', point: 'اللواء 34', job: 'منهدس برمجيات = ', status: 'حاضر' },
+            { name: 'سالم صلاح سالم', point: 'اللواء 33', job: 'خبير في التقنية  ', status: 'دورة' }
         ];
         let personnelData = [];
 
