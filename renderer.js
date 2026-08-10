@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ----- دوال تسجيل الدخول (بدون تغيير) -----
+    // ----- دوال تسجيل الدخول -----
     function checkLogin() {
         const logged = sessionStorage.getItem('loggedIn');
         if (logged === 'true') {
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     logoutBtn.addEventListener('click', handleLogout);
 
-    // ----- منطق التطبيق (بدون تغيير كبير) -----
+    // ----- منطق التطبيق -----
     function initApp() {
         const personnelTbody = document.querySelector('#personnel-table tbody');
         const exportBtn = document.getElementById('export-btn');
@@ -327,7 +327,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // ----- تحديث إحصائيات الضباط -----
         function updateStats() {
             try {
-                // تم تعديل المفاتيح هنا لتطابق الأسماء الجديدة
                 const stats = {
                     'حاضر':0,
                     'إجازة':0,
@@ -351,7 +350,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         stats[p.status]++;
                     }
                 });
-                // تم تعديل المصفوفة map لتطابق المفاتيح الجديدة
                 const map = ['حاضر',0,'إجازة','مستشفى','مهمة','مكلف','مستاذن','دورة','مرافق','متأخر','غياب','سجن','الاسرى','شهداء','جرحى','الإعاقة الدائمة','هروب'];
                 const rowOfficers = document.getElementById('row-officers');
                 if(rowOfficers) {
@@ -368,7 +366,6 @@ document.addEventListener('DOMContentLoaded', function() {
         function validate() {
             let errors = [];
             try {
-                // تم تعديل المفاتيح هنا
                 const officerStats = {
                     'حاضر':0,
                     'إجازة':0,
@@ -411,87 +408,124 @@ document.addEventListener('DOMContentLoaded', function() {
             return true;
         }
 
-       // ----- تصدير Excel -----
-async function exportExcel() {
-    if(!validate()) return;
-    try {
-        const officerStats = {
-            'حاضر':0,
-            'إجازة':0,
-            'مستشفى':0,
-            'مهمة':0,
-            'مكلف':0,
-            'مستاذن':0,
-            'دورة':0,
-            'مرافق':0,
-            'متأخر':0,
-            'غياب':0,
-            'سجن':0,
-            'الاسرى':0,
-            'شهداء':0,
-            'جرحى':0,
-            'الإعاقة الدائمة':0,
-            'هروب':0
-        };
-        personnelData.forEach(p => {
-            if (p.status && p.status !== 'شاغر' && officerStats[p.status] !== undefined) {
-                officerStats[p.status]++;
-            }
-        });
-        const officerRow = [
-            officerStats['حاضر']||0,
-            0,
-            officerStats['إجازة']||0,
-            officerStats['مستشفى']||0,
-            officerStats['مهمة']||0,
-            officerStats['مكلف']||0,
-            officerStats['مستاذن']||0,
-            officerStats['دورة']||0,
-            officerStats['مرافق']||0,
-            officerStats['متأخر']||0,
-            officerStats['غياب']||0,
-            officerStats['سجن']||0,
-            officerStats['الاسرى']||0,
-            officerStats['شهداء']||0,
-            officerStats['جرحى']||0,
-            officerStats['الإعاقة الدائمة']||0,
-            officerStats['هروب']||0
-        ];
-        const soldiers = Array.from(document.querySelectorAll('#row-soldiers .stat-input')).map(i => parseInt(i.value)||0);
-        const employees = Array.from(document.querySelectorAll('#row-employees .stat-input')).map(i => parseInt(i.value)||0);
-        const quotas = Array.from(document.querySelectorAll('#row-officers, #row-soldiers, #row-employees')).map(r => parseInt(r.querySelector('.quota-input').value)||0);
+        // ----- تصدير Excel -----
+        async function exportExcel() {
+            if(!validate()) return;
+            try {
+                const officerStats = {
+                    'حاضر':0,
+                    'إجازة':0,
+                    'مستشفى':0,
+                    'مهمة':0,
+                    'مكلف':0,
+                    'مستاذن':0,
+                    'دورة':0,
+                    'مرافق':0,
+                    'متأخر':0,
+                    'غياب':0,
+                    'سجن':0,
+                    'الاسرى':0,
+                    'شهداء':0,
+                    'جرحى':0,
+                    'الإعاقة الدائمة':0,
+                    'هروب':0
+                };
+                personnelData.forEach(p => {
+                    if (p.status && p.status !== 'شاغر' && officerStats[p.status] !== undefined) {
+                        officerStats[p.status]++;
+                    }
+                });
+                const officerRow = [
+                    officerStats['حاضر']||0,
+                    0,
+                    officerStats['إجازة']||0,
+                    officerStats['مستشفى']||0,
+                    officerStats['مهمة']||0,
+                    officerStats['مكلف']||0,
+                    officerStats['مستاذن']||0,
+                    officerStats['دورة']||0,
+                    officerStats['مرافق']||0,
+                    officerStats['متأخر']||0,
+                    officerStats['غياب']||0,
+                    officerStats['سجن']||0,
+                    officerStats['الاسرى']||0,
+                    officerStats['شهداء']||0,
+                    officerStats['جرحى']||0,
+                    officerStats['الإعاقة الدائمة']||0,
+                    officerStats['هروب']||0
+                ];
+                const soldiers = Array.from(document.querySelectorAll('#row-soldiers .stat-input')).map(i => parseInt(i.value)||0);
+                const employees = Array.from(document.querySelectorAll('#row-employees .stat-input')).map(i => parseInt(i.value)||0);
+                const quotas = Array.from(document.querySelectorAll('#row-officers, #row-soldiers, #row-employees')).map(r => parseInt(r.querySelector('.quota-input').value)||0);
 
-        const wb = new ExcelJS.Workbook(); 
-        const ws = wb.addWorksheet('سرية القناصة');
-        const headers = ['الرتبة','الملاك','في المعسكر','موقع دفاعي','إجازة','مستشفى','مهمة','مكلف','مستاذن','دورة','مرافقين','متأخر','غياب','سجن','الاسرى','شهداء','جرحى','الإعاقة الدائمة','الهروب','المجموع'];
-        ws.addRow(headers).font = { bold: true };
-        
-        const titles = ['ضباط','أفراد مقاتلين','موظف'];
-        titles.forEach((t,i) => {
-            const r = ws.addRow([t, quotas[i], ...(i===0?officerRow:(i===1?soldiers:employees))]);
-            r.getCell(20).value = { formula: `SUM(C${r.number}:S${r.number})` };
-        });
-        
-        const total = ws.addRow(['الإجمالي']);
-        for(let c=2;c<=19;c++) total.getCell(c).value = { formula: `SUM(${ws.getCell(2,c).address}:${ws.getCell(4,c).address})` };
-        total.getCell(20).value = { formula: `SUM(C${total.number}:S${total.number})` };
-        
-        // تم إزالة الصف الفارغ (ws.addRow([])) وأضفت عناوين الأسماء مباشرة
-        ws.addRow(['م','الاسم','النقطة','الوظيفة','الحالة']);
-        personnelData.forEach((p,i) => ws.addRow([i+1, p.name, p.point, p.job, p.status]));
+                const wb = new ExcelJS.Workbook(); 
+                
+                // ----- الورقة الرئيسية (سرية القناصة) -----
+                const ws = wb.addWorksheet('سرية القناصة');
+                const headers = ['الرتبة','الملاك','في المعسكر','موقع دفاعي','إجازة','مستشفى','مهمة','مكلف','مستاذن','دورة','مرافقين','متأخر','غياب','سجن','الاسرى','شهداء','جرحى','الإعاقة الدائمة','الهروب','المجموع'];
+                ws.addRow(headers).font = { bold: true };
+                
+                const titles = ['ضباط','أفراد مقاتلين','موظف'];
+                titles.forEach((t,i) => {
+                    const r = ws.addRow([t, quotas[i], ...(i===0?officerRow:(i===1?soldiers:employees))]);
+                    r.getCell(20).value = { formula: `SUM(C${r.number}:S${r.number})` };
+                });
+                
+                const total = ws.addRow(['الإجمالي']);
+                for(let c=2;c<=19;c++) total.getCell(c).value = { formula: `SUM(${ws.getCell(2,c).address}:${ws.getCell(4,c).address})` };
+                total.getCell(20).value = { formula: `SUM(C${total.number}:S${total.number})` };
+                
+                ws.addRow(['م','الاسم','النقطة','الوظيفة','الحالة']);
+                personnelData.forEach((p,i) => ws.addRow([i+1, p.name, p.point, p.job, p.status]));
 
-        const buf = await wb.xlsx.writeBuffer();
-        const blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-        const link = document.createElement('a'); 
-        link.href = URL.createObjectURL(blob); 
-        link.download = 'تقرير_السرية.xlsx';
-        document.body.appendChild(link); 
-        link.click(); 
-        document.body.removeChild(link); 
-        URL.revokeObjectURL(link.href);
-        alert('✅ تم تصدير وتنزيل الإكسيل بنجاح!');
-    } catch (e) { alert('حدث خطأ أثناء التصدير: ' + e.message); }
-}
+                // ----- الورقة الثانية: الشواغر -----
+                const vacantData = personnelData.filter(p => p.status === 'شاغر');
+                
+                if (vacantData.length > 0) {
+                    const wsVacant = wb.addWorksheet('الشواغر');
+                    
+                    // الصف الأول: عنوان مدمج
+                    const titleRow = wsVacant.addRow(['قائمة الشواغر']);
+                    wsVacant.mergeCells(`A${titleRow.number}:D${titleRow.number}`);
+                    titleRow.font = { bold: true, size: 14 };
+                    titleRow.alignment = { horizontal: 'center' };
+                    
+                    // الصف الثاني: عناوين الأعمدة
+                    const vacantHeaders = ['م', 'النقطة', 'الوظيفة', 'الحالة'];
+                    const headerRow = wsVacant.addRow(vacantHeaders);
+                    headerRow.font = { bold: true };
+                    headerRow.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: 'FFE0E0E0' }
+                    };
+                    headerRow.alignment = { horizontal: 'center' };
+                    
+                    // البيانات
+                    vacantData.forEach((p, i) => {
+                        const row = wsVacant.addRow([i+1, p.point, p.job, p.status]);
+                        row.alignment = { horizontal: 'center' };
+                    });
+                    
+                    // تنسيق الأعمدة
+                    wsVacant.getColumn(1).width = 8;
+                    wsVacant.getColumn(2).width = 25;
+                    wsVacant.getColumn(3).width = 25;
+                    wsVacant.getColumn(4).width = 15;
+                }
+
+                const buf = await wb.xlsx.writeBuffer();
+                const blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+                const link = document.createElement('a'); 
+                link.href = URL.createObjectURL(blob); 
+                link.download = 'تقرير_السرية.xlsx';
+                document.body.appendChild(link); 
+                link.click(); 
+                document.body.removeChild(link); 
+                URL.revokeObjectURL(link.href);
+                alert('✅ تم تصدير وتنزيل الإكسيل بنجاح!');
+            } catch (e) { alert('حدث خطأ أثناء التصدير: ' + e.message); }
+        }
 
         exportBtn.onclick = exportExcel;
 
