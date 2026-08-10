@@ -12,6 +12,76 @@ document.addEventListener('DOMContentLoaded', function() {
     const VALID_USER = 'شعبة القوى البشرية';
     const VALID_PASS = '010203';
 
+    // ----- كشف تحديث Service Worker -----
+    function showUpdateNotification() {
+        if (document.getElementById('update-notification')) return;
+        const notification = document.createElement('div');
+        notification.id = 'update-notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #f59e0b;
+            color: #1e293b;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            z-index: 9999;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 1.1rem;
+            direction: rtl;
+            max-width: 90%;
+            text-align: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        `;
+        notification.innerHTML = `
+            <span>🔄 تم تحديث النظام! اضغط هنا لتحديث الكاش والاستفادة من التحديثات.</span>
+            <button id="update-cache-btn" style="
+                background: #1e293b;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 8px;
+                font-weight: bold;
+                cursor: pointer;
+                font-size: 1rem;
+            ">تحديث الآن</button>
+        `;
+        document.body.appendChild(notification);
+
+        document.getElementById('update-cache-btn').addEventListener('click', function() {
+            if ('caches' in window) {
+                caches.keys().then(keys => {
+                    Promise.all(keys.map(key => caches.delete(key))).then(() => {
+                        location.reload(true);
+                    });
+                });
+            } else {
+                location.reload(true);
+            }
+        });
+
+        setTimeout(() => {
+            const notif = document.getElementById('update-notification');
+            if (notif) {
+                notif.style.opacity = '0.7';
+                notif.style.transition = 'opacity 0.5s';
+            }
+        }, 15000);
+    }
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('controllerchange', function() {
+            showUpdateNotification();
+        });
+    }
+
+    // ----- دوال تسجيل الدخول (بدون تغيير) -----
     function checkLogin() {
         const logged = sessionStorage.getItem('loggedIn');
         if (logged === 'true') {
@@ -68,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     logoutBtn.addEventListener('click', handleLogout);
 
-    // ----- منطق التطبيق -----
+    // ----- منطق التطبيق (بدون تغيير كبير) -----
     function initApp() {
         const personnelTbody = document.querySelector('#personnel-table tbody');
         const exportBtn = document.getElementById('export-btn');
@@ -76,7 +146,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const addVacantBtn = document.getElementById('add-vacant-btn');
         const resetBtn = document.getElementById('reset-btn');
 
-        // مودال الإضافة العادي
         const modal = document.getElementById('add-modal');
         const newName = document.getElementById('new-name');
         const newPoint = document.getElementById('new-point');
@@ -84,7 +153,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const modalCancel = document.getElementById('modal-cancel');
         const modalSave = document.getElementById('modal-save');
 
-        // مودال إضافة الشاغر
         const vacantModal = document.getElementById('add-vacant-modal');
         const vacantPoint = document.getElementById('vacant-point');
         const vacantJob = document.getElementById('vacant-job');
@@ -92,13 +160,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const vacantSave = document.getElementById('vacant-modal-save');
 
         const defaultData = [
-            { name: 'سالم صلاح سالم', point: 'قيادة الفرقة', job: 'مهندس  ', status: 'حاضر' },
-            { name: 'سالم صلاح سالم', point: 'اللواء 34', job: ' مبرمج ', status: 'حاضر' },
-            { name: 'سالم صلاح سالم', point: 'اللواء 33', job: 'مطور', status: 'دورة' }
+            { name: 'سالم صلاح سالم', point: 'قيادة الفرقة', job: 'ضابط امن سيبراني', status: 'حاضر' },
+            { name: 'سالم صلاح سالم', point: 'اللواء 34', job: 'ضابط امن سيبراني', status: 'حاضر' },
+            { name: 'سالم صلاح سالم', point: 'اللواء 33', job: 'ضابط امن سيبراني', status: 'دورة' }
         ];
         let personnelData = [];
 
-        // ----- إدارة الملاك (Quota) -----
+        // ----- إدارة الملاك -----
         function loadQuotas() {
             const saved = localStorage.getItem('saryaQuotas');
             if (saved) {
@@ -120,7 +188,6 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.setItem('saryaQuotas', JSON.stringify(quotas));
         }
 
-        // ربط تغيير الملاك بالحفظ
         document.querySelectorAll('.quota-input').forEach(input => {
             input.addEventListener('change', saveQuotas);
             input.addEventListener('input', saveQuotas);
@@ -227,7 +294,7 @@ document.addEventListener('DOMContentLoaded', function() {
             saveData();
         };
 
-        // ----- إضافة شاغر (مودال خاص) -----
+        // ----- إضافة شاغر -----
         function openVacantModal() {
             vacantPoint.value = '';
             vacantJob.value = '';
@@ -355,26 +422,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
         exportBtn.onclick = exportExcel;
 
-        // ----- زر المسح (تم تعديله) -----
+        // ----- زر المسح (تحديث الكاش فقط) -----
         resetBtn.onclick = async () => {
-            if (confirm('مسح البيانات والعودة للافتراضي؟ سيتم حذف الكاش لتحديث الموقع.')) {
-                // حذف بيانات التطبيق
-                localStorage.removeItem('saryaData');
-                localStorage.removeItem('saryaQuotas');
-                
-                // حذف جميع كاشات Service Worker
+            if (confirm('تحديث الكاش؟ سيتم حذف الملفات المؤقتة وتحميل أحدث إصدار.')) {
                 if ('caches' in window) {
                     try {
                         const keys = await caches.keys();
                         await Promise.all(keys.map(key => caches.delete(key)));
                         console.log('تم مسح الكاش بنجاح');
+                        alert('✅ تم تحديث الكاش. سيتم إعادة تحميل الصفحة.');
+                        location.reload(true);
                     } catch (e) {
                         console.warn('فشل مسح الكاش:', e);
+                        alert('❌ فشل تحديث الكاش. حاول تحديث الصفحة يدوياً.');
                     }
+                } else {
+                    location.reload(true);
                 }
-                
-                // إعادة تحميل الصفحة من الخادم (تجاوز الكاش)
-                location.reload(true);
             }
         };
         
