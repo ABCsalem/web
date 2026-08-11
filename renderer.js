@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // ----- إدارة تسجيل الدخول -----
+    // ----- إدارة تسجيل الدخول (بيانات مخفية) -----
     const loginScreen = document.getElementById('login-screen');
     const mainContent = document.getElementById('main-content');
     const loginBtn = document.getElementById('login-btn');
@@ -578,14 +578,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // ----- دالة المشاركة المحسّنة (تفتح نافذة اختيار التطبيقات) -----
+        // ----- دالة المشاركة المحسّنة للجوال -----
         async function shareFile(fileName, dateValue) {
             try {
                 const blob = await generateExcelBlob(fileName, dateValue);
                 
-                // التحقق من حجم الملف (حد 50 ميجابايت)
-                if (blob.size > 50 * 1024 * 1024) {
-                    alert('⚠️ الملف كبير جداً للمشاركة (أكثر من 50 ميجابايت). سيتم تحميله بدلاً من ذلك.');
+                // التحقق من حجم الملف (حد 30 ميجابايت مناسب للجوال)
+                if (blob.size > 30 * 1024 * 1024) {
+                    alert('⚠️ الملف كبير جداً للمشاركة (أكثر من 30 ميجابايت). سيتم تحميله بدلاً من ذلك.');
                     downloadBlob(blob, fileName + '.xlsx');
                     return;
                 }
@@ -602,9 +602,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         files: [file]
                     };
 
+                    // التحقق من إمكانية المشاركة
                     if (navigator.canShare(shareData)) {
                         try {
                             await navigator.share(shareData);
+                            // لا نعرض رسالة نجاح لأنه قد يكون المستخدم ألغى أو تمت المشاركة
+                            // نعرض رسالة فقط إذا تمت المشاركة فعلاً
                             alert('✅ تم مشاركة الملف بنجاح!');
                             return;
                         } catch (err) {
@@ -631,8 +634,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         return;
                     }
                 } else {
-                    // في حال عدم دعم Web Share API (مثل Electron)
-                    alert('⚠️ ميزة المشاركة غير مدعومة في هذا المتصفح أو التطبيق.\nسيتم تحميل الملف بدلاً من ذلك.');
+                    // في حال عدم دعم Web Share API
+                    alert('⚠️ ميزة المشاركة غير مدعومة في هذا المتصفح.\nيرجى استخدام متصفح حديث (Chrome أو Safari) على الجوال.\nسيتم تحميل الملف بدلاً من ذلك.');
                     downloadBlob(blob, fileName + '.xlsx');
                 }
             } catch (e) {
