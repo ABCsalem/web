@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sarya-cache-v2'; // تغيير الإصدار لدفع التحديث
+const CACHE_NAME = 'sarya-cache-v2';
 const ASSETS = [
   '/',
   '/index.html',
@@ -13,7 +13,6 @@ self.addEventListener('install', event => {
       return cache.addAll(ASSETS);
     })
   );
-  // تفعيل الـ SW فوراً بعد التثبيت
   self.skipWaiting();
 });
 
@@ -26,7 +25,6 @@ self.addEventListener('activate', event => {
       );
     })
   );
-  // التحكم في الصفحات فوراً
   self.clients.claim();
 });
 

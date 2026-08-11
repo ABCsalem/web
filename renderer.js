@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // ----- إدارة تسجيل الدخول -----
+    // ----- إدارة تسجيل الدخول (بيانات مخفية) -----
     const loginScreen = document.getElementById('login-screen');
     const mainContent = document.getElementById('main-content');
     const loginBtn = document.getElementById('login-btn');
@@ -174,6 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function initApp() {
         const personnelTbody = document.querySelector('#personnel-table tbody');
         const exportBtn = document.getElementById('export-btn');
+        const shareHeaderBtn = document.getElementById('share-whatsapp-header');
         const addBtn = document.getElementById('add-person-btn');
         const addVacantBtn = document.getElementById('add-vacant-btn');
         const resetBtn = document.getElementById('reset-btn');
@@ -191,7 +192,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const vacantCancel = document.getElementById('vacant-modal-cancel');
         const vacantSave = document.getElementById('vacant-modal-save');
 
-        // عناصر مودال التصدير
         const exportModal = document.getElementById('export-modal');
         const exportFilename = document.getElementById('export-filename');
         const exportDate = document.getElementById('export-date');
@@ -554,7 +554,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
         }
 
-        // ----- دالة تحميل الملف (للتصدير العادي) -----
+        // ----- دالة تحميل الملف -----
         function downloadBlob(blob, filename) {
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -565,14 +565,12 @@ document.addEventListener('DOMContentLoaded', function() {
             URL.revokeObjectURL(link.href);
         }
 
-        // ----- دالة التصدير العادي (لزر التصدير) -----
+        // ----- دالة التصدير العادي -----
         async function exportExcel(fileName, dateValue) {
             try {
                 const blob = await generateExcelBlob(fileName, dateValue);
                 let finalName = fileName || 'تقرير_السرية';
-                if (dateValue) {
-                    finalName += '_' + dateValue;
-                }
+                if (dateValue) finalName += '_' + dateValue;
                 downloadBlob(blob, finalName + '.xlsx');
                 alert('✅ تم تصدير وتنزيل الإكسيل بنجاح!');
             } catch (e) {
@@ -580,26 +578,42 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // ----- دالة المشاركة عبر واتساب (أو أي تطبيق) -----
+        // ----- دالة المشاركة (تفتح نافذة اختيار التطبيق) -----
         async function shareFile(fileName, dateValue) {
             try {
                 const blob = await generateExcelBlob(fileName, dateValue);
-                if (navigator.share) {
-                    try {
-                        await navigator.share({
-                            title: 'تقرير السرية',
-                            text: 'تقرير الحضور والانصراف',
-                            files: [new File([blob], `${fileName}.xlsx`, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })]
-                        });
-                        alert('✅ تم مشاركة الملف بنجاح!');
-                    } catch (shareError) {
-                        if (shareError.name !== 'AbortError') {
-                            alert('❌ فشل المشاركة: ' + shareError.message + '\nسيتم تحميل الملف محلياً.');
-                            downloadBlob(blob, fileName + '.xlsx');
+                const file = new File([blob], `${fileName}.xlsx`, { 
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+                });
+
+                // التحقق من توفر Web Share API وإمكانية المشاركة
+                if (navigator.share && navigator.canShare) {
+                    const shareData = {
+                        title: 'تقرير السرية',
+                        text: 'تقرير الحضور والانصراف',
+                        files: [file]
+                    };
+                    if (navigator.canShare(shareData)) {
+                        try {
+                            await navigator.share(shareData);
+                            alert('✅ تم مشاركة الملف بنجاح!');
+                            return;
+                        } catch (err) {
+                            if (err.name !== 'AbortError') {
+                                console.warn('فشل المشاركة:', err);
+                                alert('❌ فشل المشاركة: ' + err.message + '\nسيتم تحميل الملف بدلاً من ذلك.');
+                                downloadBlob(blob, fileName + '.xlsx');
+                            }
+                            return;
                         }
+                    } else {
+                        alert('⚠️ هذا الملف غير قابل للمشاركة عبر هذا التطبيق.\nسيتم تحميل الملف بدلاً من ذلك.');
+                        downloadBlob(blob, fileName + '.xlsx');
+                        return;
                     }
                 } else {
-                    alert('❌ ميزة المشاركة غير مدعومة في هذا المتصفح.\nسيتم تحميل الملف بدلاً من ذلك.');
+                    // في حال عدم دعم Web Share API (مثل Electron أو متصفحات قديمة)
+                    alert('⚠️ ميزة المشاركة غير مدعومة في هذا المتصفح أو التطبيق.\nسيتم تحميل الملف بدلاً من ذلك.');
                     downloadBlob(blob, fileName + '.xlsx');
                 }
             } catch (e) {
@@ -607,48 +621,40 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // ----- فتح مودال التصدير -----
+        // ----- فتح مودال التصدير مع تحديد الإجراء -----
         function openExportModal(action) {
             if (!validate()) return;
             const today = new Date().toISOString().split('T')[0];
             exportDate.value = today;
             exportFilename.value = 'تقرير_السرية';
-            // تخزين الإجراء المطلوب (تصدير أو مشاركة)
             exportModal.dataset.action = action;
             exportModal.style.display = 'flex';
         }
 
-        // ----- زر التصدير (يحدد إجراء التصدير) -----
+        // ----- أزرار الرأس -----
         exportBtn.onclick = () => openExportModal('download');
+        if (shareHeaderBtn) {
+            shareHeaderBtn.onclick = () => openExportModal('share');
+        }
 
-        // ----- زر مشاركة واتساب داخل المودال -----
-        exportModalShareWA.onclick = () => {
-            const action = exportModal.dataset.action || 'share';
-            // إذا كان الإجراء المطلوب هو المشاركة، ننفذها مباشرة
-            if (action === 'share') {
-                const fileName = exportFilename.value.trim() || 'تقرير_السرية';
-                const dateValue = exportDate.value;
-                closeExportModal();
-                shareFile(fileName, dateValue);
-            } else {
-                // إذا كان التصدير، نقوم بالتصدير العادي
-                const fileName = exportFilename.value.trim() || 'تقرير_السرية';
-                const dateValue = exportDate.value;
-                closeExportModal();
-                exportExcel(fileName, dateValue);
-            }
+        // ----- زر "مشاركة واتساب" داخل المودال -----
+        exportModalShareWA.onclick = async () => {
+            const fileName = exportFilename.value.trim() || 'تقرير_السرية';
+            const dateValue = exportDate.value;
+            closeExportModal();
+            await shareFile(fileName, dateValue);
         };
 
-        // ----- زر تأكيد التصدير (الزر الأزرق) -----
-        exportModalConfirm.onclick = () => {
+        // ----- زر تأكيد التصدير (الأزرق) -----
+        exportModalConfirm.onclick = async () => {
             const action = exportModal.dataset.action || 'download';
             const fileName = exportFilename.value.trim() || 'تقرير_السرية';
             const dateValue = exportDate.value;
             closeExportModal();
             if (action === 'download') {
-                exportExcel(fileName, dateValue);
+                await exportExcel(fileName, dateValue);
             } else {
-                shareFile(fileName, dateValue);
+                await shareFile(fileName, dateValue);
             }
         };
 
