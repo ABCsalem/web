@@ -1,3 +1,8 @@
+// احذف السطر الذي يشير إلى reset-btn لأنه تم إزالته من HTML
+// في دالة initApp، يمكنك إزالة const resetBtn = document.getElementById('reset-btn');
+// وأيضاً إزالة resetBtn.onclick = clearCacheAndReload;
+// سأقدم الملف كاملاً مع التعديلات اللازمة
+
 document.addEventListener('DOMContentLoaded', function() {
     // ----- إدارة تسجيل الدخول -----
     const loginScreen = document.getElementById('login-screen');
@@ -150,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     logoutBtn.addEventListener('click', handleLogout);
 
-    // ----- دالة مسح الكاش فقط -----
+    // ----- دالة مسح الكاش فقط (تبقى للإشعارات) -----
     async function clearCacheAndReload() {
         if (confirm('تحديث الكاش؟ سيتم حذف الملفات المؤقتة وتحميل أحدث إصدار. (بياناتك لن تتأثر)')) {
             if ('caches' in window) {
@@ -176,14 +181,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const exportBtn = document.getElementById('export-btn');
         const addBtn = document.getElementById('add-person-btn');
         const addVacantBtn = document.getElementById('add-vacant-btn');
-        const resetBtn = document.getElementById('reset-btn');
+        // تم إزالة reset-btn من HTML، لذا لا نستدعيه
         const unitSelect = document.getElementById('unit-select');
         const personnelSection = document.getElementById('personnel-section');
 
         // حقول الضباط (للتعديل بين العرض والإدخال)
         const officerStats = document.querySelectorAll('.officer-stat');
-        const soldierStats = document.querySelectorAll('.soldier-stat');
-        const employeeStats = document.querySelectorAll('.employee-stat');
 
         const modal = document.getElementById('add-modal');
         const newName = document.getElementById('new-name');
@@ -219,18 +222,14 @@ document.addEventListener('DOMContentLoaded', function() {
         function toggleUnitMode(unit) {
             currentUnit = unit;
             const isGeneral = unit === 'عام';
-            // إخفاء/إظهار قسم الموظفين
             personnelSection.style.display = isGeneral ? 'block' : 'none';
-            // تحويل حقول الضباط إلى editable أو readonly
             officerStats.forEach(span => {
                 const parent = span.parentElement;
                 const input = parent.querySelector('.officer-input');
                 if (isGeneral) {
-                    // وضع العرض: span
                     if (input) input.remove();
                     span.style.display = 'inline';
                 } else {
-                    // وضع الإدخال: input
                     span.style.display = 'none';
                     let inp = parent.querySelector('.officer-input');
                     if (!inp) {
@@ -243,11 +242,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             });
-            // إعادة حساب الإحصائيات حسب النمط
             updateStats();
         }
 
-        // الاستماع لتغيير الوحدة
         unitSelect.addEventListener('change', function() {
             toggleUnitMode(this.value);
         });
@@ -279,7 +276,7 @@ document.addEventListener('DOMContentLoaded', function() {
             input.addEventListener('input', saveQuotas);
         });
 
-        // ----- تحميل وحفظ بيانات الموظفين (للوضع العام) -----
+        // ----- تحميل وحفظ بيانات الموظفين -----
         function saveData() {
             try { localStorage.setItem('saryaData', JSON.stringify(personnelData)); } catch (e) {}
         }
@@ -301,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updateStats();
         }
 
-        // ----- عرض جدول الموظفين (للوضع العام) -----
+        // ----- عرض جدول الموظفين -----
         function renderTable() {
             personnelTbody.innerHTML = '';
             personnelData.forEach((item, idx) => {
@@ -353,7 +350,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // ----- إضافة موظف (للوضع العام) -----
+        // ----- إضافة موظف -----
         function openModal() {
             newName.value = '';
             newPoint.value = '';
@@ -382,7 +379,7 @@ document.addEventListener('DOMContentLoaded', function() {
             saveData();
         };
 
-        // ----- إضافة شاغر (للوضع العام) -----
+        // ----- إضافة شاغر -----
         function openVacantModal() {
             vacantPoint.value = '';
             vacantJob.value = '';
@@ -412,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function() {
             saveData();
         };
 
-        // ----- تحديث الإحصائيات (حسب النمط) -----
+        // ----- تحديث الإحصائيات -----
         function updateStats() {
             try {
                 const isGeneral = currentUnit === 'عام';
@@ -450,13 +447,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                     }
                 }
-                // في نمط التمام فقط، لا حاجة لتحديث القيم لأنها مدخلات يدوية
             } catch (e) {
                 console.warn('خطأ في تحديث الإحصائيات:', e);
             }
         }
 
-        // ----- التحقق من صحة البيانات (حسب النمط) -----
+        // ----- التحقق من صحة البيانات -----
         function validate() {
             let errors = [];
             try {
@@ -466,7 +462,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 let employeeSum = 0;
 
                 if (isGeneral) {
-                    // نمط عام: حساب من جدول الموظفين
                     const officerStats = {
                         'حاضر': 0,
                         'إجازة': 0,
@@ -492,13 +487,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     Object.values(officerStats).forEach(v => officerSum += v);
                 } else {
-                    // نمط التمام فقط: نأخذ المجاميع من المدخلات
                     document.querySelectorAll('.officer-input').forEach(inp => officerSum += parseInt(inp.value) || 0);
                     document.querySelectorAll('.soldier-stat').forEach(inp => soldierSum += parseInt(inp.value) || 0);
                     document.querySelectorAll('.employee-stat').forEach(inp => employeeSum += parseInt(inp.value) || 0);
                 }
 
-                // التحقق من تطابق الملاك
                 document.querySelectorAll('#row-officers, #row-soldiers, #row-employees').forEach(row => {
                     const title = row.querySelector('.rank-title') ? row.querySelector('.rank-title').textContent : '';
                     const quota = parseInt(row.querySelector('.quota-input').value) || 0;
@@ -530,7 +523,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const quotas = Array.from(document.querySelectorAll('#row-officers, #row-soldiers, #row-employees')).map(r => parseInt(r.querySelector('.quota-input').value) || 0);
 
             if (isGeneral) {
-                // نمط عام: حساب الضباط من جدول الموظفين
                 const officerStats = {
                     'حاضر': 0,
                     'إجازة': 0,
@@ -554,10 +546,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         officerStats[p.status]++;
                     }
                 });
-                // ترتيب الأعمدة: المعسكر, موقع دفاعي, إجازة, مستشفى, مهمة, مكلف, مستاذن, دورة, مرافقين, متأخر, غياب, سجن, الاسرى, شهداء, جرحى, الإعاقة الدائمة, الهروب
                 officerRow = [
                     officerStats['حاضر'] || 0,
-                    0, // موقع دفاعي (غير موجود في الحالات)
+                    0,
                     officerStats['إجازة'] || 0,
                     officerStats['مستشفى'] || 0,
                     officerStats['مهمة'] || 0,
@@ -574,11 +565,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     officerStats['الإعاقة الدائمة'] || 0,
                     officerStats['هروب'] || 0
                 ];
-                // الأفراد والموظفين من حقول الإدخال
                 soldiers = Array.from(document.querySelectorAll('#row-soldiers .stat-input')).map(i => parseInt(i.value) || 0);
                 employees = Array.from(document.querySelectorAll('#row-employees .stat-input')).map(i => parseInt(i.value) || 0);
             } else {
-                // نمط التمام فقط: نأخذ من المدخلات (بما فيها الضباط)
                 officerRow = Array.from(document.querySelectorAll('.officer-input')).map(i => parseInt(i.value) || 0);
                 soldiers = Array.from(document.querySelectorAll('.soldier-stat')).map(i => parseInt(i.value) || 0);
                 employees = Array.from(document.querySelectorAll('.employee-stat')).map(i => parseInt(i.value) || 0);
@@ -599,12 +588,10 @@ document.addEventListener('DOMContentLoaded', function() {
             for (let c = 2; c <= 19; c++) total.getCell(c).value = { formula: `SUM(${ws.getCell(2, c).address}:${ws.getCell(4, c).address})` };
             total.getCell(20).value = { formula: `SUM(C${total.number}:S${total.number})` };
 
-            // إضافة جدول التحضير (أسماء الموظفين) فقط في نمط العام
             if (isGeneral) {
                 ws.addRow(['م', 'الاسم', 'النقطة', 'الوظيفة', 'الحالة']);
                 personnelData.forEach((p, i) => ws.addRow([i + 1, p.name, p.point, p.job, p.status]));
 
-                // إضافة ورقة الشواغر فقط في نمط العام
                 const vacantData = personnelData.filter(p => p.status === 'شاغر');
                 if (vacantData.length > 0) {
                     const wsVacant = wb.addWorksheet('الشواغر');
@@ -682,8 +669,10 @@ document.addEventListener('DOMContentLoaded', function() {
         exportModalCancel.onclick = closeExportModal;
         exportModal.onclick = (e) => { if (e.target === exportModal) closeExportModal(); };
 
-        resetBtn.onclick = clearCacheAndReload;
+        // تم إزالة resetBtn، لذلك لا نربطه بأي شيء
 
+        // ----- اختصار لوحة المفاتيح (تم إزالته أيضاً لأنه كان مرتبطاً بتهيئة النظام) -----
+        // نحتفظ به فقط للإشعارات (يمكن إزالته)
         document.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'r' || e.key === 'R')) {
                 e.preventDefault();
