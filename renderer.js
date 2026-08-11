@@ -9,8 +9,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const loginError = document.getElementById('login-error');
     const userDisplay = document.getElementById('user-display');
 
-    const VALID_USER = 'شعبة القوى البشرية';
-    const VALID_PASS = '010203';
+    let VALID_USER = '';
+    let VALID_PASS = '';
+    let credentialsLoaded = false;
+
+    // جلب بيانات الاعتماد من main process عبر preload
+    async function fetchCredentials() {
+        try {
+            const creds = await window.api.getCredentials();
+            if (creds && creds.username && creds.password) {
+                VALID_USER = creds.username.trim();
+                VALID_PASS = creds.password.trim();
+                credentialsLoaded = true;
+                console.log('✅ تم جلب بيانات الدخول بنجاح');
+            } else {
+                console.warn('⚠️ بيانات الدخول غير مكتملة، استخدم القيم الافتراضية');
+                // بيانات احتياطية (للتجربة)
+                VALID_USER = 'شعبة القوى البشرية';
+                VALID_PASS = '010203';
+                credentialsLoaded = true;
+            }
+        } catch (e) {
+            console.error('❌ فشل جلب بيانات الدخول:', e);
+            // بيانات احتياطية
+            VALID_USER = 'شعبة القوى البشرية';
+            VALID_PASS = '010203';
+            credentialsLoaded = true;
+        }
+        // بعد تحميل البيانات، نتحقق من حالة تسجيل الدخول
+        checkLogin();
+    }
 
     // ----- كشف تحديث Service Worker -----
     function showUpdateNotification() {
@@ -55,15 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.appendChild(notification);
 
         document.getElementById('update-cache-btn').addEventListener('click', function() {
-            if ('caches' in window) {
-                caches.keys().then(keys => {
-                    Promise.all(keys.map(key => caches.delete(key))).then(() => {
-                        location.reload(true);
-                    });
-                });
-            } else {
-                location.reload(true);
-            }
+            clearCacheAndReload();
         });
 
         setTimeout(() => {
@@ -111,6 +131,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleLogin() {
         const user = loginUsername.value.trim();
         const pass = loginPassword.value.trim();
+        
+        console.log('🔑 محاولة الدخول بـ:', user, ' مقابل ', VALID_USER);
+        console.log('🔑 كلمة المرور المدخلة:', pass, ' مقابل ', VALID_PASS);
+        
         if (user === VALID_USER && pass === VALID_PASS) {
             sessionStorage.setItem('loggedIn', 'true');
             sessionStorage.setItem('username', user);
@@ -138,7 +162,27 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     logoutBtn.addEventListener('click', handleLogout);
 
-    // ----- منطق التطبيق -----
+    // ----- دالة مسح الكاش وإعادة التحميل (مستقلة) -----
+    async function clearCacheAndReload() {
+        if (confirm('تحديث الكاش؟ سيتم حذف الملفات المؤقتة وتحميل أحدث إصدار.')) {
+            if ('caches' in window) {
+                try {
+                    const keys = await caches.keys();
+                    await Promise.all(keys.map(key => caches.delete(key)));
+                    console.log('تم مسح الكاش بنجاح');
+                    alert('✅ تم تحديث الكاش. سيتم إعادة تحميل الصفحة.');
+                    location.reload(true);
+                } catch (e) {
+                    console.warn('فشل مسح الكاش:', e);
+                    alert('❌ فشل تحديث الكاش. حاول تحديث الصفحة يدوياً.');
+                }
+            } else {
+                location.reload(true);
+            }
+        }
+    }
+
+    // ----- منطق التطبيق الرئيسي -----
     function initApp() {
         const personnelTbody = document.querySelector('#personnel-table tbody');
         const exportBtn = document.getElementById('export-btn');
@@ -159,6 +203,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const vacantCancel = document.getElementById('vacant-modal-cancel');
         const vacantSave = document.getElementById('vacant-modal-save');
 
+        // عناصر مودال التصدير الجديد
+        const exportModal = document.getElementById('export-modal');
+        const exportFilename = document.getElementById('export-filename');
+        const exportDate = document.getElementById('export-date');
+        const exportModalCancel = document.getElementById('export-modal-cancel');
+        const exportModalConfirm = document.getElementById('export-modal-confirm');
+
+        // تعيين التاريخ الحالي كقيمة افتراضية
+        const today = new Date().toISOString().split('T')[0];
+        exportDate.value = today;
+
         const defaultData = [
             { name: 'سالم صلاح سالم', point: 'قيادة الفرقة', job: 'ضابط امن سيبراني', status: 'حاضر' },
             { name: 'سالم صلاح سالم', point: 'اللواء 34', job: 'ضابط امن سيبراني', status: 'حاضر' },
@@ -166,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ];
         let personnelData = [];
 
-        // ----- إدارة الملاك -----
+        // ----- إدارة الملاك (العدادات) -----
         function loadQuotas() {
             const saved = localStorage.getItem('saryaQuotas');
             if (saved) {
@@ -324,7 +379,7 @@ document.addEventListener('DOMContentLoaded', function() {
             saveData();
         };
 
-        // ----- تحديث إحصائيات الضباط -----
+        // ----- تحديث إحصائيات الضباط (الأرقام الموجودة بجانب كل حالة) -----
         function updateStats() {
             try {
                 const stats = {
@@ -362,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (e) {}
         }
 
-        // ----- التحقق من صحة البيانات -----
+        // ----- التحقق من صحة البيانات قبل التصدير -----
         function validate() {
             let errors = [];
             try {
@@ -408,8 +463,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return true;
         }
 
-        // ----- تصدير Excel -----
-        async function exportExcel() {
+        // ----- تصدير Excel (مع اسم الملف والتاريخ) -----
+        async function exportExcel(fileName, dateValue) {
             if(!validate()) return;
             try {
                 const officerStats = {
@@ -460,7 +515,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const wb = new ExcelJS.Workbook(); 
                 
-                // ----- الورقة الرئيسية (سرية القناصة) -----
+                // الورقة الرئيسية (سرية القناصة)
                 const ws = wb.addWorksheet('سرية القناصة');
                 const headers = ['الرتبة','الملاك','في المعسكر','موقع دفاعي','إجازة','مستشفى','مهمة','مكلف','مستاذن','دورة','مرافقين','متأخر','غياب','سجن','الاسرى','شهداء','جرحى','الإعاقة الدائمة','الهروب','المجموع'];
                 ws.addRow(headers).font = { bold: true };
@@ -478,19 +533,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 ws.addRow(['م','الاسم','النقطة','الوظيفة','الحالة']);
                 personnelData.forEach((p,i) => ws.addRow([i+1, p.name, p.point, p.job, p.status]));
 
-                // ----- الورقة الثانية: الشواغر -----
+                // الورقة الثانية: الشواغر
                 const vacantData = personnelData.filter(p => p.status === 'شاغر');
                 
                 if (vacantData.length > 0) {
                     const wsVacant = wb.addWorksheet('الشواغر');
                     
-                    // الصف الأول: عنوان مدمج
                     const titleRow = wsVacant.addRow(['قائمة الشواغر']);
                     wsVacant.mergeCells(`A${titleRow.number}:D${titleRow.number}`);
                     titleRow.font = { bold: true, size: 14 };
                     titleRow.alignment = { horizontal: 'center' };
                     
-                    // الصف الثاني: عناوين الأعمدة
                     const vacantHeaders = ['م', 'النقطة', 'الوظيفة', 'الحالة'];
                     const headerRow = wsVacant.addRow(vacantHeaders);
                     headerRow.font = { bold: true };
@@ -501,13 +554,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     };
                     headerRow.alignment = { horizontal: 'center' };
                     
-                    // البيانات
                     vacantData.forEach((p, i) => {
                         const row = wsVacant.addRow([i+1, p.point, p.job, p.status]);
                         row.alignment = { horizontal: 'center' };
                     });
                     
-                    // تنسيق الأعمدة
                     wsVacant.getColumn(1).width = 8;
                     wsVacant.getColumn(2).width = 25;
                     wsVacant.getColumn(3).width = 25;
@@ -518,7 +569,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 const blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
                 const link = document.createElement('a'); 
                 link.href = URL.createObjectURL(blob); 
-                link.download = 'تقرير_السرية.xlsx';
+                let finalName = fileName || 'تقرير_السرية';
+                if (dateValue) {
+                    finalName += '_' + dateValue;
+                }
+                link.download = finalName + '.xlsx';
                 document.body.appendChild(link); 
                 link.click(); 
                 document.body.removeChild(link); 
@@ -527,31 +582,45 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (e) { alert('حدث خطأ أثناء التصدير: ' + e.message); }
         }
 
-        exportBtn.onclick = exportExcel;
-
-        // ----- زر المسح (تحديث الكاش فقط) -----
-        resetBtn.onclick = async () => {
-            if (confirm('تحديث الكاش؟ سيتم حذف الملفات المؤقتة وتحميل أحدث إصدار.')) {
-                if ('caches' in window) {
-                    try {
-                        const keys = await caches.keys();
-                        await Promise.all(keys.map(key => caches.delete(key)));
-                        console.log('تم مسح الكاش بنجاح');
-                        alert('✅ تم تحديث الكاش. سيتم إعادة تحميل الصفحة.');
-                        location.reload(true);
-                    } catch (e) {
-                        console.warn('فشل مسح الكاش:', e);
-                        alert('❌ فشل تحديث الكاش. حاول تحديث الصفحة يدوياً.');
-                    }
-                } else {
-                    location.reload(true);
-                }
-            }
+        // ----- زر التصدير (يفتح المودال) -----
+        exportBtn.onclick = () => {
+            const today = new Date().toISOString().split('T')[0];
+            exportDate.value = today;
+            exportFilename.value = 'تقرير_السرية';
+            exportModal.style.display = 'flex';
         };
-        
+
+        // ----- إغلاق مودال التصدير -----
+        function closeExportModal() {
+            exportModal.style.display = 'none';
+        }
+        exportModalCancel.onclick = closeExportModal;
+        exportModal.onclick = (e) => { if(e.target === exportModal) closeExportModal(); };
+
+        // ----- تأكيد التصدير -----
+        exportModalConfirm.onclick = () => {
+            const fileName = exportFilename.value.trim() || 'تقرير_السرية';
+            const dateValue = exportDate.value;
+            closeExportModal();
+            exportExcel(fileName, dateValue);
+        };
+
+        // ----- زر تهيئة النظام (يدعو الدالة المستقلة) -----
+        resetBtn.onclick = clearCacheAndReload;
+
+        // ----- اختصار لوحة المفاتيح: Ctrl+Shift+R (أو Cmd+Shift+R) -----
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'r' || e.key === 'R')) {
+                e.preventDefault();
+                clearCacheAndReload();
+            }
+        });
+
+        // تحميل البيانات الأولية
         loadQuotas();
         loadData();
     }
 
-    checkLogin();
+    // ----- بدء التطبيق: جلب بيانات الدخول ثم التحقق من تسجيل الدخول -----
+    fetchCredentials();
 });
