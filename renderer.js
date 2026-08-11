@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // ----- إدارة تسجيل الدخول (بيانات مخفية) -----
+    // ----- إدارة تسجيل الدخول -----
     const loginScreen = document.getElementById('login-screen');
     const mainContent = document.getElementById('main-content');
     const loginBtn = document.getElementById('login-btn');
@@ -18,14 +18,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (creds && creds.username && creds.password) {
                 VALID_USER = creds.username.trim();
                 VALID_PASS = creds.password.trim();
-                console.log('✅ تم جلب بيانات الدخول بنجاح');
+                console.log('تم جلب بيانات الدخول بنجاح');
             } else {
-                console.warn('⚠️ بيانات الدخول غير مكتملة، استخدم القيم الافتراضية');
+                console.warn('بيانات الدخول غير مكتملة، استخدم القيم الافتراضية');
                 VALID_USER = 'شعبة القوى البشرية';
                 VALID_PASS = '010203';
             }
         } catch (e) {
-            console.error('❌ فشل جلب بيانات الدخول:', e);
+            console.error('فشل جلب بيانات الدخول:', e);
             VALID_USER = 'شعبة القوى البشرية';
             VALID_PASS = '010203';
         }
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: #f59e0b;
+            background: #f39c12;
             color: #1e293b;
             padding: 16px 24px;
             border-radius: 12px;
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
             justify-content: center;
         `;
         notification.innerHTML = `
-            <span>🔄 تم تحديث النظام! اضغط هنا لتحديث الكاش والاستفادة من التحديثات.</span>
+            <span>تم تحديث النظام! اضغط هنا لتحديث الكاش والاستفادة من التحديثات.</span>
             <button id="update-cache-btn" style="
                 background: #1e293b;
                 color: white;
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loginScreen.style.display = 'none';
         mainContent.style.display = 'block';
         const username = sessionStorage.getItem('username') || 'شعبة القوى البشرية';
-        userDisplay.textContent = 'مرحباً بك في نظام  ' + username;
+        userDisplay.textContent = 'مرحباً بك في نظام ' + username;
         initApp();
     }
 
@@ -150,19 +150,19 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     logoutBtn.addEventListener('click', handleLogout);
 
-    // ----- دالة مسح الكاش وإعادة التحميل -----
+    // ----- دالة مسح الكاش فقط -----
     async function clearCacheAndReload() {
-        if (confirm('تحديث الكاش؟ سيتم حذف الملفات المؤقتة وتحميل أحدث إصدار.')) {
+        if (confirm('تحديث الكاش؟ سيتم حذف الملفات المؤقتة وتحميل أحدث إصدار. (بياناتك لن تتأثر)')) {
             if ('caches' in window) {
                 try {
                     const keys = await caches.keys();
                     await Promise.all(keys.map(key => caches.delete(key)));
                     console.log('تم مسح الكاش بنجاح');
-                    alert('✅ تم تحديث الكاش. سيتم إعادة تحميل الصفحة.');
+                    alert('تم تحديث الكاش. سيتم إعادة تحميل الصفحة.');
                     location.reload(true);
                 } catch (e) {
                     console.warn('فشل مسح الكاش:', e);
-                    alert('❌ فشل تحديث الكاش. حاول تحديث الصفحة يدوياً.');
+                    alert('فشل تحديث الكاش. حاول تحديث الصفحة يدوياً.');
                 }
             } else {
                 location.reload(true);
@@ -170,14 +170,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // ----- منطق التطبيق الرئيسي -----
+    // ----- منطق التطبيق -----
     function initApp() {
         const personnelTbody = document.querySelector('#personnel-table tbody');
         const exportBtn = document.getElementById('export-btn');
-        const shareHeaderBtn = document.getElementById('share-whatsapp-header');
         const addBtn = document.getElementById('add-person-btn');
         const addVacantBtn = document.getElementById('add-vacant-btn');
         const resetBtn = document.getElementById('reset-btn');
+        const unitSelect = document.getElementById('unit-select');
+        const personnelSection = document.getElementById('personnel-section');
+
+        // حقول الضباط (للتعديل بين العرض والإدخال)
+        const officerStats = document.querySelectorAll('.officer-stat');
+        const soldierStats = document.querySelectorAll('.soldier-stat');
+        const employeeStats = document.querySelectorAll('.employee-stat');
 
         const modal = document.getElementById('add-modal');
         const newName = document.getElementById('new-name');
@@ -197,7 +203,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const exportDate = document.getElementById('export-date');
         const exportModalCancel = document.getElementById('export-modal-cancel');
         const exportModalConfirm = document.getElementById('export-modal-confirm');
-        const exportModalShareWA = document.getElementById('export-modal-share-wa');
 
         const today = new Date().toISOString().split('T')[0];
         exportDate.value = today;
@@ -208,6 +213,44 @@ document.addEventListener('DOMContentLoaded', function() {
             { name: 'سالم صلاح سالم', point: 'اللواء 33', job: 'ضابط امن سيبراني', status: 'دورة' }
         ];
         let personnelData = [];
+        let currentUnit = 'عام';
+
+        // ----- تبديل نمط الوحدة -----
+        function toggleUnitMode(unit) {
+            currentUnit = unit;
+            const isGeneral = unit === 'عام';
+            // إخفاء/إظهار قسم الموظفين
+            personnelSection.style.display = isGeneral ? 'block' : 'none';
+            // تحويل حقول الضباط إلى editable أو readonly
+            officerStats.forEach(span => {
+                const parent = span.parentElement;
+                const input = parent.querySelector('.officer-input');
+                if (isGeneral) {
+                    // وضع العرض: span
+                    if (input) input.remove();
+                    span.style.display = 'inline';
+                } else {
+                    // وضع الإدخال: input
+                    span.style.display = 'none';
+                    let inp = parent.querySelector('.officer-input');
+                    if (!inp) {
+                        inp = document.createElement('input');
+                        inp.type = 'number';
+                        inp.className = 'stat-input officer-input';
+                        inp.value = span.textContent || '0';
+                        inp.min = '0';
+                        parent.appendChild(inp);
+                    }
+                }
+            });
+            // إعادة حساب الإحصائيات حسب النمط
+            updateStats();
+        }
+
+        // الاستماع لتغيير الوحدة
+        unitSelect.addEventListener('change', function() {
+            toggleUnitMode(this.value);
+        });
 
         // ----- إدارة الملاك -----
         function loadQuotas() {
@@ -236,8 +279,8 @@ document.addEventListener('DOMContentLoaded', function() {
             input.addEventListener('input', saveQuotas);
         });
 
-        // ----- تحميل وحفظ بيانات الموظفين -----
-        function saveData() { 
+        // ----- تحميل وحفظ بيانات الموظفين (للوضع العام) -----
+        function saveData() {
             try { localStorage.setItem('saryaData', JSON.stringify(personnelData)); } catch (e) {}
         }
 
@@ -254,11 +297,11 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 personnelData = JSON.parse(JSON.stringify(defaultData));
             }
-            renderTable(); 
+            renderTable();
             updateStats();
         }
 
-        // ----- عرض الجدول -----
+        // ----- عرض جدول الموظفين (للوضع العام) -----
         function renderTable() {
             personnelTbody.innerHTML = '';
             personnelData.forEach((item, idx) => {
@@ -294,50 +337,52 @@ document.addEventListener('DOMContentLoaded', function() {
                 inputs[0].oninput = (e) => { personnelData[idx].name = e.target.value; saveData(); };
                 inputs[1].oninput = (e) => { personnelData[idx].point = e.target.value; saveData(); };
                 inputs[2].oninput = (e) => { personnelData[idx].job = e.target.value; saveData(); };
-                status.onchange = (e) => { 
-                    personnelData[idx].status = e.target.value; 
-                    saveData(); 
-                    updateStats(); 
+                status.onchange = (e) => {
+                    personnelData[idx].status = e.target.value;
+                    saveData();
+                    updateStats();
                 };
                 delBtn.onclick = () => {
-                    if(confirm('حذف الموظف؟')) { 
-                        personnelData.splice(idx,1); 
-                        renderTable(); 
-                        updateStats(); 
-                        saveData(); 
+                    if (confirm('حذف الموظف؟')) {
+                        personnelData.splice(idx, 1);
+                        renderTable();
+                        updateStats();
+                        saveData();
                     }
                 };
             });
         }
 
-        // ----- إضافة موظف عادي -----
-        function openModal() { 
-            newName.value=''; newPoint.value=''; newJob.value=''; 
-            modal.style.display='flex'; 
-            setTimeout(()=>newName.focus(), 100); 
+        // ----- إضافة موظف (للوضع العام) -----
+        function openModal() {
+            newName.value = '';
+            newPoint.value = '';
+            newJob.value = '';
+            modal.style.display = 'flex';
+            setTimeout(() => newName.focus(), 100);
         }
-        function closeModal() { modal.style.display='none'; }
-        
+        function closeModal() { modal.style.display = 'none'; }
+
         addBtn.onclick = openModal;
         modalCancel.onclick = closeModal;
-        modal.onclick = (e) => { if(e.target === modal) closeModal(); };
-        
+        modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+
         modalSave.onclick = () => {
             const name = newName.value.trim();
-            if(!name) { alert('أدخل الاسم'); return; }
-            personnelData.push({ 
-                name: name, 
-                point: newPoint.value.trim(), 
-                job: newJob.value.trim(), 
-                status: 'حاضر' 
+            if (!name) { alert('أدخل الاسم'); return; }
+            personnelData.push({
+                name: name,
+                point: newPoint.value.trim(),
+                job: newJob.value.trim(),
+                status: 'حاضر'
             });
-            closeModal(); 
-            renderTable(); 
-            updateStats(); 
+            closeModal();
+            renderTable();
+            updateStats();
             saveData();
         };
 
-        // ----- إضافة شاغر -----
+        // ----- إضافة شاغر (للوضع العام) -----
         function openVacantModal() {
             vacantPoint.value = '';
             vacantJob.value = '';
@@ -350,12 +395,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         addVacantBtn.onclick = openVacantModal;
         vacantCancel.onclick = closeVacantModal;
-        vacantModal.onclick = (e) => { if(e.target === vacantModal) closeVacantModal(); };
+        vacantModal.onclick = (e) => { if (e.target === vacantModal) closeVacantModal(); };
 
         vacantSave.onclick = () => {
             const point = vacantPoint.value.trim();
             const job = vacantJob.value.trim();
-            personnelData.push({ 
+            personnelData.push({
                 name: '',
                 point: point,
                 job: job,
@@ -367,191 +412,224 @@ document.addEventListener('DOMContentLoaded', function() {
             saveData();
         };
 
-        // ----- تحديث إحصائيات الضباط -----
+        // ----- تحديث الإحصائيات (حسب النمط) -----
         function updateStats() {
             try {
-                const stats = {
-                    'حاضر':0,
-                    'إجازة':0,
-                    'مستشفى':0,
-                    'مهمة':0,
-                    'مكلف':0,
-                    'مستاذن':0,
-                    'دورة':0,
-                    'مرافق':0,
-                    'متأخر':0,
-                    'غياب':0,
-                    'سجن':0,
-                    'الاسرى':0,
-                    'شهداء':0,
-                    'جرحى':0,
-                    'الإعاقة الدائمة':0,
-                    'هروب':0
-                };
-                personnelData.forEach(p => {
-                    if (p.status && p.status !== 'شاغر' && stats[p.status] !== undefined) {
-                        stats[p.status]++;
-                    }
-                });
-                const map = ['حاضر',0,'إجازة','مستشفى','مهمة','مكلف','مستاذن','دورة','مرافق','متأخر','غياب','سجن','الاسرى','شهداء','جرحى','الإعاقة الدائمة','هروب'];
-                const rowOfficers = document.getElementById('row-officers');
-                if(rowOfficers) {
-                    const spans = rowOfficers.querySelectorAll('.stat-val');
-                    spans.forEach((span, i) => {
-                        let key = map[i]; 
-                        span.innerText = key === 0 ? '0' : (stats[key] || 0);
+                const isGeneral = currentUnit === 'عام';
+                if (isGeneral) {
+                    const stats = {
+                        'حاضر': 0,
+                        'إجازة': 0,
+                        'مستشفى': 0,
+                        'مهمة': 0,
+                        'مكلف': 0,
+                        'مستاذن': 0,
+                        'دورة': 0,
+                        'مرافق': 0,
+                        'متأخر': 0,
+                        'غياب': 0,
+                        'سجن': 0,
+                        'الاسرى': 0,
+                        'شهداء': 0,
+                        'جرحى': 0,
+                        'الإعاقة الدائمة': 0,
+                        'هروب': 0
+                    };
+                    personnelData.forEach(p => {
+                        if (p.status && p.status !== 'شاغر' && stats[p.status] !== undefined) {
+                            stats[p.status]++;
+                        }
                     });
+                    const map = ['حاضر', 0, 'إجازة', 'مستشفى', 'مهمة', 'مكلف', 'مستاذن', 'دورة', 'مرافق', 'متأخر', 'غياب', 'سجن', 'الاسرى', 'شهداء', 'جرحى', 'الإعاقة الدائمة', 'هروب'];
+                    const rowOfficers = document.getElementById('row-officers');
+                    if (rowOfficers) {
+                        const spans = rowOfficers.querySelectorAll('.stat-val:not(.officer-input)');
+                        spans.forEach((span, i) => {
+                            let key = map[i];
+                            span.textContent = key === 0 ? '0' : (stats[key] || 0);
+                        });
+                    }
                 }
-            } catch (e) {}
+                // في نمط التمام فقط، لا حاجة لتحديث القيم لأنها مدخلات يدوية
+            } catch (e) {
+                console.warn('خطأ في تحديث الإحصائيات:', e);
+            }
         }
 
-        // ----- التحقق من صحة البيانات -----
+        // ----- التحقق من صحة البيانات (حسب النمط) -----
         function validate() {
             let errors = [];
             try {
+                const isGeneral = currentUnit === 'عام';
+                let officerSum = 0;
+                let soldierSum = 0;
+                let employeeSum = 0;
+
+                if (isGeneral) {
+                    // نمط عام: حساب من جدول الموظفين
+                    const officerStats = {
+                        'حاضر': 0,
+                        'إجازة': 0,
+                        'مستشفى': 0,
+                        'مهمة': 0,
+                        'مكلف': 0,
+                        'مستاذن': 0,
+                        'دورة': 0,
+                        'مرافق': 0,
+                        'متأخر': 0,
+                        'غياب': 0,
+                        'سجن': 0,
+                        'الاسرى': 0,
+                        'شهداء': 0,
+                        'جرحى': 0,
+                        'الإعاقة الدائمة': 0,
+                        'هروب': 0
+                    };
+                    personnelData.forEach(p => {
+                        if (p.status && p.status !== 'شاغر' && officerStats[p.status] !== undefined) {
+                            officerStats[p.status]++;
+                        }
+                    });
+                    Object.values(officerStats).forEach(v => officerSum += v);
+                } else {
+                    // نمط التمام فقط: نأخذ المجاميع من المدخلات
+                    document.querySelectorAll('.officer-input').forEach(inp => officerSum += parseInt(inp.value) || 0);
+                    document.querySelectorAll('.soldier-stat').forEach(inp => soldierSum += parseInt(inp.value) || 0);
+                    document.querySelectorAll('.employee-stat').forEach(inp => employeeSum += parseInt(inp.value) || 0);
+                }
+
+                // التحقق من تطابق الملاك
+                document.querySelectorAll('#row-officers, #row-soldiers, #row-employees').forEach(row => {
+                    const title = row.querySelector('.rank-title') ? row.querySelector('.rank-title').textContent : '';
+                    const quota = parseInt(row.querySelector('.quota-input').value) || 0;
+                    let sum = 0;
+                    if (title.includes('ضباط')) {
+                        sum = officerSum;
+                    } else if (title.includes('أفراد')) {
+                        sum = soldierSum;
+                    } else if (title.includes('موظف')) {
+                        sum = employeeSum;
+                    }
+                    if (sum !== quota) errors.push(`صف "${title}" غير متطابق! الملاك: ${quota}، المدخل: ${sum}`);
+                });
+            } catch (e) { errors.push('خطأ في التحقق'); }
+
+            if (errors.length > 0) {
+                alert('منع التصدير:\n' + errors.join('\n'));
+                return false;
+            }
+            return true;
+        }
+
+        // ----- دالة إنشاء ملف Excel -----
+        async function generateExcelBlob(fileName, dateValue) {
+            const isGeneral = currentUnit === 'عام';
+            let officerRow = [];
+            let soldiers = [];
+            let employees = [];
+            const quotas = Array.from(document.querySelectorAll('#row-officers, #row-soldiers, #row-employees')).map(r => parseInt(r.querySelector('.quota-input').value) || 0);
+
+            if (isGeneral) {
+                // نمط عام: حساب الضباط من جدول الموظفين
                 const officerStats = {
-                    'حاضر':0,
-                    'إجازة':0,
-                    'مستشفى':0,
-                    'مهمة':0,
-                    'مكلف':0,
-                    'مستاذن':0,
-                    'دورة':0,
-                    'مرافق':0,
-                    'متأخر':0,
-                    'غياب':0,
-                    'سجن':0,
-                    'الاسرى':0,
-                    'شهداء':0,
-                    'جرحى':0,
-                    'الإعاقة الدائمة':0,
-                    'هروب':0
+                    'حاضر': 0,
+                    'إجازة': 0,
+                    'مستشفى': 0,
+                    'مهمة': 0,
+                    'مكلف': 0,
+                    'مستاذن': 0,
+                    'دورة': 0,
+                    'مرافق': 0,
+                    'متأخر': 0,
+                    'غياب': 0,
+                    'سجن': 0,
+                    'الاسرى': 0,
+                    'شهداء': 0,
+                    'جرحى': 0,
+                    'الإعاقة الدائمة': 0,
+                    'هروب': 0
                 };
                 personnelData.forEach(p => {
                     if (p.status && p.status !== 'شاغر' && officerStats[p.status] !== undefined) {
                         officerStats[p.status]++;
                     }
                 });
-                let officerSum = 0; Object.values(officerStats).forEach(v => officerSum += v);
-                
-                document.querySelectorAll('#row-officers, #row-soldiers, #row-employees').forEach(row => {
-                    const title = row.querySelector('.rank-title') ? row.querySelector('.rank-title').innerText : row.querySelector('.row-title')?.innerText || '';
-                    const quota = parseInt(row.querySelector('.quota-input').value) || 0;
-                    let sum = 0;
-                    if(title.includes('ضباط')) { 
-                        sum = officerSum; 
-                    } else { 
-                        row.querySelectorAll('.stat-input').forEach(inp => sum += parseInt(inp.value)||0); 
-                    }
-                    if(sum !== quota) errors.push(`صف "${title}" غير متطابق! الملاك: ${quota}، المدخل: ${sum}`);
-                });
-            } catch (e) { errors.push('خطأ في التحقق'); }
-
-            if(errors.length > 0) {
-                alert('⛔ منع التصدير:\n' + errors.join('\n'));
-                return false;
+                // ترتيب الأعمدة: المعسكر, موقع دفاعي, إجازة, مستشفى, مهمة, مكلف, مستاذن, دورة, مرافقين, متأخر, غياب, سجن, الاسرى, شهداء, جرحى, الإعاقة الدائمة, الهروب
+                officerRow = [
+                    officerStats['حاضر'] || 0,
+                    0, // موقع دفاعي (غير موجود في الحالات)
+                    officerStats['إجازة'] || 0,
+                    officerStats['مستشفى'] || 0,
+                    officerStats['مهمة'] || 0,
+                    officerStats['مكلف'] || 0,
+                    officerStats['مستاذن'] || 0,
+                    officerStats['دورة'] || 0,
+                    officerStats['مرافق'] || 0,
+                    officerStats['متأخر'] || 0,
+                    officerStats['غياب'] || 0,
+                    officerStats['سجن'] || 0,
+                    officerStats['الاسرى'] || 0,
+                    officerStats['شهداء'] || 0,
+                    officerStats['جرحى'] || 0,
+                    officerStats['الإعاقة الدائمة'] || 0,
+                    officerStats['هروب'] || 0
+                ];
+                // الأفراد والموظفين من حقول الإدخال
+                soldiers = Array.from(document.querySelectorAll('#row-soldiers .stat-input')).map(i => parseInt(i.value) || 0);
+                employees = Array.from(document.querySelectorAll('#row-employees .stat-input')).map(i => parseInt(i.value) || 0);
+            } else {
+                // نمط التمام فقط: نأخذ من المدخلات (بما فيها الضباط)
+                officerRow = Array.from(document.querySelectorAll('.officer-input')).map(i => parseInt(i.value) || 0);
+                soldiers = Array.from(document.querySelectorAll('.soldier-stat')).map(i => parseInt(i.value) || 0);
+                employees = Array.from(document.querySelectorAll('.employee-stat')).map(i => parseInt(i.value) || 0);
             }
-            return true;
-        }
 
-        // ----- دالة إنشاء ملف Excel وإرجاع Blob -----
-        async function generateExcelBlob(fileName, dateValue) {
-            const officerStats = {
-                'حاضر':0,
-                'إجازة':0,
-                'مستشفى':0,
-                'مهمة':0,
-                'مكلف':0,
-                'مستاذن':0,
-                'دورة':0,
-                'مرافق':0,
-                'متأخر':0,
-                'غياب':0,
-                'سجن':0,
-                'الاسرى':0,
-                'شهداء':0,
-                'جرحى':0,
-                'الإعاقة الدائمة':0,
-                'هروب':0
-            };
-            personnelData.forEach(p => {
-                if (p.status && p.status !== 'شاغر' && officerStats[p.status] !== undefined) {
-                    officerStats[p.status]++;
-                }
-            });
-            const officerRow = [
-                officerStats['حاضر']||0,
-                0,
-                officerStats['إجازة']||0,
-                officerStats['مستشفى']||0,
-                officerStats['مهمة']||0,
-                officerStats['مكلف']||0,
-                officerStats['مستاذن']||0,
-                officerStats['دورة']||0,
-                officerStats['مرافق']||0,
-                officerStats['متأخر']||0,
-                officerStats['غياب']||0,
-                officerStats['سجن']||0,
-                officerStats['الاسرى']||0,
-                officerStats['شهداء']||0,
-                officerStats['جرحى']||0,
-                officerStats['الإعاقة الدائمة']||0,
-                officerStats['هروب']||0
-            ];
-            const soldiers = Array.from(document.querySelectorAll('#row-soldiers .stat-input')).map(i => parseInt(i.value)||0);
-            const employees = Array.from(document.querySelectorAll('#row-employees .stat-input')).map(i => parseInt(i.value)||0);
-            const quotas = Array.from(document.querySelectorAll('#row-officers, #row-soldiers, #row-employees')).map(r => parseInt(r.querySelector('.quota-input').value)||0);
-
-            const wb = new ExcelJS.Workbook(); 
-            
+            const wb = new ExcelJS.Workbook();
             const ws = wb.addWorksheet('سرية القناصة');
-            const headers = ['الرتبة','الملاك','في المعسكر','موقع دفاعي','إجازة','مستشفى','مهمة','مكلف','مستاذن','دورة','مرافقين','متأخر','غياب','سجن','الاسرى','شهداء','جرحى','الإعاقة الدائمة','الهروب','المجموع'];
+            const headers = ['الرتبة', 'الملاك', 'في المعسكر', 'موقع دفاعي', 'إجازة', 'مستشفى', 'مهمة', 'مكلف', 'مستاذن', 'دورة', 'مرافقين', 'متأخر', 'غياب', 'سجن', 'الاسرى', 'شهداء', 'جرحى', 'الإعاقة الدائمة', 'الهروب', 'المجموع'];
             ws.addRow(headers).font = { bold: true };
-            
-            const titles = ['ضباط','أفراد مقاتلين','موظف'];
-            titles.forEach((t,i) => {
-                const r = ws.addRow([t, quotas[i], ...(i===0?officerRow:(i===1?soldiers:employees))]);
+
+            const titles = ['ضباط', 'أفراد مقاتلين', 'موظف'];
+            titles.forEach((t, i) => {
+                const r = ws.addRow([t, quotas[i], ...(i === 0 ? officerRow : (i === 1 ? soldiers : employees))]);
                 r.getCell(20).value = { formula: `SUM(C${r.number}:S${r.number})` };
             });
-            
-            const total = ws.addRow(['الإجمالي']);
-            for(let c=2;c<=19;c++) total.getCell(c).value = { formula: `SUM(${ws.getCell(2,c).address}:${ws.getCell(4,c).address})` };
-            total.getCell(20).value = { formula: `SUM(C${total.number}:S${total.number})` };
-            
-            ws.addRow(['م','الاسم','النقطة','الوظيفة','الحالة']);
-            personnelData.forEach((p,i) => ws.addRow([i+1, p.name, p.point, p.job, p.status]));
 
-            const vacantData = personnelData.filter(p => p.status === 'شاغر');
-            if (vacantData.length > 0) {
-                const wsVacant = wb.addWorksheet('الشواغر');
-                const titleRow = wsVacant.addRow(['قائمة الشواغر']);
-                wsVacant.mergeCells(`A${titleRow.number}:D${titleRow.number}`);
-                titleRow.font = { bold: true, size: 14 };
-                titleRow.alignment = { horizontal: 'center' };
-                
-                const vacantHeaders = ['م', 'النقطة', 'الوظيفة', 'الحالة'];
-                const headerRow = wsVacant.addRow(vacantHeaders);
-                headerRow.font = { bold: true };
-                headerRow.fill = {
-                    type: 'pattern',
-                    pattern: 'solid',
-                    fgColor: { argb: 'FFE0E0E0' }
-                };
-                headerRow.alignment = { horizontal: 'center' };
-                
-                vacantData.forEach((p, i) => {
-                    const row = wsVacant.addRow([i+1, p.point, p.job, p.status]);
-                    row.alignment = { horizontal: 'center' };
-                });
-                
-                wsVacant.getColumn(1).width = 8;
-                wsVacant.getColumn(2).width = 25;
-                wsVacant.getColumn(3).width = 25;
-                wsVacant.getColumn(4).width = 15;
+            const total = ws.addRow(['الإجمالي']);
+            for (let c = 2; c <= 19; c++) total.getCell(c).value = { formula: `SUM(${ws.getCell(2, c).address}:${ws.getCell(4, c).address})` };
+            total.getCell(20).value = { formula: `SUM(C${total.number}:S${total.number})` };
+
+            // إضافة جدول التحضير (أسماء الموظفين) فقط في نمط العام
+            if (isGeneral) {
+                ws.addRow(['م', 'الاسم', 'النقطة', 'الوظيفة', 'الحالة']);
+                personnelData.forEach((p, i) => ws.addRow([i + 1, p.name, p.point, p.job, p.status]));
+
+                // إضافة ورقة الشواغر فقط في نمط العام
+                const vacantData = personnelData.filter(p => p.status === 'شاغر');
+                if (vacantData.length > 0) {
+                    const wsVacant = wb.addWorksheet('الشواغر');
+                    const titleRow = wsVacant.addRow(['قائمة الشواغر']);
+                    wsVacant.mergeCells(`A${titleRow.number}:D${titleRow.number}`);
+                    titleRow.font = { bold: true, size: 14 };
+                    titleRow.alignment = { horizontal: 'center' };
+                    const vacantHeaders = ['م', 'النقطة', 'الوظيفة', 'الحالة'];
+                    const headerRow = wsVacant.addRow(vacantHeaders);
+                    headerRow.font = { bold: true };
+                    headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E0E0' } };
+                    headerRow.alignment = { horizontal: 'center' };
+                    vacantData.forEach((p, i) => {
+                        const row = wsVacant.addRow([i + 1, p.point, p.job, p.status]);
+                        row.alignment = { horizontal: 'center' };
+                    });
+                    wsVacant.getColumn(1).width = 8;
+                    wsVacant.getColumn(2).width = 25;
+                    wsVacant.getColumn(3).width = 25;
+                    wsVacant.getColumn(4).width = 15;
+                }
             }
 
             const buf = await wb.xlsx.writeBuffer();
-            return new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+            return new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         }
 
         // ----- دالة تحميل الملف -----
@@ -565,132 +643,47 @@ document.addEventListener('DOMContentLoaded', function() {
             URL.revokeObjectURL(link.href);
         }
 
-        // ----- دالة التصدير العادي -----
+        // ----- دالة التصدير -----
         async function exportExcel(fileName, dateValue) {
             try {
                 const blob = await generateExcelBlob(fileName, dateValue);
-                let finalName = fileName || 'تقرير_السرية';
-                if (dateValue) finalName += '_' + dateValue;
+                let finalName = fileName || '';
+                if (dateValue) {
+                    finalName += '_' + dateValue;
+                }
                 downloadBlob(blob, finalName + '.xlsx');
-                alert('✅ تم تصدير وتنزيل الإكسيل بنجاح!');
+                alert('تم تصدير وتنزيل الإكسيل بنجاح!');
             } catch (e) {
                 alert('حدث خطأ أثناء التصدير: ' + e.message);
             }
         }
 
-        // ----- دالة المشاركة المحسّنة للجوال -----
-        async function shareFile(fileName, dateValue) {
-            try {
-                const blob = await generateExcelBlob(fileName, dateValue);
-                
-                // التحقق من حجم الملف (حد 30 ميجابايت مناسب للجوال)
-                if (blob.size > 30 * 1024 * 1024) {
-                    alert('⚠️ الملف كبير جداً للمشاركة (أكثر من 30 ميجابايت). سيتم تحميله بدلاً من ذلك.');
-                    downloadBlob(blob, fileName + '.xlsx');
-                    return;
-                }
-
-                const file = new File([blob], `${fileName}.xlsx`, { 
-                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
-                });
-
-                // التحقق من توفر Web Share API
-                if (navigator.share && navigator.canShare) {
-                    const shareData = {
-                        title: 'تقرير السرية',
-                        text: 'تقرير الحضور والانصراف',
-                        files: [file]
-                    };
-
-                    // التحقق من إمكانية المشاركة
-                    if (navigator.canShare(shareData)) {
-                        try {
-                            await navigator.share(shareData);
-                            // لا نعرض رسالة نجاح لأنه قد يكون المستخدم ألغى أو تمت المشاركة
-                            // نعرض رسالة فقط إذا تمت المشاركة فعلاً
-                            alert('✅ تم مشاركة الملف بنجاح!');
-                            return;
-                        } catch (err) {
-                            // إذا ألغى المستخدم المشاركة، لا نعرض رسالة
-                            if (err.name === 'AbortError') {
-                                console.log('المستخدم ألغى المشاركة');
-                                return;
-                            }
-                            // إذا كان خطأ إذن
-                            if (err.name === 'NotAllowedError' || err.message.includes('Permission denied')) {
-                                alert('❌ تم رفض إذن المشاركة. يرجى منح الإذن للتطبيق أو المتصفح.\nسيتم تحميل الملف بدلاً من ذلك.');
-                                downloadBlob(blob, fileName + '.xlsx');
-                                return;
-                            }
-                            // أي خطأ آخر
-                            console.warn('فشل المشاركة:', err);
-                            alert('❌ فشل المشاركة: ' + err.message + '\nسيتم تحميل الملف بدلاً من ذلك.');
-                            downloadBlob(blob, fileName + '.xlsx');
-                            return;
-                        }
-                    } else {
-                        alert('⚠️ هذا الملف غير قابل للمشاركة عبر هذا التطبيق.\nسيتم تحميل الملف بدلاً من ذلك.');
-                        downloadBlob(blob, fileName + '.xlsx');
-                        return;
-                    }
-                } else {
-                    // في حال عدم دعم Web Share API
-                    alert('⚠️ ميزة المشاركة غير مدعومة في هذا المتصفح.\nيرجى استخدام متصفح حديث (Chrome أو Safari) على الجوال.\nسيتم تحميل الملف بدلاً من ذلك.');
-                    downloadBlob(blob, fileName + '.xlsx');
-                }
-            } catch (e) {
-                alert('حدث خطأ أثناء تصدير الملف: ' + e.message);
-            }
-        }
-
-        // ----- فتح مودال التصدير مع تحديد الإجراء -----
-        function openExportModal(action) {
+        // ----- فتح مودال التصدير -----
+        function openExportModal() {
             if (!validate()) return;
             const today = new Date().toISOString().split('T')[0];
             exportDate.value = today;
-            exportFilename.value = 'تقرير_السرية';
-            exportModal.dataset.action = action;
+            exportFilename.value = '';
             exportModal.style.display = 'flex';
         }
 
-        // ----- أزرار الرأس -----
-        exportBtn.onclick = () => openExportModal('download');
-        if (shareHeaderBtn) {
-            shareHeaderBtn.onclick = () => openExportModal('share');
-        }
+        exportBtn.onclick = openExportModal;
 
-        // ----- زر "مشاركة واتساب" داخل المودال -----
-        exportModalShareWA.onclick = async () => {
-            const fileName = exportFilename.value.trim() || 'تقرير_السرية';
+        exportModalConfirm.onclick = () => {
+            const fileName = exportFilename.value.trim() || '';
             const dateValue = exportDate.value;
             closeExportModal();
-            await shareFile(fileName, dateValue);
+            exportExcel(fileName, dateValue);
         };
 
-        // ----- زر تأكيد التصدير (الأزرق) -----
-        exportModalConfirm.onclick = async () => {
-            const action = exportModal.dataset.action || 'download';
-            const fileName = exportFilename.value.trim() || 'تقرير_السرية';
-            const dateValue = exportDate.value;
-            closeExportModal();
-            if (action === 'download') {
-                await exportExcel(fileName, dateValue);
-            } else {
-                await shareFile(fileName, dateValue);
-            }
-        };
-
-        // ----- إغلاق مودال التصدير -----
         function closeExportModal() {
             exportModal.style.display = 'none';
         }
         exportModalCancel.onclick = closeExportModal;
-        exportModal.onclick = (e) => { if(e.target === exportModal) closeExportModal(); };
+        exportModal.onclick = (e) => { if (e.target === exportModal) closeExportModal(); };
 
-        // ----- زر تهيئة النظام -----
         resetBtn.onclick = clearCacheAndReload;
 
-        // ----- اختصار لوحة المفاتيح: Ctrl+Shift+R -----
         document.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'r' || e.key === 'R')) {
                 e.preventDefault();
@@ -698,10 +691,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
+        // تهيئة الوضع الافتراضي
+        toggleUnitMode('عام');
         loadQuotas();
         loadData();
     }
 
-    // ----- بدء التطبيق -----
     fetchCredentials();
 });
