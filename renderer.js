@@ -1,8 +1,3 @@
-// احذف السطر الذي يشير إلى reset-btn لأنه تم إزالته من HTML
-// في دالة initApp، يمكنك إزالة const resetBtn = document.getElementById('reset-btn');
-// وأيضاً إزالة resetBtn.onclick = clearCacheAndReload;
-// سأقدم الملف كاملاً مع التعديلات اللازمة
-
 document.addEventListener('DOMContentLoaded', function() {
     // ----- إدارة تسجيل الدخول -----
     const loginScreen = document.getElementById('login-screen');
@@ -181,7 +176,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const exportBtn = document.getElementById('export-btn');
         const addBtn = document.getElementById('add-person-btn');
         const addVacantBtn = document.getElementById('add-vacant-btn');
-        // تم إزالة reset-btn من HTML، لذا لا نستدعيه
         const unitSelect = document.getElementById('unit-select');
         const personnelSection = document.getElementById('personnel-section');
 
@@ -452,7 +446,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // ----- التحقق من صحة البيانات -----
+        // ----- التحقق من صحة البيانات (المُصلح) -----
         function validate() {
             let errors = [];
             try {
@@ -462,6 +456,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let employeeSum = 0;
 
                 if (isGeneral) {
+                    // حساب الضباط من جدول الموظفين
                     const officerStats = {
                         'حاضر': 0,
                         'إجازة': 0,
@@ -486,12 +481,22 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     });
                     Object.values(officerStats).forEach(v => officerSum += v);
+
+                    // حساب الأفراد والموظفين من حقول الإدخال
+                    document.querySelectorAll('#row-soldiers .stat-input').forEach(inp => {
+                        soldierSum += parseInt(inp.value) || 0;
+                    });
+                    document.querySelectorAll('#row-employees .stat-input').forEach(inp => {
+                        employeeSum += parseInt(inp.value) || 0;
+                    });
                 } else {
+                    // نمط التمام فقط: نأخذ من المدخلات
                     document.querySelectorAll('.officer-input').forEach(inp => officerSum += parseInt(inp.value) || 0);
                     document.querySelectorAll('.soldier-stat').forEach(inp => soldierSum += parseInt(inp.value) || 0);
                     document.querySelectorAll('.employee-stat').forEach(inp => employeeSum += parseInt(inp.value) || 0);
                 }
 
+                // التحقق من تطابق الملاك
                 document.querySelectorAll('#row-officers, #row-soldiers, #row-employees').forEach(row => {
                     const title = row.querySelector('.rank-title') ? row.querySelector('.rank-title').textContent : '';
                     const quota = parseInt(row.querySelector('.quota-input').value) || 0;
@@ -634,7 +639,7 @@ document.addEventListener('DOMContentLoaded', function() {
         async function exportExcel(fileName, dateValue) {
             try {
                 const blob = await generateExcelBlob(fileName, dateValue);
-                let finalName = fileName || '';
+                let finalName = fileName || 'تقرير_السرية';
                 if (dateValue) {
                     finalName += '_' + dateValue;
                 }
@@ -650,14 +655,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!validate()) return;
             const today = new Date().toISOString().split('T')[0];
             exportDate.value = today;
-            exportFilename.value = '';
+            exportFilename.value = 'تقرير_السرية';
             exportModal.style.display = 'flex';
         }
 
         exportBtn.onclick = openExportModal;
 
         exportModalConfirm.onclick = () => {
-            const fileName = exportFilename.value.trim() || '';
+            const fileName = exportFilename.value.trim() || 'تقرير_السرية';
             const dateValue = exportDate.value;
             closeExportModal();
             exportExcel(fileName, dateValue);
@@ -669,10 +674,7 @@ document.addEventListener('DOMContentLoaded', function() {
         exportModalCancel.onclick = closeExportModal;
         exportModal.onclick = (e) => { if (e.target === exportModal) closeExportModal(); };
 
-        // تم إزالة resetBtn، لذلك لا نربطه بأي شيء
-
-        // ----- اختصار لوحة المفاتيح (تم إزالته أيضاً لأنه كان مرتبطاً بتهيئة النظام) -----
-        // نحتفظ به فقط للإشعارات (يمكن إزالته)
+        // ----- اختصار لوحة المفاتيح -----
         document.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'r' || e.key === 'R')) {
                 e.preventDefault();
