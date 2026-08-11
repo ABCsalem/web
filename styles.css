@@ -1,142 +1,121 @@
-/* شاشة تسجيل الدخول */
+/* ----- شاشة تسجيل الدخول ----- */
 .login-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #1e293b, #0f172a);
+  background: linear-gradient(135deg, #1a2634, #0f172a);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 .login-box {
-  background: #ffffff;
-  padding: 30px 25px;
-  border-radius: 16px;
+  background: white;
+  padding: 40px 30px;
+  border-radius: 24px;
   width: 90%;
-  max-width: 380px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  max-width: 400px;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.4);
   text-align: center;
 }
 .login-box h2 {
-  color: #dc2626;
+  color: #c0392b;
   margin-top: 0;
   font-size: 1.6rem;
+  font-weight: 600;
 }
 .login-box p {
-  color: #64748b;
-  margin-bottom: 20px;
+  color: #7f8c8d;
+  margin-bottom: 25px;
+  font-size: 0.95rem;
 }
 .login-form .form-group {
   text-align: right;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 .login-form .form-group label {
   display: block;
   font-weight: 600;
-  margin-bottom: 4px;
-  color: #334155;
+  margin-bottom: 5px;
+  color: #2c3e50;
 }
 .login-form .form-group input {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  padding: 12px;
+  border: 2px solid #dfe6e9;
+  border-radius: 10px;
   font-size: 1rem;
   box-sizing: border-box;
   transition: 0.2s;
 }
 .login-form .form-group input:focus {
-  border-color: #2563eb;
+  border-color: #2980b9;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+  box-shadow: 0 0 0 3px rgba(41,128,185,0.2);
 }
 .btn-login {
   width: 100%;
-  padding: 12px;
-  background: #2563eb;
+  padding: 14px;
+  background: #2980b9;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
   transition: 0.2s;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 .btn-login:hover {
-  background: #1d4ed8;
+  background: #2471a3;
 }
 .btn-login:active {
   transform: scale(0.97);
 }
 .login-error {
-  color: #dc2626;
-  margin-top: 12px;
+  color: #e74c3c;
+  margin-top: 15px;
   font-weight: 600;
 }
 
-/* الأنماط العامة */
+/* ----- الأنماط العامة ----- */
 body {
-  font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
-  background: #f1f5f9;
-  padding: 10px;
-  color: #1e293b;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #ecf0f1;
+  padding: 15px;
+  color: #2c3e50;
   direction: rtl;
   text-align: right;
   -webkit-tap-highlight-color: transparent;
-  margin: 0;
 }
 .container {
   max-width: 1400px;
   margin: 0 auto;
 }
 .header-actions,
-.table-header-actions,
-.unit-selector {
+.table-header-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid #e2e8f0;
-  padding-bottom: 10px;
-  margin-bottom: 15px;
+  border-bottom: 2px solid #bdc3c7;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
-  gap: 10px;
-}
-.unit-selector {
-  border-bottom: none;
-  background: #ffffff;
-  padding: 10px 15px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-.unit-selector label {
-  font-weight: 600;
-  color: #334155;
-}
-.unit-selector select {
-  padding: 8px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 1rem;
-  background: white;
-}
-.unit-selector #unit-display {
-  font-weight: 700;
-  color: #2563eb;
+  gap: 12px;
 }
 h1 {
-  color: #dc2626;
+  color: #c0392b;
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 .developer {
-  font-size: 0.85rem;
-  color: #64748b;
-  margin-top: 2px;
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  margin-top: 4px;
   font-weight: 500;
 }
 .btn-export,
@@ -147,99 +126,130 @@ h1 {
 .btn-del,
 .btn-logout,
 .btn-add-vacant {
-  padding: 10px 16px;
+  padding: 10px 18px;
   font-size: 0.95rem;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   border: none;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   transition: 0.2s;
 }
-.btn-export {
-  background: #2563eb;
-  color: white;
+.btn-export { background: #2980b9; color: white; }
+.btn-export:hover { background: #2471a3; }
+.btn-export:active { transform: scale(0.95); }
+.btn-add { background: #27ae60; color: white; }
+.btn-add:hover { background: #229954; }
+.btn-reset { background: #f39c12; color: white; }
+.btn-reset:hover { background: #d68910; }
+.btn-del { background: #e74c3c; color: white; }
+.btn-del:hover { background: #c0392b; }
+.btn-logout { background: #e74c3c; color: white; }
+.btn-logout:hover { background: #c0392b; }
+.btn-add-vacant { background: #8e44ad; color: white; }
+.btn-add-vacant:hover { background: #7d3c98; }
+
+/* ----- اختيار الوحدة (شكل رسمي) ----- */
+.unit-selector {
+  background: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  border: 1px solid #d5d8dc;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
 }
-.btn-export:active {
-  transform: scale(0.95);
-  background: #1d4ed8;
+.unit-selector label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 1.1rem;
+  letter-spacing: 0.5px;
 }
-.btn-add {
-  background: #16a34a;
-  color: white;
+.unit-selector select {
+  padding: 10px 20px;
+  border: 2px solid #d5d8dc;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%232c3e50' stroke-width='2' fill='none'/%3E%3C/svg%3E") no-repeat left 12px center;
+  background-size: 12px;
+  padding-right: 20px;
+  padding-left: 36px;
+  min-width: 200px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: 500;
+  color: #2c3e50;
+  appearance: none;
+  -webkit-appearance: none;
 }
-.btn-reset {
-  background: #f59e0b;
-  color: white;
+.unit-selector select:hover {
+  border-color: #2980b9;
 }
-.btn-del {
-  background: #ef4444;
-  color: white;
+.unit-selector select:focus {
+  border-color: #2980b9;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(41,128,185,0.15);
 }
-.btn-logout {
-  background: #ef4444;
-  color: white;
+.unit-selector select option {
+  padding: 8px;
+  font-weight: 500;
 }
-.btn-logout:active {
-  transform: scale(0.95);
-}
-.btn-add-vacant {
-  background: #8b5cf6;
-  color: white;
-}
-.btn-add-vacant:active {
-  transform: scale(0.95);
-}
-.btn-cancel {
-  background: #e2e8f0;
-  color: #334155;
-}
-.btn-save {
-  background: #2563eb;
-  color: white;
+@media (max-width: 640px) {
+  .unit-selector {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .unit-selector select {
+    min-width: unset;
+    width: 100%;
+  }
 }
 
-/* بطاقات الإحصائيات */
+/* ----- بطاقات الإحصائيات ----- */
 #stats-container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 .stats-card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  border: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  border: 1px solid #e8e8e8;
 }
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid #e2e8f0;
-  padding-bottom: 10px;
-  margin-bottom: 12px;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 .rank-title {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #2c3e50;
 }
 .quota-group {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 .quota-group label {
   font-weight: 600;
-  color: #475569;
+  color: #7f8c8d;
 }
 .quota-input {
-  width: 65px;
-  padding: 6px;
-  border: 1px solid #cbd5e1;
+  width: 70px;
+  padding: 8px;
+  border: 1px solid #d5d8dc;
   border-radius: 6px;
   text-align: center;
   font-size: 1rem;
@@ -247,163 +257,44 @@ h1 {
 }
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 8px;
 }
 .stat-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f8fafc;
-  padding: 6px 10px;
+  background: #f8f9fa;
+  padding: 6px 12px;
   border-radius: 6px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #e8e8e8;
 }
 .stat-label {
   font-weight: 500;
-  color: #475569;
-  font-size: 0.85rem;
+  color: #5d6d7e;
+  font-size: 0.9rem;
 }
 .stat-val {
   font-weight: 700;
-  color: #1e293b;
-  min-width: 28px;
+  color: #2c3e50;
+  min-width: 30px;
   text-align: center;
 }
 .stat-input {
-  width: 55px;
-  padding: 4px;
-  border: 1px solid #cbd5e1;
+  width: 60px;
+  padding: 6px;
+  border: 1px solid #d5d8dc;
   border-radius: 6px;
   text-align: center;
-  font-size: 0.95rem;
-  background: white;
-}
-.stat-input::placeholder {
-  color: #94a3b8;
-  font-size: 0.75rem;
-}
-
-/* جدول الموظفين */
-.table-section {
-  background: white;
-  padding: 12px;
-  border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  margin-bottom: 20px;
-}
-.table-responsive {
-  overflow-x: auto;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-  min-width: 500px;
-}
-th,
-td {
-  border: 1px solid #e2e8f0;
-  padding: 6px 4px;
-  text-align: center;
-  vertical-align: middle;
-}
-th {
-  background: #f8fafc;
-  color: #334155;
-  font-weight: 600;
-}
-.p-input,
-select {
-  padding: 6px 4px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  text-align: center;
-  font-size: 0.95rem;
-  width: 100%;
-  box-sizing: border-box;
-  background: white;
-  min-height: 36px;
-}
-.p-input {
-  min-width: 70px;
-}
-select {
-  appearance: auto;
-  cursor: pointer;
-}
-
-/* مودالات */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-.modal-box {
-  background: white;
-  width: 92%;
-  max-width: 420px;
-  padding: 25px;
-  border-radius: 12px;
-  text-align: center;
-}
-.modal-form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin: 15px 0;
-}
-.form-group {
-  display: flex;
-  flex-direction: column;
-  text-align: right;
-}
-.form-group label {
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-.form-group input {
-  padding: 10px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
   font-size: 1rem;
-  text-align: right;
+  background: white;
 }
-.modal-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
+.stat-input:focus {
+  border-color: #2980b9;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(41,128,185,0.15);
 }
-.modal-actions button {
-  flex: 1;
-  min-width: 80px;
-}
-
-/* استجابة للشاشات الصغيرة */
 @media (max-width: 640px) {
-  .header-actions,
-  .table-header-actions,
-  .unit-selector {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .header-actions > div:first-child {
-    text-align: center;
-  }
-  .header-actions > div:last-child {
-    justify-content: center;
-  }
-  h1 {
-    font-size: 1.1rem;
-  }
   .stats-grid {
     grid-template-columns: 1fr;
   }
@@ -416,18 +307,138 @@ select {
   .stat-input {
     width: 60px;
   }
-  .btn-export,
-  .btn-add,
-  .btn-reset,
-  .btn-logout,
-  .btn-add-vacant {
-    padding: 10px 12px;
-    font-size: 0.9rem;
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
-  .modal-box {
-    padding: 20px;
-  }
-  .unit-selector select {
-    width: 100%;
-  }
+}
+
+/* ----- جدول الموظفين ----- */
+.table-section {
+  background: white;
+  padding: 16px;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-bottom: 20px;
+  border: 1px solid #e8e8e8;
+}
+.table-responsive {
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  min-width: 600px;
+}
+th,
+td {
+  border: 1px solid #e8e8e8;
+  padding: 8px 6px;
+  text-align: center;
+  vertical-align: middle;
+}
+th {
+  background: #f8f9fa;
+  color: #2c3e50;
+  font-weight: 600;
+}
+.p-input,
+select {
+  padding: 6px 4px;
+  border: 1px solid #d5d8dc;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+  background: white;
+  min-height: 36px;
+}
+.p-input:focus,
+select:focus {
+  border-color: #2980b9;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(41,128,185,0.12);
+}
+.p-input {
+  min-width: 80px;
+}
+select {
+  appearance: auto;
+  cursor: pointer;
+}
+
+/* ----- مودالات ----- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal-box {
+  background: white;
+  width: 92%;
+  max-width: 450px;
+  padding: 28px 24px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 18px 0;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #2c3e50;
+}
+.form-group input {
+  padding: 12px;
+  border: 2px solid #dfe6e9;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: right;
+  transition: 0.2s;
+}
+.form-group input:focus {
+  border-color: #2980b9;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(41,128,185,0.1);
+}
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.btn-cancel {
+  flex: 1;
+  background: #ecf0f1;
+  color: #2c3e50;
+}
+.btn-cancel:hover {
+  background: #dfe6e9;
+}
+.btn-save {
+  flex: 1;
+  background: #2980b9;
+  color: white;
+}
+.btn-save:hover {
+  background: #2471a3;
 }
