@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // ----- إدارة تسجيل الدخول (بيانات مخفية) -----
+    // ----- إدارة تسجيل الدخول -----
     const loginScreen = document.getElementById('login-screen');
     const mainContent = document.getElementById('main-content');
     const loginBtn = document.getElementById('login-btn');
@@ -578,7 +578,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // ----- دالة المشاركة المحسّنة (مع معالجة الأخطاء) -----
+        // ----- دالة المشاركة المحسّنة (تفتح نافذة اختيار التطبيقات) -----
         async function shareFile(fileName, dateValue) {
             try {
                 const blob = await generateExcelBlob(fileName, dateValue);
