@@ -578,32 +578,51 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // ----- دالة المشاركة (تفتح نافذة اختيار التطبيق) -----
+        // ----- دالة المشاركة المحسّنة (مع معالجة الأخطاء) -----
         async function shareFile(fileName, dateValue) {
             try {
                 const blob = await generateExcelBlob(fileName, dateValue);
+                
+                // التحقق من حجم الملف (حد 50 ميجابايت)
+                if (blob.size > 50 * 1024 * 1024) {
+                    alert('⚠️ الملف كبير جداً للمشاركة (أكثر من 50 ميجابايت). سيتم تحميله بدلاً من ذلك.');
+                    downloadBlob(blob, fileName + '.xlsx');
+                    return;
+                }
+
                 const file = new File([blob], `${fileName}.xlsx`, { 
                     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
                 });
 
-                // التحقق من توفر Web Share API وإمكانية المشاركة
+                // التحقق من توفر Web Share API
                 if (navigator.share && navigator.canShare) {
                     const shareData = {
                         title: 'تقرير السرية',
                         text: 'تقرير الحضور والانصراف',
                         files: [file]
                     };
+
                     if (navigator.canShare(shareData)) {
                         try {
                             await navigator.share(shareData);
                             alert('✅ تم مشاركة الملف بنجاح!');
                             return;
                         } catch (err) {
-                            if (err.name !== 'AbortError') {
-                                console.warn('فشل المشاركة:', err);
-                                alert('❌ فشل المشاركة: ' + err.message + '\nسيتم تحميل الملف بدلاً من ذلك.');
-                                downloadBlob(blob, fileName + '.xlsx');
+                            // إذا ألغى المستخدم المشاركة، لا نعرض رسالة
+                            if (err.name === 'AbortError') {
+                                console.log('المستخدم ألغى المشاركة');
+                                return;
                             }
+                            // إذا كان خطأ إذن
+                            if (err.name === 'NotAllowedError' || err.message.includes('Permission denied')) {
+                                alert('❌ تم رفض إذن المشاركة. يرجى منح الإذن للتطبيق أو المتصفح.\nسيتم تحميل الملف بدلاً من ذلك.');
+                                downloadBlob(blob, fileName + '.xlsx');
+                                return;
+                            }
+                            // أي خطأ آخر
+                            console.warn('فشل المشاركة:', err);
+                            alert('❌ فشل المشاركة: ' + err.message + '\nسيتم تحميل الملف بدلاً من ذلك.');
+                            downloadBlob(blob, fileName + '.xlsx');
                             return;
                         }
                     } else {
@@ -612,7 +631,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         return;
                     }
                 } else {
-                    // في حال عدم دعم Web Share API (مثل Electron أو متصفحات قديمة)
+                    // في حال عدم دعم Web Share API (مثل Electron)
                     alert('⚠️ ميزة المشاركة غير مدعومة في هذا المتصفح أو التطبيق.\nسيتم تحميل الملف بدلاً من ذلك.');
                     downloadBlob(blob, fileName + '.xlsx');
                 }
