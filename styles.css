@@ -101,7 +101,7 @@ body {
 }
 h1 { color: #dc2626; margin: 0; font-size: 1.4rem; }
 .developer { font-size: 0.9rem; color: #64748b; margin-top: 3px; font-weight: 500; }
-.btn-export, .btn-add, .btn-reset, .btn-cancel, .btn-save, .btn-del, .btn-logout { 
+.btn-export, .btn-add, .btn-reset, .btn-cancel, .btn-save, .btn-del, .btn-logout, .btn-share-whatsapp { 
   padding: 12px 16px; 
   font-size: 1rem; 
   border-radius: 8px; 
@@ -118,6 +118,35 @@ h1 { color: #dc2626; margin: 0; font-size: 1.4rem; }
 .btn-del { background: #ef4444; color: white; }
 .btn-logout { background: #ef4444; color: white; }
 .btn-logout:active { transform: scale(0.95); }
+
+/* ----- زر مشاركة واتساب ----- */
+.btn-share-whatsapp {
+  background: #25D366;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 16px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: 0.2s;
+}
+.btn-share-whatsapp:hover {
+  background: #1da851;
+}
+.btn-share-whatsapp:active {
+  transform: scale(0.95);
+}
+.btn-share-whatsapp svg {
+  width: 20px;
+  height: 20px;
+  fill: white;
+}
 
 /* ----- بطاقات الإحصائيات ----- */
 #stats-container {
@@ -199,7 +228,6 @@ h1 { color: #dc2626; margin: 0; font-size: 1.4rem; }
   font-size: 1rem;
   background: white;
 }
-/* تنسيق placeholder للحقول الفارغة */
 .stat-input::placeholder {
   color: #94a3b8;
   font-size: 0.8rem;
@@ -265,7 +293,7 @@ select { appearance: auto; cursor: pointer; }
   z-index: 1000; 
 }
 .modal-box { 
-  background: white; width: 92%; max-width: 400px; padding: 25px; 
+  background: white; width: 92%; max-width: 450px; padding: 25px; 
   border-radius: 12px; text-align: center; 
 }
 .modal-form { display: flex; flex-direction: column; gap: 15px; margin: 15px 0; }

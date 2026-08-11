@@ -11,32 +11,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let VALID_USER = '';
     let VALID_PASS = '';
-    let credentialsLoaded = false;
 
-    // جلب بيانات الاعتماد من main process عبر preload
     async function fetchCredentials() {
         try {
             const creds = await window.api.getCredentials();
             if (creds && creds.username && creds.password) {
                 VALID_USER = creds.username.trim();
                 VALID_PASS = creds.password.trim();
-                credentialsLoaded = true;
                 console.log('✅ تم جلب بيانات الدخول بنجاح');
             } else {
                 console.warn('⚠️ بيانات الدخول غير مكتملة، استخدم القيم الافتراضية');
-                // بيانات احتياطية (للتجربة)
                 VALID_USER = 'شعبة القوى البشرية';
                 VALID_PASS = '010203';
-                credentialsLoaded = true;
             }
         } catch (e) {
             console.error('❌ فشل جلب بيانات الدخول:', e);
-            // بيانات احتياطية
             VALID_USER = 'شعبة القوى البشرية';
             VALID_PASS = '010203';
-            credentialsLoaded = true;
         }
-        // بعد تحميل البيانات، نتحقق من حالة تسجيل الدخول
         checkLogin();
     }
 
@@ -131,10 +123,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleLogin() {
         const user = loginUsername.value.trim();
         const pass = loginPassword.value.trim();
-        
-        console.log('🔑 محاولة الدخول بـ:', user, ' مقابل ', VALID_USER);
-        console.log('🔑 كلمة المرور المدخلة:', pass, ' مقابل ', VALID_PASS);
-        
         if (user === VALID_USER && pass === VALID_PASS) {
             sessionStorage.setItem('loggedIn', 'true');
             sessionStorage.setItem('username', user);
@@ -162,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     logoutBtn.addEventListener('click', handleLogout);
 
-    // ----- دالة مسح الكاش وإعادة التحميل (مستقلة) -----
+    // ----- دالة مسح الكاش وإعادة التحميل -----
     async function clearCacheAndReload() {
         if (confirm('تحديث الكاش؟ سيتم حذف الملفات المؤقتة وتحميل أحدث إصدار.')) {
             if ('caches' in window) {
@@ -203,14 +191,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const vacantCancel = document.getElementById('vacant-modal-cancel');
         const vacantSave = document.getElementById('vacant-modal-save');
 
-        // عناصر مودال التصدير الجديد
+        // عناصر مودال التصدير
         const exportModal = document.getElementById('export-modal');
         const exportFilename = document.getElementById('export-filename');
         const exportDate = document.getElementById('export-date');
         const exportModalCancel = document.getElementById('export-modal-cancel');
         const exportModalConfirm = document.getElementById('export-modal-confirm');
+        const exportModalShareWA = document.getElementById('export-modal-share-wa');
 
-        // تعيين التاريخ الحالي كقيمة افتراضية
         const today = new Date().toISOString().split('T')[0];
         exportDate.value = today;
 
@@ -221,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ];
         let personnelData = [];
 
-        // ----- إدارة الملاك (العدادات) -----
+        // ----- إدارة الملاك -----
         function loadQuotas() {
             const saved = localStorage.getItem('saryaQuotas');
             if (saved) {
@@ -379,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function() {
             saveData();
         };
 
-        // ----- تحديث إحصائيات الضباط (الأرقام الموجودة بجانب كل حالة) -----
+        // ----- تحديث إحصائيات الضباط -----
         function updateStats() {
             try {
                 const stats = {
@@ -417,7 +405,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (e) {}
         }
 
-        // ----- التحقق من صحة البيانات قبل التصدير -----
+        // ----- التحقق من صحة البيانات -----
         function validate() {
             let errors = [];
             try {
@@ -459,135 +447,209 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             } catch (e) { errors.push('خطأ في التحقق'); }
 
-            if(errors.length > 0) { alert('⛔ منع التصدير:\n' + errors.join('\n')); return false; }
+            if(errors.length > 0) {
+                alert('⛔ منع التصدير:\n' + errors.join('\n'));
+                return false;
+            }
             return true;
         }
 
-        // ----- تصدير Excel (مع اسم الملف والتاريخ) -----
-        async function exportExcel(fileName, dateValue) {
-            if(!validate()) return;
-            try {
-                const officerStats = {
-                    'حاضر':0,
-                    'إجازة':0,
-                    'مستشفى':0,
-                    'مهمة':0,
-                    'مكلف':0,
-                    'مستاذن':0,
-                    'دورة':0,
-                    'مرافق':0,
-                    'متأخر':0,
-                    'غياب':0,
-                    'سجن':0,
-                    'الاسرى':0,
-                    'شهداء':0,
-                    'جرحى':0,
-                    'الإعاقة الدائمة':0,
-                    'هروب':0
-                };
-                personnelData.forEach(p => {
-                    if (p.status && p.status !== 'شاغر' && officerStats[p.status] !== undefined) {
-                        officerStats[p.status]++;
-                    }
-                });
-                const officerRow = [
-                    officerStats['حاضر']||0,
-                    0,
-                    officerStats['إجازة']||0,
-                    officerStats['مستشفى']||0,
-                    officerStats['مهمة']||0,
-                    officerStats['مكلف']||0,
-                    officerStats['مستاذن']||0,
-                    officerStats['دورة']||0,
-                    officerStats['مرافق']||0,
-                    officerStats['متأخر']||0,
-                    officerStats['غياب']||0,
-                    officerStats['سجن']||0,
-                    officerStats['الاسرى']||0,
-                    officerStats['شهداء']||0,
-                    officerStats['جرحى']||0,
-                    officerStats['الإعاقة الدائمة']||0,
-                    officerStats['هروب']||0
-                ];
-                const soldiers = Array.from(document.querySelectorAll('#row-soldiers .stat-input')).map(i => parseInt(i.value)||0);
-                const employees = Array.from(document.querySelectorAll('#row-employees .stat-input')).map(i => parseInt(i.value)||0);
-                const quotas = Array.from(document.querySelectorAll('#row-officers, #row-soldiers, #row-employees')).map(r => parseInt(r.querySelector('.quota-input').value)||0);
-
-                const wb = new ExcelJS.Workbook(); 
-                
-                // الورقة الرئيسية (سرية القناصة)
-                const ws = wb.addWorksheet('سرية القناصة');
-                const headers = ['الرتبة','الملاك','في المعسكر','موقع دفاعي','إجازة','مستشفى','مهمة','مكلف','مستاذن','دورة','مرافقين','متأخر','غياب','سجن','الاسرى','شهداء','جرحى','الإعاقة الدائمة','الهروب','المجموع'];
-                ws.addRow(headers).font = { bold: true };
-                
-                const titles = ['ضباط','أفراد مقاتلين','موظف'];
-                titles.forEach((t,i) => {
-                    const r = ws.addRow([t, quotas[i], ...(i===0?officerRow:(i===1?soldiers:employees))]);
-                    r.getCell(20).value = { formula: `SUM(C${r.number}:S${r.number})` };
-                });
-                
-                const total = ws.addRow(['الإجمالي']);
-                for(let c=2;c<=19;c++) total.getCell(c).value = { formula: `SUM(${ws.getCell(2,c).address}:${ws.getCell(4,c).address})` };
-                total.getCell(20).value = { formula: `SUM(C${total.number}:S${total.number})` };
-                
-                ws.addRow(['م','الاسم','النقطة','الوظيفة','الحالة']);
-                personnelData.forEach((p,i) => ws.addRow([i+1, p.name, p.point, p.job, p.status]));
-
-                // الورقة الثانية: الشواغر
-                const vacantData = personnelData.filter(p => p.status === 'شاغر');
-                
-                if (vacantData.length > 0) {
-                    const wsVacant = wb.addWorksheet('الشواغر');
-                    
-                    const titleRow = wsVacant.addRow(['قائمة الشواغر']);
-                    wsVacant.mergeCells(`A${titleRow.number}:D${titleRow.number}`);
-                    titleRow.font = { bold: true, size: 14 };
-                    titleRow.alignment = { horizontal: 'center' };
-                    
-                    const vacantHeaders = ['م', 'النقطة', 'الوظيفة', 'الحالة'];
-                    const headerRow = wsVacant.addRow(vacantHeaders);
-                    headerRow.font = { bold: true };
-                    headerRow.fill = {
-                        type: 'pattern',
-                        pattern: 'solid',
-                        fgColor: { argb: 'FFE0E0E0' }
-                    };
-                    headerRow.alignment = { horizontal: 'center' };
-                    
-                    vacantData.forEach((p, i) => {
-                        const row = wsVacant.addRow([i+1, p.point, p.job, p.status]);
-                        row.alignment = { horizontal: 'center' };
-                    });
-                    
-                    wsVacant.getColumn(1).width = 8;
-                    wsVacant.getColumn(2).width = 25;
-                    wsVacant.getColumn(3).width = 25;
-                    wsVacant.getColumn(4).width = 15;
+        // ----- دالة إنشاء ملف Excel وإرجاع Blob -----
+        async function generateExcelBlob(fileName, dateValue) {
+            const officerStats = {
+                'حاضر':0,
+                'إجازة':0,
+                'مستشفى':0,
+                'مهمة':0,
+                'مكلف':0,
+                'مستاذن':0,
+                'دورة':0,
+                'مرافق':0,
+                'متأخر':0,
+                'غياب':0,
+                'سجن':0,
+                'الاسرى':0,
+                'شهداء':0,
+                'جرحى':0,
+                'الإعاقة الدائمة':0,
+                'هروب':0
+            };
+            personnelData.forEach(p => {
+                if (p.status && p.status !== 'شاغر' && officerStats[p.status] !== undefined) {
+                    officerStats[p.status]++;
                 }
+            });
+            const officerRow = [
+                officerStats['حاضر']||0,
+                0,
+                officerStats['إجازة']||0,
+                officerStats['مستشفى']||0,
+                officerStats['مهمة']||0,
+                officerStats['مكلف']||0,
+                officerStats['مستاذن']||0,
+                officerStats['دورة']||0,
+                officerStats['مرافق']||0,
+                officerStats['متأخر']||0,
+                officerStats['غياب']||0,
+                officerStats['سجن']||0,
+                officerStats['الاسرى']||0,
+                officerStats['شهداء']||0,
+                officerStats['جرحى']||0,
+                officerStats['الإعاقة الدائمة']||0,
+                officerStats['هروب']||0
+            ];
+            const soldiers = Array.from(document.querySelectorAll('#row-soldiers .stat-input')).map(i => parseInt(i.value)||0);
+            const employees = Array.from(document.querySelectorAll('#row-employees .stat-input')).map(i => parseInt(i.value)||0);
+            const quotas = Array.from(document.querySelectorAll('#row-officers, #row-soldiers, #row-employees')).map(r => parseInt(r.querySelector('.quota-input').value)||0);
 
-                const buf = await wb.xlsx.writeBuffer();
-                const blob = new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-                const link = document.createElement('a'); 
-                link.href = URL.createObjectURL(blob); 
+            const wb = new ExcelJS.Workbook(); 
+            
+            const ws = wb.addWorksheet('سرية القناصة');
+            const headers = ['الرتبة','الملاك','في المعسكر','موقع دفاعي','إجازة','مستشفى','مهمة','مكلف','مستاذن','دورة','مرافقين','متأخر','غياب','سجن','الاسرى','شهداء','جرحى','الإعاقة الدائمة','الهروب','المجموع'];
+            ws.addRow(headers).font = { bold: true };
+            
+            const titles = ['ضباط','أفراد مقاتلين','موظف'];
+            titles.forEach((t,i) => {
+                const r = ws.addRow([t, quotas[i], ...(i===0?officerRow:(i===1?soldiers:employees))]);
+                r.getCell(20).value = { formula: `SUM(C${r.number}:S${r.number})` };
+            });
+            
+            const total = ws.addRow(['الإجمالي']);
+            for(let c=2;c<=19;c++) total.getCell(c).value = { formula: `SUM(${ws.getCell(2,c).address}:${ws.getCell(4,c).address})` };
+            total.getCell(20).value = { formula: `SUM(C${total.number}:S${total.number})` };
+            
+            ws.addRow(['م','الاسم','النقطة','الوظيفة','الحالة']);
+            personnelData.forEach((p,i) => ws.addRow([i+1, p.name, p.point, p.job, p.status]));
+
+            const vacantData = personnelData.filter(p => p.status === 'شاغر');
+            if (vacantData.length > 0) {
+                const wsVacant = wb.addWorksheet('الشواغر');
+                const titleRow = wsVacant.addRow(['قائمة الشواغر']);
+                wsVacant.mergeCells(`A${titleRow.number}:D${titleRow.number}`);
+                titleRow.font = { bold: true, size: 14 };
+                titleRow.alignment = { horizontal: 'center' };
+                
+                const vacantHeaders = ['م', 'النقطة', 'الوظيفة', 'الحالة'];
+                const headerRow = wsVacant.addRow(vacantHeaders);
+                headerRow.font = { bold: true };
+                headerRow.fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FFE0E0E0' }
+                };
+                headerRow.alignment = { horizontal: 'center' };
+                
+                vacantData.forEach((p, i) => {
+                    const row = wsVacant.addRow([i+1, p.point, p.job, p.status]);
+                    row.alignment = { horizontal: 'center' };
+                });
+                
+                wsVacant.getColumn(1).width = 8;
+                wsVacant.getColumn(2).width = 25;
+                wsVacant.getColumn(3).width = 25;
+                wsVacant.getColumn(4).width = 15;
+            }
+
+            const buf = await wb.xlsx.writeBuffer();
+            return new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+        }
+
+        // ----- دالة تحميل الملف (للتصدير العادي) -----
+        function downloadBlob(blob, filename) {
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+
+        // ----- دالة التصدير العادي (لزر التصدير) -----
+        async function exportExcel(fileName, dateValue) {
+            try {
+                const blob = await generateExcelBlob(fileName, dateValue);
                 let finalName = fileName || 'تقرير_السرية';
                 if (dateValue) {
                     finalName += '_' + dateValue;
                 }
-                link.download = finalName + '.xlsx';
-                document.body.appendChild(link); 
-                link.click(); 
-                document.body.removeChild(link); 
-                URL.revokeObjectURL(link.href);
+                downloadBlob(blob, finalName + '.xlsx');
                 alert('✅ تم تصدير وتنزيل الإكسيل بنجاح!');
-            } catch (e) { alert('حدث خطأ أثناء التصدير: ' + e.message); }
+            } catch (e) {
+                alert('حدث خطأ أثناء التصدير: ' + e.message);
+            }
         }
 
-        // ----- زر التصدير (يفتح المودال) -----
-        exportBtn.onclick = () => {
+        // ----- دالة المشاركة عبر واتساب (أو أي تطبيق) -----
+        async function shareFile(fileName, dateValue) {
+            try {
+                const blob = await generateExcelBlob(fileName, dateValue);
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: 'تقرير السرية',
+                            text: 'تقرير الحضور والانصراف',
+                            files: [new File([blob], `${fileName}.xlsx`, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })]
+                        });
+                        alert('✅ تم مشاركة الملف بنجاح!');
+                    } catch (shareError) {
+                        if (shareError.name !== 'AbortError') {
+                            alert('❌ فشل المشاركة: ' + shareError.message + '\nسيتم تحميل الملف محلياً.');
+                            downloadBlob(blob, fileName + '.xlsx');
+                        }
+                    }
+                } else {
+                    alert('❌ ميزة المشاركة غير مدعومة في هذا المتصفح.\nسيتم تحميل الملف بدلاً من ذلك.');
+                    downloadBlob(blob, fileName + '.xlsx');
+                }
+            } catch (e) {
+                alert('حدث خطأ أثناء تصدير الملف: ' + e.message);
+            }
+        }
+
+        // ----- فتح مودال التصدير -----
+        function openExportModal(action) {
+            if (!validate()) return;
             const today = new Date().toISOString().split('T')[0];
             exportDate.value = today;
             exportFilename.value = 'تقرير_السرية';
+            // تخزين الإجراء المطلوب (تصدير أو مشاركة)
+            exportModal.dataset.action = action;
             exportModal.style.display = 'flex';
+        }
+
+        // ----- زر التصدير (يحدد إجراء التصدير) -----
+        exportBtn.onclick = () => openExportModal('download');
+
+        // ----- زر مشاركة واتساب داخل المودال -----
+        exportModalShareWA.onclick = () => {
+            const action = exportModal.dataset.action || 'share';
+            // إذا كان الإجراء المطلوب هو المشاركة، ننفذها مباشرة
+            if (action === 'share') {
+                const fileName = exportFilename.value.trim() || 'تقرير_السرية';
+                const dateValue = exportDate.value;
+                closeExportModal();
+                shareFile(fileName, dateValue);
+            } else {
+                // إذا كان التصدير، نقوم بالتصدير العادي
+                const fileName = exportFilename.value.trim() || 'تقرير_السرية';
+                const dateValue = exportDate.value;
+                closeExportModal();
+                exportExcel(fileName, dateValue);
+            }
+        };
+
+        // ----- زر تأكيد التصدير (الزر الأزرق) -----
+        exportModalConfirm.onclick = () => {
+            const action = exportModal.dataset.action || 'download';
+            const fileName = exportFilename.value.trim() || 'تقرير_السرية';
+            const dateValue = exportDate.value;
+            closeExportModal();
+            if (action === 'download') {
+                exportExcel(fileName, dateValue);
+            } else {
+                shareFile(fileName, dateValue);
+            }
         };
 
         // ----- إغلاق مودال التصدير -----
@@ -597,18 +659,10 @@ document.addEventListener('DOMContentLoaded', function() {
         exportModalCancel.onclick = closeExportModal;
         exportModal.onclick = (e) => { if(e.target === exportModal) closeExportModal(); };
 
-        // ----- تأكيد التصدير -----
-        exportModalConfirm.onclick = () => {
-            const fileName = exportFilename.value.trim() || 'تقرير_السرية';
-            const dateValue = exportDate.value;
-            closeExportModal();
-            exportExcel(fileName, dateValue);
-        };
-
-        // ----- زر تهيئة النظام (يدعو الدالة المستقلة) -----
+        // ----- زر تهيئة النظام -----
         resetBtn.onclick = clearCacheAndReload;
 
-        // ----- اختصار لوحة المفاتيح: Ctrl+Shift+R (أو Cmd+Shift+R) -----
+        // ----- اختصار لوحة المفاتيح: Ctrl+Shift+R -----
         document.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'r' || e.key === 'R')) {
                 e.preventDefault();
@@ -616,11 +670,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // تحميل البيانات الأولية
         loadQuotas();
         loadData();
     }
 
-    // ----- بدء التطبيق: جلب بيانات الدخول ثم التحقق من تسجيل الدخول -----
+    // ----- بدء التطبيق -----
     fetchCredentials();
 });
