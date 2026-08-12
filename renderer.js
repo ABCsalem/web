@@ -17,10 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (manifestLink) manifestLink.remove();
 
     // ============================================================
-    // 1. رابط ملف users.json (غيّر هذا الرابط إلى رابطك المباشر)
+    // 1. رابط ملف users.json (رابطك المباشر)
     // ============================================================
     const USERS_JSON_URL = 'https://raw.githubusercontent.com/ABCsalem/web/main/users.json';
-    // مثال: 'https://raw.githubusercontent.com/salamsalah/sarya-users/main/users.json'
 
     // ============================================================
     // 2. جلب المستخدمين من الرابط المباشر
@@ -64,8 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const loginError = document.getElementById('login-error');
     const userDisplay = document.getElementById('user-display');
 
-    // زر إدارة المستخدمين لن يظهر لأننا لا نستطيع تعديل users.json عبر المتصفح
-    // لكننا سنخفيه نهائياً (يمكنك إظهاره للمدير لكن التعديل لن يعمل)
+    // زر إدارة المستخدمين لن يظهر (لأننا لا نستطيع تعديل users.json عبر المتصفح)
     const manageUsersBtn = document.getElementById('manage-users-btn');
     if (manageUsersBtn) manageUsersBtn.style.display = 'none';
 

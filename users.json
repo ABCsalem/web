@@ -2,100 +2,56 @@
   "الطيران": {
     "password": "14325",
     "isAdmin": false,
-    "quotas": {
-      "officers": 7,
-      "soldiers": 73,
-      "employees": 2
-    }
+    "quotas": { "officers": 7, "soldiers": 73, "employees": 2 }
   },
   "القناصة": {
     "password": "25436",
     "isAdmin": false,
-    "quotas": {
-      "officers": 5,
-      "soldiers": 84,
-      "employees": 2
-    }
+    "quotas": { "officers": 5, "soldiers": 84, "employees": 2 }
   },
   "الامن": {
     "password": "12354",
     "isAdmin": false,
-    "quotas": {
-      "officers": 0,
-      "soldiers": 0,
-      "employees": 12
-    }
+    "quotas": { "officers": 0, "soldiers": 0, "employees": 12 }
   },
   "الاسناد الاداري": {
     "password": "15234",
     "isAdmin": false,
-    "quotas": {
-      "officers": 7,
-      "soldiers": 60,
-      "employees": 13
-    }
+    "quotas": { "officers": 7, "soldiers": 60, "employees": 13 }
   },
   "شرطة عسكرية": {
     "password": "26345",
     "isAdmin": false,
-    "quotas": {
-      "officers": 7,
-      "soldiers": 161,
-      "employees": 2
-    }
+    "quotas": { "officers": 7, "soldiers": 161, "employees": 2 }
   },
   "الاسناد الطبي": {
     "password": "25436",
     "isAdmin": false,
-    "quotas": {
-      "officers": 7,
-      "soldiers": 0,
-      "employees": 129
-    }
+    "quotas": { "officers": 7, "soldiers": 0, "employees": 129 }
   },
   "الصيانة": {
     "password": "24563",
     "isAdmin": false,
-    "quotas": {
-      "officers": 7,
-      "soldiers": 0,
-      "employees": 90
-    }
+    "quotas": { "officers": 7, "soldiers": 0, "employees": 90 }
   },
   "الكورنيت": {
     "password": "15234",
     "isAdmin": false,
-    "quotas": {
-      "officers": 0,
-      "soldiers": 75,
-      "employees": 3
-    }
+    "quotas": { "officers": 0, "soldiers": 75, "employees": 3 }
   },
   "الهندسة": {
     "password": "13542",
     "isAdmin": false,
-    "quotas": {
-      "officers": 6,
-      "soldiers": 93,
-      "employees": 2
-    }
+    "quotas": { "officers": 6, "soldiers": 93, "employees": 2 }
   },
   "الاتصالات": {
     "password": "24653",
     "isAdmin": false,
-    "quotas": {
-      "officers": 7,
-      "soldiers": 72,
-      "employees": 3
-    }
+    "quotas": { "officers": 7, "soldiers": 72, "employees": 3 }
   },
   "admin": {
-    "password": "123",
+    "password": "admin123",
     "isAdmin": true,
-    "quotas": {
-      "officers": 20,
-      "soldiers": 50,
-      "employees": 10
-    }
+    "quotas": { "officers": 20, "soldiers": 50, "employees": 10 }
   }
 }
