@@ -1,6 +1,6 @@
 {
   "الاتصالات": {
-    "password": "1234566",
+    "password": "24653",
     "isAdmin": false,
     "quotas": {
       "officers": 10,
@@ -9,21 +9,40 @@
     }
   },
   "الطيران": {
-    "password": "123654",
+    "password": "14325",
     "isAdmin": false,
     "quotas": {
-      "officers": 8,
-      "soldiers": 20,
-      "employees": 4
+      "officers": 7,
+      "soldiers": 73,
+      "employees": 2
     }
   },
-  "admin": {
-    "password": "admin123",
+  "البشرية": {
+    "password": "البشرية",
     "isAdmin": true,
     "quotas": {
-      "officers": 20,
-      "soldiers": 50,
-      "employees": 10
+      "officers": 5,
+      "soldiers": 0,
+      "employees": 0
+    }
+  }
+},
+  "الطيران": {
+    "password": "14325",
+    "isAdmin": false,
+    "quotas": {
+      "officers": 7,
+      "soldiers": 73,
+      "employees": 2
+    }
+  },
+  "البشرية": {
+    "password": "البشرية",
+    "isAdmin": true,
+    "quotas": {
+      "officers": 5,
+      "soldiers": 0,
+      "employees": 0
     }
   }
 }
