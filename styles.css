@@ -200,7 +200,6 @@ h1 {
   background: #1860a3;
   border-color: #1860a3;
 }
-/* أزرار الحذف في الجدول */
 .btn-del {
   background: #dc3545;
   color: white;
@@ -220,7 +219,7 @@ h1 {
   transform: scale(0.95);
 }
 
-/* ----- اختيار الوحدة (شكل رسمي) ----- */
+/* ----- اختيار الوحدة ----- */
 .unit-selector {
   background: white;
   padding: 16px 24px;
@@ -263,10 +262,6 @@ h1 {
   border-color: #2980b9;
   outline: none;
   box-shadow: 0 0 0 3px rgba(41,128,185,0.15);
-}
-.unit-selector select option {
-  padding: 8px;
-  font-weight: 500;
 }
 @media (max-width: 640px) {
   .unit-selector {
@@ -497,7 +492,6 @@ select {
   gap: 10px;
   flex-wrap: wrap;
 }
-/* أنماط إدارة المستخدمين */
 .user-management-table {
   width: 100%;
   border-collapse: collapse;
@@ -560,8 +554,6 @@ select {
 .add-user-form button:hover {
   background: #2471a3;
 }
-
-/* جعل حقول الملاك للقراءة فقط تبدو رمادية */
 .quota-input[readonly] {
   background-color: #f0f0f0;
   cursor: not-allowed;
