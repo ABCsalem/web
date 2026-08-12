@@ -1,7 +1,7 @@
 {
   "الطيران": {
     "password": "14325",
-    "isAdmin": true,
+    "isAdmin": false,
     "quotas": {
       "officers": 7,
       "soldiers": 73,

@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================================
     // 1. رابط ملف users.json (غيّر هذا الرابط إلى رابطك المباشر)
     // ============================================================
-    const USERS_JSON_URL = 'https://raw.githubusercontent.com/اسمك/المستودع/main/users.json';
+    const USERS_JSON_URL = 'https://raw.githubusercontent.com/ABCsalem/web/main/users.json';
     // مثال: 'https://raw.githubusercontent.com/salamsalah/sarya-users/main/users.json'
 
     // ============================================================
