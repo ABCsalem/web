@@ -1,0 +1,11 @@
+{
+  "admin": {
+    "password": "admin123",
+    "isAdmin": true,
+    "quotas": {
+      "officers": 20,
+      "soldiers": 50,
+      "employees": 10
+    }
+  }
+}
