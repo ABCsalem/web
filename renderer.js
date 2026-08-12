@@ -1,5 +1,6 @@
 // ================================================================
 // renderer.js - نسخة تعتمد على ملف users.json من رابط مباشر (GitHub)
+// مع إضافة جميع حالات الموظفين في القائمة المنسدلة
 // ================================================================
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -133,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function showMainContent() {
         loginScreen.style.display = 'none';
         mainContent.style.display = 'block';
-        userDisplay.textContent = 'مرحباً بك يا كاتب  ' + currentUser;
+        userDisplay.textContent = 'مرحباً بك في نظام ' + currentUser;
         initApp();
     }
 
@@ -266,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updateStats();
         }
 
-        // ---- عرض الجدول ----
+        // ---- عرض الجدول (تمت إضافة جميع الحالات إلى القائمة) ----
         function renderTable() {
             personnelTbody.innerHTML = '';
             personnelData.forEach((item, idx) => {
@@ -288,6 +289,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             <option value="مستاذن" ${item.status==='مستاذن'?'selected':''}>مستاذن</option>
                             <option value="غياب" ${item.status==='غياب'?'selected':''}>غياب</option>
                             <option value="سجن" ${item.status==='سجن'?'selected':''}>سجن</option>
+                            <option value="متأخر" ${item.status==='متأخر'?'selected':''}>متأخر</option>
+                            <option value="الاسرى" ${item.status==='الاسرى'?'selected':''}>الاسرى</option>
+                            <option value="شهداء" ${item.status==='شهداء'?'selected':''}>شهداء</option>
+                            <option value="جرحى" ${item.status==='جرحى'?'selected':''}>جرحى</option>
+                            <option value="الإعاقة الدائمة" ${item.status==='الإعاقة الدائمة'?'selected':''}>الإعاقة الدائمة</option>
+                            <option value="هروب" ${item.status==='هروب'?'selected':''}>هروب</option>
                             <option value="شاغر" ${item.status==='شاغر'?'selected':''}>شاغر</option>
                         </select>
                     </td>
@@ -348,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
             saveData();
         };
 
-        // ---- تحديث الإحصائيات ----
+        // ---- تحديث الإحصائيات (تستثني حالة "شاغر" تلقائياً) ----
         function updateStats() {
             try {
                 const isGeneral = currentUnit === 'عام';
