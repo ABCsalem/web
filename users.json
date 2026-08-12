@@ -1,4 +1,22 @@
 {
+  "الاتصالات": {
+    "password": "1234566",
+    "isAdmin": false,
+    "quotas": {
+      "officers": 10,
+      "soldiers": 25,
+      "employees": 5
+    }
+  },
+  "الطيران": {
+    "password": "123654",
+    "isAdmin": false,
+    "quotas": {
+      "officers": 8,
+      "soldiers": 20,
+      "employees": 4
+    }
+  },
   "admin": {
     "password": "admin123",
     "isAdmin": true,

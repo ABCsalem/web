@@ -1,10 +1,10 @@
 // ================================================================
-// renderer.js - النسخة النهائية الكاملة (تعمل مع api.php و localStorage)
+// renderer.js - نسخة تعتمد على ملف users.json من رابط مباشر (GitHub)
 // ================================================================
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. إلغاء Service Worker و Manifest لتجنب أخطاء (إن وجدت)
+    // 0. إلغاء Service Worker و Manifest لتجنب الأخطاء
     // ============================================================
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
@@ -17,59 +17,43 @@ document.addEventListener('DOMContentLoaded', function() {
     if (manifestLink) manifestLink.remove();
 
     // ============================================================
-    // 1. دوال الاتصال بـ API (api.php) لإدارة المستخدمين
+    // 1. رابط ملف users.json (غيّر هذا الرابط إلى رابطك المباشر)
     // ============================================================
-    const API_URL = 'api.php'; // تأكد أن الملف في نفس المجلد
+    const USERS_JSON_URL = 'https://raw.githubusercontent.com/اسمك/المستودع/main/users.json';
+    // مثال: 'https://raw.githubusercontent.com/salamsalah/sarya-users/main/users.json'
 
-    // جلب كل المستخدمين
+    // ============================================================
+    // 2. جلب المستخدمين من الرابط المباشر
+    // ============================================================
+    let cachedUsers = null;
+
     async function getUsers() {
-        const url = API_URL + '?action=get';
-        console.log('📡 جاري جلب المستخدمين من:', url);
-        const res = await fetch(url);
-        if (!res.ok) {
-            const text = await res.text();
-            throw new Error(`خطأ ${res.status}: ${text.substring(0, 100)}`);
+        if (cachedUsers) return cachedUsers;
+        try {
+            console.log('📡 جاري جلب المستخدمين من:', USERS_JSON_URL);
+            const res = await fetch(USERS_JSON_URL);
+            if (!res.ok) {
+                throw new Error('فشل تحميل الملف: ' + res.status);
+            }
+            const data = await res.json();
+            cachedUsers = data;
+            console.log('✅ تم جلب المستخدمين:', data);
+            return data;
+        } catch (e) {
+            console.error('❌ خطأ في جلب المستخدمين:', e);
+            // في حال فشل التحميل، نستخدم بيانات افتراضية للتجربة
+            const fallback = {
+                admin: { password: 'admin123', isAdmin: true, quotas: { officers: 20, soldiers: 50, employees: 10 } },
+                الاتصالات: { password: '1234566', isAdmin: false, quotas: { officers: 10, soldiers: 25, employees: 5 } },
+                الطيران: { password: '123654', isAdmin: false, quotas: { officers: 8, soldiers: 20, employees: 4 } }
+            };
+            cachedUsers = fallback;
+            return fallback;
         }
-        const data = await res.json();
-        console.log('✅ تم جلب المستخدمين:', data);
-        return data;
-    }
-
-    // إضافة مستخدم جديد
-    async function addUser(username, password, quotas, isAdmin = false) {
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'add', username, password, quotas, isAdmin })
-        });
-        const text = await res.text();
-        try { return JSON.parse(text); } catch (e) { throw new Error('استجابة غير صالحة: ' + text); }
-    }
-
-    // تحديث ملاك مستخدم
-    async function updateUserQuotas(username, quotas) {
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'update', username, quotas })
-        });
-        const text = await res.text();
-        try { return JSON.parse(text); } catch (e) { throw new Error('استجابة غير صالحة: ' + text); }
-    }
-
-    // حذف مستخدم
-    async function deleteUser(username) {
-        const res = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'delete', username })
-        });
-        const text = await res.text();
-        try { return JSON.parse(text); } catch (e) { throw new Error('استجابة غير صالحة: ' + text); }
     }
 
     // ============================================================
-    // 2. عناصر الواجهة الأساسية
+    // 3. عناصر الواجهة الأساسية
     // ============================================================
     const loginScreen = document.getElementById('login-screen');
     const mainContent = document.getElementById('main-content');
@@ -80,23 +64,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const loginError = document.getElementById('login-error');
     const userDisplay = document.getElementById('user-display');
 
+    // زر إدارة المستخدمين لن يظهر لأننا لا نستطيع تعديل users.json عبر المتصفح
+    // لكننا سنخفيه نهائياً (يمكنك إظهاره للمدير لكن التعديل لن يعمل)
     const manageUsersBtn = document.getElementById('manage-users-btn');
-    const userManagementModal = document.getElementById('user-management-modal');
-    const userTableBody = document.getElementById('user-table-body');
-    const addUsername = document.getElementById('add-username');
-    const addPassword = document.getElementById('add-password');
-    const addOfficersQuota = document.getElementById('add-officers-quota');
-    const addSoldiersQuota = document.getElementById('add-soldiers-quota');
-    const addEmployeesQuota = document.getElementById('add-employees-quota');
-    const addUserBtn = document.getElementById('add-user-btn');
-    const closeUserManagement = document.getElementById('close-user-management');
+    if (manageUsersBtn) manageUsersBtn.style.display = 'none';
 
     let currentUser = null;
     let currentQuotas = null;
     let isAdmin = false;
 
     // ============================================================
-    // 3. دوال تسجيل الدخول
+    // 4. تسجيل الدخول (يعتمد على getUsers)
     // ============================================================
     async function handleLogin() {
         const username = loginUsername.value.trim();
@@ -158,9 +136,6 @@ document.addEventListener('DOMContentLoaded', function() {
         loginScreen.style.display = 'none';
         mainContent.style.display = 'block';
         userDisplay.textContent = 'مرحباً بك في نظام ' + currentUser;
-        if (manageUsersBtn) {
-            manageUsersBtn.style.display = isAdmin ? 'inline-flex' : 'none';
-        }
         initApp();
     }
 
@@ -185,136 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
     logoutBtn.addEventListener('click', handleLogout);
 
     // ============================================================
-    // 4. إدارة المستخدمين (واجهة المدير) - تعتمد على API
-    // ============================================================
-    async function loadUsersTable() {
-        try {
-            const users = await getUsers();
-            userTableBody.innerHTML = '';
-            for (const [username, data] of Object.entries(users)) {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${username}</td>
-                    <td>${data.isAdmin ? 'نعم' : 'لا'}</td>
-                    <td>${data.quotas.officers || 0}</td>
-                    <td>${data.quotas.soldiers || 0}</td>
-                    <td>${data.quotas.employees || 0}</td>
-                    <td>
-                        <button class="btn btn-small btn-edit-quota" data-username="${username}">تعديل الملاك</button>
-                        ${username !== 'admin' ? `<button class="btn btn-small btn-danger" data-username="${username}">حذف</button>` : ''}
-                    </td>
-                `;
-                userTableBody.appendChild(tr);
-            }
-            // إضافة مستمعات للأزرار
-            document.querySelectorAll('.btn-edit-quota').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    openEditQuotaModal(this.dataset.username);
-                });
-            });
-            document.querySelectorAll('.btn-danger').forEach(btn => {
-                btn.addEventListener('click', async function() {
-                    const username = this.dataset.username;
-                    if (confirm(`حذف المستخدم "${username}"؟`)) {
-                        try {
-                            const result = await deleteUser(username);
-                            if (result.success) {
-                                alert('تم الحذف');
-                                loadUsersTable();
-                            } else {
-                                alert('فشل الحذف: ' + result.error);
-                            }
-                        } catch (e) { alert('خطأ: ' + e.message); }
-                    }
-                });
-            });
-        } catch (e) {
-            alert('خطأ في تحميل المستخدمين: ' + e.message);
-        }
-    }
-
-    function openEditQuotaModal(username) {
-        const modal = document.getElementById('edit-quota-modal');
-        const inputOfficers = document.getElementById('edit-officers-quota');
-        const inputSoldiers = document.getElementById('edit-soldiers-quota');
-        const inputEmployees = document.getElementById('edit-employees-quota');
-        const saveBtn = document.getElementById('save-quota-edit');
-        const cancelBtn = document.getElementById('cancel-quota-edit');
-
-        getUsers().then(users => {
-            const user = users[username];
-            if (!user) { alert('المستخدم غير موجود'); return; }
-            inputOfficers.value = user.quotas.officers || 0;
-            inputSoldiers.value = user.quotas.soldiers || 0;
-            inputEmployees.value = user.quotas.employees || 0;
-            modal.style.display = 'flex';
-
-            saveBtn.onclick = async function() {
-                const quotas = {
-                    officers: parseInt(inputOfficers.value) || 0,
-                    soldiers: parseInt(inputSoldiers.value) || 0,
-                    employees: parseInt(inputEmployees.value) || 0
-                };
-                try {
-                    const result = await updateUserQuotas(username, quotas);
-                    if (result.success) {
-                        alert('تم التحديث');
-                        modal.style.display = 'none';
-                        loadUsersTable();
-                        if (username === currentUser) {
-                            currentQuotas = quotas;
-                            sessionStorage.setItem('quotas', JSON.stringify(quotas));
-                            applyQuotas(quotas);
-                        }
-                    } else {
-                        alert('فشل التحديث: ' + result.error);
-                    }
-                } catch (e) { alert('خطأ: ' + e.message); }
-            };
-            cancelBtn.onclick = () => { modal.style.display = 'none'; };
-            modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
-        });
-    }
-
-    if (manageUsersBtn) {
-        manageUsersBtn.addEventListener('click', function() {
-            userManagementModal.style.display = 'flex';
-            loadUsersTable();
-        });
-    }
-    if (closeUserManagement) {
-        closeUserManagement.addEventListener('click', function() {
-            userManagementModal.style.display = 'none';
-        });
-        userManagementModal.addEventListener('click', function(e) {
-            if (e.target === userManagementModal) userManagementModal.style.display = 'none';
-        });
-    }
-    if (addUserBtn) {
-        addUserBtn.addEventListener('click', async function() {
-            const username = addUsername.value.trim();
-            const password = addPassword.value.trim();
-            const officers = parseInt(addOfficersQuota.value) || 0;
-            const soldiers = parseInt(addSoldiersQuota.value) || 0;
-            const employees = parseInt(addEmployeesQuota.value) || 0;
-            if (!username || !password) { alert('أدخل اسم وكلمة مرور'); return; }
-            const quotas = { officers, soldiers, employees };
-            try {
-                const result = await addUser(username, password, quotas, false);
-                if (result.success) {
-                    alert('تمت الإضافة');
-                    addUsername.value = ''; addPassword.value = '';
-                    addOfficersQuota.value = ''; addSoldiersQuota.value = ''; addEmployeesQuota.value = '';
-                    loadUsersTable();
-                } else {
-                    alert('فشل الإضافة: ' + result.error);
-                }
-            } catch (e) { alert('خطأ: ' + e.message); }
-        });
-    }
-
-    // ============================================================
-    // 5. تطبيق الملاكات على حقول الملاك الرئيسية
+    // 5. تطبيق الملاكات على حقول الملاك
     // ============================================================
     function applyQuotas(quotas) {
         const officersInput = document.querySelector('#row-officers .quota-input');
