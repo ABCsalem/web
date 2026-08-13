@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sarya-pwa-v3';
+const CACHE_NAME = 'sarya-pwa-v4';  // تغيير الإصدار لتفعيل التحديث
 const OFFLINE_URL = '/web/index.html';
 
 const ASSETS = [
@@ -9,15 +9,17 @@ const ASSETS = [
   '/web/manifest.json'
 ];
 
+// تثبيت الـ SW مع تخزين الملفات
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       console.log('📦 تخزين الملفات الأساسية');
       return cache.addAll(ASSETS);
-    }).then(() => self.skipWaiting())
+    }).then(() => self.skipWaiting()) // تفعيل الـ SW الجديد فوراً
   );
 });
 
+// تفعيل الـ SW الجديد وحذف الكاش القديم
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -25,14 +27,18 @@ self.addEventListener('activate', event => {
         cacheNames.filter(name => name !== CACHE_NAME)
           .map(name => caches.delete(name))
       );
-    }).then(() => self.clients.claim())
+    }).then(() => {
+      // السيطرة على الصفحات المفتوحة
+      return self.clients.claim();
+    })
   );
 });
 
+// استراتيجية الشبكة أولاً مع الاحتياط بالكاش
 self.addEventListener('fetch', event => {
   const requestUrl = new URL(event.request.url);
 
-  // نستثني users.json (نذهب للشبكة دائماً)
+  // استثناء users.json (نذهب للشبكة دائماً)
   if (requestUrl.pathname.includes('users.json')) {
     event.respondWith(fetch(event.request).catch(() => {
       return new Response('لا يمكن تحميل بيانات المستخدمين', { status: 503 });
@@ -40,6 +46,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // استراتيجية "Stale-While-Revalidate" للملفات الأخرى
   event.respondWith(
     caches.match(event.request).then(cachedResponse => {
       const fetchPromise = fetch(event.request).then(networkResponse => {
