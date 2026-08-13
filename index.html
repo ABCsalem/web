@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
   <title>نظام إدارة وأتمتة التحضير - م/سالم صلاح</title>
 
+  <!-- ربط ملف PWA (manifest) -->
   <link rel="manifest" href="/web/manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -47,7 +48,7 @@
       .notice-bar .scroll-text { animation-duration: 25s; }
     }
 
-    /* زر تثبيت التطبيق (في الهيدر) */
+    /* زر تثبيت التطبيق في الهيدر (يظهر عند الحاجة) */
     .install-btn {
       display: inline-flex;
       align-items: center;
@@ -75,7 +76,7 @@
       .install-btn { width: 100%; justify-content: center; }
     }
 
-    /* مودال التثبيت المنبثق (يظهر في المنتصف) */
+    /* مودال التثبيت المنبثق (يظهر تلقائياً) */
     .install-modal {
       position: fixed;
       top: 0;
@@ -105,7 +106,7 @@
     .install-modal-content h3 {
       margin-top: 0;
       color: #1e293b;
-      font-size: 1.5rem;
+      font-size: 1.4rem;
     }
     .install-modal-content p {
       color: #64748b;
@@ -132,17 +133,17 @@
       border: none;
       color: #94a3b8;
       font-size: 0.9rem;
-      margin-top: 12px;
+      margin-top: 10px;
       cursor: pointer;
       text-decoration: underline;
-      width: 100%;
+      padding: 8px;
     }
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* زر التحديث المخفي (للمطور فقط) */
+    /* زر تحديث التطبيق (مخفي للمطور فقط) */
     .update-btn-hidden {
       position: fixed;
       bottom: 10px;
@@ -155,15 +156,15 @@
       color: #64748b;
       cursor: pointer;
       z-index: 999;
-      opacity: 0.5;
-      transition: 0.2s;
+      opacity: 0.4;
+      transition: 0.3s;
     }
     .update-btn-hidden:hover {
       opacity: 1;
       background: #e2e8f0;
     }
 
-    /* أنماط مودال إدارة المستخدمين (موجودة أصلاً في styles.css، لكن نضعها احتياطاً) */
+    /* أنماط إدارة المستخدمين (لن تظهر) */
     .user-management-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
     .user-management-table th, .user-management-table td { border: 1px solid #ddd; padding: 6px; text-align: center; }
     .user-management-table th { background: #f2f2f2; }
@@ -214,10 +215,12 @@
         </div>
       </div>
 
+      <!-- شريط التنبيه -->
       <div class="notice-bar">
         <span class="scroll-text">⚠️ &nbsp; نسعى جاهدين للتحول الرقمي وانهاء عشوائية العمل التقليدي &nbsp; ⚠️</span>
       </div>
 
+      <!-- اختيار الوحدة -->
       <div class="unit-selector">
         <label for="unit-select">اختر الوحدة:</label>
         <select id="unit-select">
@@ -341,20 +344,20 @@
     </div>
   </div>
 
-  <!-- مودال التثبيت المنبثق (يظهر تلقائياً) -->
+  <!-- مودال التثبيت المنبثق -->
   <div id="install-modal" class="install-modal">
     <div class="install-modal-content">
       <h3>📲 قم بتثبيت التطبيق</h3>
-      <p>للحصول على تجربة أفضل وسرعة في الوصول، قم بتثبيت التطبيق على جهازك.</p>
+      <p>للحصول على تجربة أفضل وسرعة في الوصول، قم بتثبيت التطبيق على جهازك. سيصبح مثل أي تطبيق آخر في قائمة التطبيقات.</p>
       <button id="install-modal-btn" class="btn-install-modal">تثبيت التطبيق</button>
       <button id="install-modal-close" class="btn-close-modal">تخطي</button>
     </div>
   </div>
 
-  <!-- زر تحديث التطبيق (مخفي للمطور فقط) -->
+  <!-- زر تحديث التطبيق (للمطور فقط) -->
   <button id="update-app-btn" class="update-btn-hidden">🔄 تحديث التطبيق</button>
 
-  <!-- مودال إدارة المستخدمين -->
+  <!-- بقية المودالات (نفسها) -->
   <div id="user-management-modal" class="modal-overlay" style="display:none;">
     <div class="modal-box" style="max-width: 700px;">
       <h3>إدارة المستخدمين</h3>
@@ -375,7 +378,6 @@
     </div>
   </div>
 
-  <!-- مودال تعديل الملاك -->
   <div id="edit-quota-modal" class="modal-overlay" style="display:none;">
     <div class="modal-box">
       <h3>تعديل الملاك</h3>
@@ -391,7 +393,6 @@
     </div>
   </div>
 
-  <!-- مودال إضافة موظف -->
   <div id="add-modal" class="modal-overlay" style="display: none;">
     <div class="modal-box">
       <h3>إضافة موظف جديد</h3>
@@ -404,7 +405,6 @@
     </div>
   </div>
 
-  <!-- مودال إضافة شاغر -->
   <div id="add-vacant-modal" class="modal-overlay" style="display: none;">
     <div class="modal-box">
       <h3>إضافة شاغر</h3>
@@ -417,7 +417,6 @@
     </div>
   </div>
 
-  <!-- مودال التصدير -->
   <div id="export-modal" class="modal-overlay" style="display: none;">
     <div class="modal-box">
       <h3>تصدير التقرير</h3>
@@ -438,39 +437,36 @@
     </div>
   </div>
 
+  <!-- كود PWA والتثبيت المنبثق -->
   <script>
-    // ============================================================
-    // كود PWA والتثبيت المنبثق
-    // ============================================================
-
     // 1. تسجيل Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/web/sw.js')
           .then(registration => {
-            console.log('✅ Service Worker مسجل:', registration);
+            console.log('✅ Service Worker مسجل بنجاح:', registration);
           })
           .catch(error => {
-            console.log('❌ فشل التسجيل:', error);
+            console.log('❌ فشل تسجيل Service Worker:', error);
           });
       });
     }
 
-    // 2. إدارة التثبيت المنبثق
+    // 2. إدارة المودال المنبثق للتثبيت
     let deferredPrompt = null;
     const installModal = document.getElementById('install-modal');
     const installModalBtn = document.getElementById('install-modal-btn');
     const installModalClose = document.getElementById('install-modal-close');
     const installBtnHeader = document.getElementById('install-app-btn');
 
-    // التحقق مما إذا كان التطبيق مثبتاً بالفعل
+    // التحقق مما إذا كان التطبيق مثبتاً بالفعل (في وضع standalone)
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     if (isStandalone) {
       if (installModal) installModal.style.display = 'none';
       if (installBtnHeader) installBtnHeader.classList.add('hidden');
     }
 
-    // استقبال حدث beforeinstallprompt
+    // استقبال حدث beforeinstallprompt (يُطلق عندما يكون التطبيق قابلاً للتثبيت)
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
@@ -517,16 +513,13 @@
       console.log('✅ تم تثبيت التطبيق');
     });
 
-    // ============================================================
     // 3. زر تحديث التطبيق (للمطور فقط)
-    // ============================================================
     document.getElementById('update-app-btn').addEventListener('click', function() {
       if (confirm('تحديث التطبيق؟ سيتم تحميل أحدث إصدار ولن تفقد بياناتك المخزنة.')) {
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.ready.then(registration => {
             registration.update();
-            // إعادة تحميل الصفحة بعد التحديث
-            window.location.reload(true);
+            setTimeout(() => window.location.reload(true), 1000);
           }).catch(e => {
             alert('خطأ في التحديث: ' + e.message);
           });
@@ -535,11 +528,6 @@
         }
       }
     });
-
-    // ============================================================
-    // 4. باقي كود التطبيق سيتم تحميله عبر renderer.js
-    // ============================================================
-    console.log('✅ PWA والإعدادات جاهزة');
   </script>
 
   <!-- تحميل ملف renderer.js -->
