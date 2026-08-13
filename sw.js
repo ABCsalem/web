@@ -1,12 +1,6 @@
-// ================================================================
-// sw.js - Service Worker لتطبيق نظام التحضير (PWA)
-// يدعم التخزين المؤقت للملفات الأساسية ويعمل على أندرويد
-// ================================================================
-
-const CACHE_NAME = 'sarya-pwa-v2';
+const CACHE_NAME = 'sarya-pwa-v3';
 const OFFLINE_URL = '/web/index.html';
 
-// الملفات الأساسية التي سيتم تخزينها مؤقتاً
 const ASSETS = [
   '/web/',
   '/web/index.html',
@@ -15,7 +9,6 @@ const ASSETS = [
   '/web/manifest.json'
 ];
 
-// تثبيت الـ Service Worker وتخزين الملفات
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
@@ -25,7 +18,6 @@ self.addEventListener('install', event => {
   );
 });
 
-// تفعيل الـ Service Worker وحذف الكاش القديم
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -37,26 +29,20 @@ self.addEventListener('activate', event => {
   );
 });
 
-// استراتيجية "الشبكة أولاً" للملفات، مع الاحتياط بالكاش
-// هذا يضمن أن ملف users.json يتم جلبه دائماً من الشبكة (لكننا سنستثنيه)
 self.addEventListener('fetch', event => {
   const requestUrl = new URL(event.request.url);
 
-  // نستثني طلبات users.json (نذهب للشبكة دائماً ولا نخزنها)
+  // نستثني users.json (نذهب للشبكة دائماً)
   if (requestUrl.pathname.includes('users.json')) {
     event.respondWith(fetch(event.request).catch(() => {
-      // في حال فشل الشبكة، نعيد استجابة فارغة أو رسالة خطأ
-      return new Response('لا يمكن تحميل بيانات المستخدمين، تأكد من الاتصال بالإنترنت', { status: 503 });
+      return new Response('لا يمكن تحميل بيانات المستخدمين', { status: 503 });
     }));
     return;
   }
 
-  // استراتيجية "Stale-While-Revalidate" للملفات الأخرى
   event.respondWith(
     caches.match(event.request).then(cachedResponse => {
-      // نعيد النسخة المخزنة إن وجدت، ونحدث الكاش في الخلفية
       const fetchPromise = fetch(event.request).then(networkResponse => {
-        // نحدث الكاش بالنسخة الجديدة
         if (networkResponse && networkResponse.status === 200) {
           const clone = networkResponse.clone();
           caches.open(CACHE_NAME).then(cache => {
@@ -65,13 +51,10 @@ self.addEventListener('fetch', event => {
         }
         return networkResponse;
       }).catch(() => {
-        // إذا فشل الشبكة ولا يوجد كاش، نعيد الصفحة الرئيسية
         if (event.request.mode === 'navigate') {
           return caches.match(OFFLINE_URL);
         }
       });
-
-      // نعيد النسخة المخزنة أولاً (إن وجدت) أو ننتظر الشبكة
       return cachedResponse || fetchPromise;
     })
   );

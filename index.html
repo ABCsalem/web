@@ -4,19 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
   <title>نظام إدارة وأتمتة التحضير - م/سالم صلاح</title>
-  
+
   <!-- ربط ملف PWA (manifest) -->
   <link rel="manifest" href="/web/manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#dc2626">
-  
-  <!-- ربط ملف الأنماط -->
+
   <link rel="stylesheet" href="/web/styles.css">
-  
-  <!-- مكتبة ExcelJS لإنشاء ملفات Excel -->
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
-  
+
   <style>
     /* شريط التنبيه المتحرك */
     .notice-bar {
@@ -49,6 +46,32 @@
     @media (max-width: 640px) {
       .notice-bar { font-size: 0.85rem; padding: 6px 0; }
       .notice-bar .scroll-text { animation-duration: 25s; }
+    }
+
+    /* زر تثبيت التطبيق (يظهر فقط عند توفر الإمكانية) */
+    .install-btn {
+      display: none;
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 5px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .install-btn:hover {
+      background: #218838;
+    }
+    .install-btn.show {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    @media (max-width: 640px) {
+      .install-btn { width: 100%; justify-content: center; }
     }
 
     /* أنماط مودال إدارة المستخدمين */
@@ -98,6 +121,8 @@
           <button id="manage-users-btn" class="btn btn-secondary" style="display:none;">إدارة المستخدمين</button>
           <button id="logout-btn" class="btn btn-secondary">تسجيل خروج</button>
           <button id="export-btn" class="btn btn-primary">تصدير</button>
+          <!-- زر تثبيت التطبيق (يظهر عند توفر الإمكانية) -->
+          <button id="install-app-btn" class="install-btn">📲 تثبيت التطبيق</button>
         </div>
       </div>
 
@@ -314,8 +339,9 @@
     </div>
   </div>
 
-  <!-- كود تسجيل Service Worker (PWA) -->
+  <!-- كود تسجيل Service Worker و PWA -->
   <script>
+    // 1. تسجيل Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/web/sw.js')
@@ -327,6 +353,37 @@
           });
       });
     }
+
+    // 2. التعامل مع زر تثبيت التطبيق (PWA)
+    let deferredPrompt = null;
+    const installBtn = document.getElementById('install-app-btn');
+
+    // استماع حدث قبل ظهور طلب التثبيت
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.classList.add('show');
+      console.log('✅ جاهز للتثبيت');
+    });
+
+    // عند الضغط على زر التثبيت
+    installBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const result = await deferredPrompt.userChoice;
+        console.log('✅ نتيجة التثبيت:', result);
+        deferredPrompt = null;
+        installBtn.classList.remove('show');
+      } else {
+        alert('عذراً، التثبيت غير متاح حالياً. تأكد من أنك تستخدم متصفح كروم أو إيدج.');
+      }
+    });
+
+    // في حال تم تثبيت التطبيق بالفعل، نخفي الزر
+    window.addEventListener('appinstalled', () => {
+      installBtn.classList.remove('show');
+      console.log('✅ تم تثبيت التطبيق بنجاح');
+    });
   </script>
 
   <!-- ملف الـ JavaScript الرئيسي -->
