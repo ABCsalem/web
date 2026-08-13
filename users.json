@@ -89,85 +89,23 @@
       "employees": 3
     }
   },
-  "سالم": {
-    "password": "سالم",
+  "admin": {
+    "password": "admin123",
     "isAdmin": true,
     "quotas": {
-      "officers": 0,
-      "soldiers": 0,
-      "employees": 0
+      "officers": 20,
+      "soldiers": 50,
+      "employees": 10
     }
-  },
-  "التدريب": {
-    "password": "100200",
-    "isAdmin": false,
-    "quotas": {
-      "officers": 4,
-      "soldiers": 0,
-      "employees": 0
-    }
-  },
-  "البشرية": {
-    "password": "010203",
-    "isAdmin": false,
-    "quotas": {
-      "officers": 4,
-      "soldiers": 0,
-      "employees": 0
-    }
-  },
-  "الامداد": {
-    "password": "203010",
-    "isAdmin": false,
-    "quotas": {
-      "officers": 14,
-      "soldiers": 0,
-      "employees": 0
-    }
-  },
-  "العمليات": {
-    "password": "102030",
-    "isAdmin": false,
-    "quotas": {
-      "officers": 11,
-      "soldiers": 0,
-      "employees": 0
-    }
-  },
-  "الاستخبارات": {
-    "password": "201030",
-    "isAdmin": false,
-    "quotas": {
-      "officers": 3,
-      "soldiers": 0,
-      "employees": 0
-    }
-  },
-  "المالية": {
-    "password": "112233",
-    "isAdmin": false,
-    "quotas": {
-      "officers": 4,
-      "soldiers": 0,
-      "employees": 0
-    }
-  },
-  "الرقابة": {
-    "password": "332211",
-    "isAdmin": false,
-    "quotas": {
-      "officers": 14,
-      "soldiers": 0,
-      "employees": 0
-    }
-},
+  }
+,
   "القانونية": {
-    "password": "506070",
-    "isAdmin": false,
+    "password": "123456",
+    "isAdmin": true,
     "quotas": {
-      "officers": 3,
-      "soldiers": 0,
-      "employees": 0
+      "officers": 20,
+      "soldiers": 50,
+      "employees": 10
     }
   }
 }
