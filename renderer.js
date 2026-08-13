@@ -1,14 +1,7 @@
 // ================================================================
-// renderer.js - نسخة تعتمد على ملف users.json من رابط مباشر (GitHub)
-// مع إضافة جميع حالات الموظفين في القائمة المنسدلة
+// renderer.js - نسخة تعتمد على users.json من GitHub مع دعم PWA
 // ================================================================
 document.addEventListener('DOMContentLoaded', function() {
-
-    // ============================================================
-    // 0. إلغاء Service Worker و Manifest (لكننا لن نلغيها لأننا نريد PWA)
-    // ============================================================
-    // تم إزالة جزء إلغاء Service Worker لأننا نريده يعمل
-    // لكننا نترك التعليق فقط
 
     // ============================================================
     // 1. رابط ملف users.json (رابطك المباشر)
@@ -34,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return data;
         } catch (e) {
             console.error('❌ خطأ في جلب المستخدمين:', e);
-            // في حال فشل التحميل، نستخدم بيانات افتراضية للتجربة
+            // بيانات افتراضية للطوارئ
             const fallback = {
                 admin: { password: 'admin123', isAdmin: true, quotas: { officers: 20, soldiers: 50, employees: 10 } },
                 الاتصالات: { password: '1234566', isAdmin: false, quotas: { officers: 10, soldiers: 25, employees: 5 } },
@@ -57,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const loginError = document.getElementById('login-error');
     const userDisplay = document.getElementById('user-display');
 
-    // زر إدارة المستخدمين لن يظهر (لأننا لا نستطيع تعديل users.json عبر المتصفح)
+    // زر إدارة المستخدمين (مخفي لأننا لا نستطيع تعديل users.json)
     const manageUsersBtn = document.getElementById('manage-users-btn');
     if (manageUsersBtn) manageUsersBtn.style.display = 'none';
 
@@ -66,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let isAdmin = false;
 
     // ============================================================
-    // 4. تسجيل الدخول (يعتمد على getUsers)
+    // 4. تسجيل الدخول
     // ============================================================
     async function handleLogin() {
         const username = loginUsername.value.trim();
@@ -152,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
     logoutBtn.addEventListener('click', handleLogout);
 
     // ============================================================
-    // 5. تطبيق الملاكات على حقول الملاك
+    // 5. تطبيق الملاكات
     // ============================================================
     function applyQuotas(quotas) {
         const officersInput = document.querySelector('#row-officers .quota-input');
@@ -208,10 +201,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let personnelData = [];
         let currentUnit = 'عام';
 
-        // تطبيق الملاكات من الجلسة
         if (currentQuotas) applyQuotas(currentQuotas);
 
-        // ---- تبديل الوحدة ----
         function toggleUnitMode(unit) {
             currentUnit = unit;
             const isGeneral = unit === 'عام';
@@ -239,7 +230,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         unitSelect.addEventListener('change', function() { toggleUnitMode(this.value); });
 
-        // ---- حفظ وتحميل بيانات الموظفين (في localStorage) ----
         function saveData() {
             try { localStorage.setItem('saryaData', JSON.stringify(personnelData)); } catch (e) {}
         }
@@ -260,7 +250,6 @@ document.addEventListener('DOMContentLoaded', function() {
             updateStats();
         }
 
-        // ---- عرض الجدول (تمت إضافة جميع الحالات إلى القائمة) ----
         function renderTable() {
             personnelTbody.innerHTML = '';
             personnelData.forEach((item, idx) => {
@@ -318,7 +307,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // ---- إضافة موظف ----
         function openModal() { newName.value = ''; newPoint.value = ''; newJob.value = ''; modal.style.display = 'flex'; setTimeout(() => newName.focus(), 100); }
         function closeModal() { modal.style.display = 'none'; }
         addBtn.onclick = openModal;
@@ -334,7 +322,6 @@ document.addEventListener('DOMContentLoaded', function() {
             saveData();
         };
 
-        // ---- إضافة شاغر ----
         function openVacantModal() { vacantPoint.value = ''; vacantJob.value = ''; vacantModal.style.display = 'flex'; setTimeout(() => vacantPoint.focus(), 100); }
         function closeVacantModal() { vacantModal.style.display = 'none'; }
         addVacantBtn.onclick = openVacantModal;
@@ -348,7 +335,6 @@ document.addEventListener('DOMContentLoaded', function() {
             saveData();
         };
 
-        // ---- تحديث الإحصائيات (تستثني حالة "شاغر" تلقائياً) ----
         function updateStats() {
             try {
                 const isGeneral = currentUnit === 'عام';
@@ -376,7 +362,6 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (e) { console.warn('خطأ في الإحصائيات:', e); }
         }
 
-        // ---- التحقق من صحة البيانات قبل التصدير ----
         function validate() {
             let errors = [];
             try {
@@ -410,7 +395,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return true;
         }
 
-        // ---- إنشاء ملف Excel ----
         async function generateExcelBlob() {
             const isGeneral = currentUnit === 'عام';
             let officerRow = [], soldiers = [], employees = [];
@@ -509,7 +493,6 @@ document.addEventListener('DOMContentLoaded', function() {
         exportModalCancel.onclick = closeExportModal;
         exportModal.onclick = (e) => { if (e.target === exportModal) closeExportModal(); };
 
-        // ---- اختصار مسح الكاش ----
         document.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'r' || e.key === 'R')) {
                 e.preventDefault();
@@ -524,7 +507,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // ---- بدء التطبيق ----
         toggleUnitMode('عام');
         loadData();
     }
