@@ -5,17 +5,10 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // ============================================================
-    // 0. إلغاء Service Worker و Manifest لتجنب الأخطاء
+    // 0. إلغاء Service Worker و Manifest (لكننا لن نلغيها لأننا نريد PWA)
     // ============================================================
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            for (let registration of registrations) {
-                registration.unregister();
-            }
-        });
-    }
-    const manifestLink = document.querySelector('link[rel="manifest"]');
-    if (manifestLink) manifestLink.remove();
+    // تم إزالة جزء إلغاء Service Worker لأننا نريده يعمل
+    // لكننا نترك التعليق فقط
 
     // ============================================================
     // 1. رابط ملف users.json (رابطك المباشر)
