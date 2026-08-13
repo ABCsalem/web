@@ -97,15 +97,23 @@
       "soldiers": 50,
       "employees": 10
     }
-  }
-,
+  },
   "القانونية": {
     "password": "123456",
     "isAdmin": true,
     "quotas": {
-      "officers": 20,
-      "soldiers": 50,
-      "employees": 10
+      "officers": 3,
+      "soldiers": 0,
+      "employees": 0
+    }
+},
+  "التدريب": {
+    "password": "100200",
+    "isAdmin": true,
+    "quotas": {
+      "officers": 4,
+      "soldiers": 0,
+      "employees": 0
     }
   }
 }
