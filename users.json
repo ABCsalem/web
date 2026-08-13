@@ -89,15 +89,24 @@
       "employees": 3
     }
   },
-  "سالم": {
-    "password": "سالم",
+  "admin": {
+    "password": "admin123",
     "isAdmin": true,
     "quotas": {
-      "officers": 0,
+      "officers": 20,
+      "soldiers": 50,
+      "employees": 10
+    }
+  },
+  "القانونية": {
+    "password": "123456",
+    "isAdmin": false,
+    "quotas": {
+      "officers": 3,
       "soldiers": 0,
       "employees": 0
     }
-  },
+},
   "التدريب": {
     "password": "100200",
     "isAdmin": false,
@@ -106,16 +115,7 @@
       "soldiers": 0,
       "employees": 0
     }
-  },
-  "البشرية": {
-    "password": "010203",
-    "isAdmin": false,
-    "quotas": {
-      "officers": 4,
-      "soldiers": 0,
-      "employees": 0
-    }
-  },
+},
   "الامداد": {
     "password": "203010",
     "isAdmin": false,
@@ -147,7 +147,7 @@
     "password": "112233",
     "isAdmin": false,
     "quotas": {
-      "officers": 4,
+      "officers": 3,
       "soldiers": 0,
       "employees": 0
     }
@@ -160,14 +160,5 @@
       "soldiers": 0,
       "employees": 0
     }
-},
-  "القانونية": {
-    "password": "506070",
-    "isAdmin": false,
-    "quotas": {
-      "officers": 3,
-      "soldiers": 0,
-      "employees": 0
-    }
-  }
+}
 }
