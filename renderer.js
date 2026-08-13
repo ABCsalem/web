@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function showMainContent() {
         loginScreen.style.display = 'none';
         mainContent.style.display = 'block';
-        userDisplay.textContent = 'مرحباًيا كاتب نظام ' + currentUser;
+        userDisplay.textContent = ' مرحباً كاتب  ' + currentUser;
         initApp();
     }
 
