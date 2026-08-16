@@ -1,536 +1,247 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <title>نظام إدارة وأتمتة التحضير - م/سالم صلاح</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>نظام إدارة القوة المتقدم</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #f0f4f8; color: #1e293b; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; background: #fff; border-radius: 24px; padding: 28px 32px; box-shadow: 0 20px 60px rgba(0,0,0,0.10); }
+        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; border-bottom: 2px solid #e9edf2; padding-bottom: 18px; margin-bottom: 24px; }
+        .header h1 { font-size: 26px; font-weight: 700; color: #0b2b4a; }
+        .header h1 small { font-size: 16px; font-weight: 400; color: #64748b; }
+        .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.2s; background: #f1f5f9; color: #1e293b; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.08); }
+        .btn-primary { background: #1a4b7a; color: #fff; }
+        .btn-primary:hover { background: #0f3b62; }
+        .btn-success { background: #0f7b4a; color: #fff; }
+        .btn-success:hover { background: #0b653d; }
+        .btn-warning { background: #b45309; color: #fff; }
+        .btn-warning:hover { background: #92400e; }
+        .btn-info { background: #0e7490; color: #fff; }
+        .btn-info:hover { background: #0a5a72; }
+        .btn-outline { background: transparent; border: 2px solid #cbd5e1; }
+        .btn-outline:hover { border-color: #94a3b8; background: #f8fafc; }
+        .btn-danger { background: #dc2626; color: #fff; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin: 20px 0; }
+        @media (max-width:1024px) { .grid-2 { grid-template-columns:1fr; } }
+        .card { background: #fafcff; border-radius: 18px; border: 1px solid #e9edf2; padding: 20px 22px; }
+        .card-title { font-size: 17px; font-weight: 700; margin-bottom: 14px; color: #0b2b4a; }
+        .card-title .sub { font-weight: 400; font-size: 13px; color: #64748b; }
+        .file-drop { border: 2px dashed #d1d9e6; border-radius: 14px; padding: 28px 16px; text-align: center; cursor: pointer; background: #f8fafc; position: relative; transition: 0.2s; }
+        .file-drop:hover { border-color: #1a4b7a; background: #f1f7fe; }
+        .file-drop input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        .file-drop .icon { font-size: 36px; display: block; margin-bottom: 6px; }
+        .file-drop .label { font-weight: 600; }
+        .file-drop .hint { font-size: 13px; color: #94a3b8; }
+        .file-status { margin-top: 10px; padding: 8px 14px; border-radius: 10px; background: #f1f5f9; display: flex; justify-content: space-between; }
+        .file-status .ok { color: #0f7b4a; font-weight: 600; }
+        .log-area { background: #f8fafc; border-radius: 14px; padding: 14px 18px; max-height: 260px; overflow-y: auto; font-family: monospace; font-size: 14px; border: 1px solid #e9edf2; margin-top: 12px; direction: ltr; text-align: left; }
+        .log-entry { padding: 4px 0; border-bottom: 1px solid #f1f5f9; }
+        .log-entry .time { color: #94a3b8; margin-left: 12px; }
+        .log-entry.success { color: #0f7b4a; }
+        .log-entry.error { color: #b91c1c; }
+        .log-entry.warning { color: #b45309; }
+        .table-wrap { overflow-x: auto; margin-top: 12px; border-radius: 12px; border: 1px solid #e9edf2; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
+        th { background: #f1f5f9; padding: 10px 12px; border-bottom: 2px solid #d1d9e6; text-align: center; }
+        td { padding: 8px 12px; text-align: center; border-bottom: 1px solid #e9edf2; }
+        .highlight-excluded { background: #fef3c7 !important; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .mt-12 { margin-top: 12px; }
+        .mt-20 { margin-top: 20px; }
+        .mb-8 { margin-bottom: 8px; }
+        .hidden { display: none !important; }
+        .text-muted { color: #94a3b8; }
+        .day-selector { display: flex; align-items: center; gap: 12px; background: #f8fafc; padding: 8px 16px; border-radius: 12px; border: 1px solid #e9edf2; }
+        .day-selector input { width: 70px; padding: 6px 8px; border: 1px solid #d1d9e6; border-radius: 8px; text-align: center; font-weight: 600; }
+        .day-selector input:focus { outline: 2px solid #1a4b7a; border-color: transparent; }
+        .progress-wrap { margin: 16px 0 8px; display: none; }
+        .progress-wrap.active { display: block; }
+        .progress-bar { width: 100%; height: 8px; background: #e9edf2; border-radius: 20px; overflow: hidden; }
+        .progress-bar .fill { height: 100%; width: 0%; background: linear-gradient(90deg, #1a4b7a, #3b82f6); transition: width 0.35s; }
+        .progress-label { font-size: 13px; color: #64748b; text-align: center; margin-top: 4px; }
 
-  <!-- ربط ملف PWA (manifest) -->
-  <link rel="manifest" href="/web/manifest.json">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#dc2626">
+        .status-h { background-color: #22c55e; color: #000; font-weight: bold; }
+        .status-gh { background-color: #ef4444; color: #fff; font-weight: bold; }
+        .status-t { background-color: #eab308; color: #000; font-weight: bold; }
+        .status-n { background-color: #92400e; color: #fff; font-weight: bold; }
+        .status-d { background-color: #3b82f6; color: #fff; font-weight: bold; }
+        .status-j { background-color: #6b7280; color: #fff; font-weight: bold; }
+        .status-m { background-color: #1f2937; color: #fff; font-weight: bold; }
+        .status-r { background-color: #06b6d4; color: #fff; font-weight: bold; }
 
-  <link rel="stylesheet" href="/web/styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+        .day-buttons { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+        .day-btn { width: 40px; height: 40px; border-radius: 8px; border: 1px solid #d1d9e6; background: #f8fafc; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .day-btn:hover { background: #e2e8f0; transform: scale(1.05); }
+        .day-btn.active { background: #1a4b7a; color: #fff; border-color: #1a4b7a; }
+        .day-btn.has-data { border-color: #22c55e; background: #f0fdf4; }
+        .day-btn.empty { opacity: 0.4; cursor: default; }
 
-  <style>
-    /* شريط التنبيه المتحرك */
-    .notice-bar {
-      background: #fef08a;
-      color: #1e293b;
-      padding: 8px 0;
-      border-radius: 6px;
-      margin: 10px 0 16px 0;
-      overflow: hidden;
-      white-space: nowrap;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      border: 1px solid #facc15;
-      font-weight: 600;
-      font-size: 1rem;
-      direction: rtl;
-    }
-    .notice-bar .scroll-text {
-      display: inline-block;
-      padding-left: 100%;
-      animation: scrollRightToLeft 20s linear infinite;
-      white-space: nowrap;
-    }
-    @keyframes scrollRightToLeft {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-100%); }
-    }
-    .notice-bar:hover .scroll-text {
-      animation-play-state: paused;
-    }
-    @media (max-width: 640px) {
-      .notice-bar { font-size: 0.85rem; padding: 6px 0; }
-      .notice-bar .scroll-text { animation-duration: 25s; }
-    }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: #fff; border-radius: 24px; padding: 32px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .modal-box h3 { font-size: 20px; margin-bottom: 20px; color: #0b2b4a; }
+        .modal-box .form-group { margin-bottom: 16px; }
+        .modal-box .form-group label { display: block; font-weight: 600; margin-bottom: 4px; }
+        .modal-box .form-group input { width: 100%; padding: 8px 12px; border: 1px solid #d1d9e6; border-radius: 8px; font-size: 15px; }
+        .modal-box .form-group input:focus { outline: 2px solid #1a4b7a; border-color: transparent; }
+        .modal-box .actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
 
-    /* زر تثبيت التطبيق في الهيدر (يظهر عند الحاجة) */
-    .install-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #28a745;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      margin: 5px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      transition: 0.2s;
-    }
-    .install-btn:hover {
-      background: #218838;
-      transform: scale(1.02);
-    }
-    .install-btn.hidden {
-      display: none;
-    }
-    @media (max-width: 640px) {
-      .install-btn { width: 100%; justify-content: center; }
-    }
-
-    /* مودال التثبيت المنبثق (يظهر تلقائياً) */
-    .install-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.6);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 10000;
-      backdrop-filter: blur(4px);
-    }
-    .install-modal.show {
-      display: flex;
-    }
-    .install-modal-content {
-      background: white;
-      padding: 30px 25px;
-      border-radius: 20px;
-      max-width: 400px;
-      width: 90%;
-      text-align: center;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      animation: fadeInUp 0.4s ease;
-    }
-    .install-modal-content h3 {
-      margin-top: 0;
-      color: #1e293b;
-      font-size: 1.4rem;
-    }
-    .install-modal-content p {
-      color: #64748b;
-      margin: 10px 0 20px;
-      line-height: 1.6;
-    }
-    .install-modal-content .btn-install-modal {
-      background: #28a745;
-      color: white;
-      border: none;
-      padding: 12px 30px;
-      border-radius: 10px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-      width: 100%;
-    }
-    .install-modal-content .btn-install-modal:hover {
-      background: #218838;
-    }
-    .install-modal-content .btn-close-modal {
-      background: transparent;
-      border: none;
-      color: #94a3b8;
-      font-size: 0.9rem;
-      margin-top: 10px;
-      cursor: pointer;
-      text-decoration: underline;
-      padding: 8px;
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* زر تحديث التطبيق (مخفي للمطور فقط) */
-    .update-btn-hidden {
-      position: fixed;
-      bottom: 10px;
-      left: 10px;
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      color: #64748b;
-      cursor: pointer;
-      z-index: 999;
-      opacity: 0.4;
-      transition: 0.3s;
-    }
-    .update-btn-hidden:hover {
-      opacity: 1;
-      background: #e2e8f0;
-    }
-
-    /* أنماط إدارة المستخدمين (لن تظهر) */
-    .user-management-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-    .user-management-table th, .user-management-table td { border: 1px solid #ddd; padding: 6px; text-align: center; }
-    .user-management-table th { background: #f2f2f2; }
-    .btn-small { padding: 4px 10px; font-size: 0.8rem; border-radius: 4px; border: none; cursor: pointer; }
-    .btn-edit-quota { background: #f39c12; color: white; }
-    .btn-danger { background: #e74c3c; color: white; }
-    .add-user-form { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; align-items: center; }
-    .add-user-form input { padding: 6px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 80px; }
-    .add-user-form button { padding: 6px 16px; background: #2980b9; color: white; border: none; border-radius: 4px; cursor: pointer; }
-  </style>
+        /* تنسيق خاص بزر الانتقال */
+        .btn-migrate {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+        .btn-migrate:hover {
+            background: linear-gradient(135deg, #b91c1c, #991b1b);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.4);
+        }
+        .btn-migrate .icon {
+            font-size: 18px;
+        }
+    </style>
 </head>
 <body>
-
-  <!-- شاشة تسجيل الدخول -->
-  <div id="login-screen" class="login-overlay">
-    <div class="login-box">
-      <h2>سجل الدخول لإدارة عملك اليومي</h2>
-      <p>نظام إدارة وأتمتة التحضير</p>
-      <div class="login-form">
-        <div class="form-group">
-          <label>اسم المستخدم</label>
-          <input type="text" id="login-username" placeholder="أدخل اسم المستخدم">
-        </div>
-        <div class="form-group">
-          <label>كلمة المرور</label>
-          <input type="password" id="login-password" placeholder="أدخل كلمة المرور">
-        </div>
-        <button id="login-btn" class="btn-login">دخول</button>
-        <div id="login-error" class="login-error" style="display:none;"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- المحتوى الرئيسي -->
-  <div id="main-content" style="display:none;">
     <div class="container">
-      <div class="header-actions">
-        <div>
-          <h1>نظام إدارة وأتمتة التحضير والتمام - شعبة القوى البشرية</h1>
-          <div class="developer">مطور النظام: م/سالم صلاح</div>
-        </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-          <span id="user-display" style="font-weight:bold; color:#2563eb;"></span>
-          <button id="manage-users-btn" class="btn btn-secondary" style="display:none;">إدارة المستخدمين</button>
-          <button id="logout-btn" class="btn btn-secondary">تسجيل خروج</button>
-          <button id="export-btn" class="btn btn-primary">تصدير</button>
-          <button id="install-app-btn" class="install-btn hidden">📲 تثبيت التطبيق</button>
-        </div>
-      </div>
-
-      <!-- شريط التنبيه -->
-      <div class="notice-bar">
-        <span class="scroll-text">⚠️ &nbsp; صلي على محمد &nbsp; ⚠️</span>
-      </div>
-
-      <!-- اختيار الوحدة -->
-      <div class="unit-selector">
-        <label for="unit-select">اختر الوحدة:</label>
-        <select id="unit-select">
-          <option value="عام">نمط التمام + التحضير</option>
-          <option value="ل31">نمط التمام فقط</option>
-        </select>
-      </div>
-
-      <!-- قسم تعبئة الأعداد -->
-      <div class="table-section" id="stats-section">
-        <h2>تعبئة أعداد المقاتلين والموظفين</h2>
-        <div id="stats-container">
-          <!-- ضباط -->
-          <div id="row-officers" class="stats-card">
-            <div class="card-header">
-              <span class="rank-title">ضباط</span>
-              <div class="quota-group">
-                <label>الملاك:</label>
-                <input type="number" class="quota-input" value="0" min="0" data-row="officers" readonly>
-              </div>
+        <div class="header">
+            <h1>نظام إدارة القوة المتقدم <small>v2.0</small></h1>
+            <div class="actions">
+                <!-- زر الانتقال إلى النظام الجديد -->
+                <a href="https://aleamaliqa.net/" target="_blank" class="btn btn-migrate">
+                    <span class="icon">🚀</span> الانتقال إلى النظام الجديد
+                </a>
+                <button class="btn btn-outline" onclick="clearAll()">مسح الكل</button>
+                <button class="btn btn-outline" onclick="exportErrorReport()">تقرير الأخطاء</button>
             </div>
-            <div class="stats-grid">
-              <div class="stat-item"><span class="stat-label">المعسكر</span><span class="stat-val officer-stat">0</span></div>
-              <div class="stat-item"><span class="stat-label">موقع دفاعي</span><span class="stat-val officer-stat">0</span></div>
-              <div class="stat-item"><span class="stat-label">إجازة</span><span class="stat-val officer-stat">0</span></div>
-              <div class="stat-item"><span class="stat-label">مستشفى</span><span class="stat-val officer-stat">0</span></div>
-              <div class="stat-item"><span class="stat-label">مهمة</span><span class="stat-val officer-stat">0</span></div>
-              <div class="stat-item"><span class="stat-label">مكلف</span><span class="stat-val officer-stat">0</span></div>
-              <div class="stat-item"><span class="stat-label">مستاذن</span><span class="stat-val officer-stat">0</span></div>
-              <div class="stat-item"><span class="stat-label">دورة</span><span class="stat-val officer-stat">0</span></div>
-              <div class="stat-item"><span class="stat-label">مرافقين</span><span class="stat-val officer-stat">0</span></div>
-              <div class="stat-item"><span class="stat-label">متأخر</span><span class="stat-val officer-stat">0</span></div>
-              <div class="stat-item"><span class="stat-label">غياب</span><span class="stat-val officer-stat">0</span></div>
-              <div class="stat-item"><span class="stat-label">سجن</span><span class="stat-val officer-stat">0</span></div>
-              <div class="stat-item"><span class="stat-label">الاسرى</span><span class="stat-val officer-stat">0</span></div>
-              <div class="stat-item"><span class="stat-label">شهداء</span><span class="stat-val officer-stat">0</span></div>
-              <div class="stat-item"><span class="stat-label">جرحى</span><span class="stat-val officer-stat">0</span></div>
-              <div class="stat-item"><span class="stat-label">الإعاقة الدائمة</span><span class="stat-val officer-stat">0</span></div>
-              <div class="stat-item"><span class="stat-label">الهروب</span><span class="stat-val officer-stat">0</span></div>
+        </div>
+
+        <div class="flex-between mb-8" style="background:#f8fafc;border-radius:14px;padding:10px 18px;border:1px solid #e9edf2;">
+            <span id="statusMain">الكشف الرئيسي: <span class="text-muted">لم يتم رفعه</span></span>
+            <span id="statusFingerprint">بصمات اليوم: <span class="text-muted">غير مرفوعة</span></span>
+            <span id="statusSub">الملفات الفرعية: <span class="text-muted">0/7</span></span>
+            <span id="statusProcess">المعالجة: <span class="text-muted">في انتظار</span></span>
+        </div>
+
+        <div class="card">
+            <div class="card-title">1. الكشف العام الرئيسي <span class="sub">(قاعدة البيانات الأساسية)</span></div>
+            <div class="file-drop">
+                <span class="icon">📂</span>
+                <div class="label">ارفع ملف الكشف الرئيسي</div>
+                <div class="hint">xlsx / xls</div>
+                <input type="file" accept=".xlsx,.xls" id="fileMain" />
             </div>
-          </div>
+            <div id="mainStatus" class="file-status"><span>الحالة: <span class="text-muted">لم يتم رفع ملف</span></span><span id="mainCount">—</span></div>
+            <div id="mainPreview" class="table-wrap hidden"><table><thead><tr><th>#</th><th>ID</th><th>الاسم</th><th>القطاع</th><th>النقطة</th><th>الوظيفة</th></tr></thead><tbody id="mainPreviewBody"></tbody></table></div>
+        </div>
 
-          <!-- أفراد مقاتلين -->
-          <div id="row-soldiers" class="stats-card">
-            <div class="card-header">
-              <span class="rank-title">أفراد مقاتلين</span>
-              <div class="quota-group">
-                <label>الملاك:</label>
-                <input type="number" class="quota-input" value="0" min="0" data-row="soldiers" readonly>
-              </div>
+        <div class="card mt-20">
+            <div class="card-title">2. كشف البصمات اليومية <span class="sub">(يتم استيراد ملف واحد)</span></div>
+            <div class="file-drop">
+                <span class="icon">🖐️</span>
+                <div class="label">ارفع ملف البصمات</div>
+                <div class="hint">xlsx / xls</div>
+                <input type="file" accept=".xlsx,.xls" id="fileFingerprint" />
             </div>
-            <div class="stats-grid">
-              <div class="stat-item"><span class="stat-label">المعسكر</span><input type="number" class="stat-input soldier-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">موقع دفاعي</span><input type="number" class="stat-input soldier-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">إجازة</span><input type="number" class="stat-input soldier-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">مستشفى</span><input type="number" class="stat-input soldier-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">مهمة</span><input type="number" class="stat-input soldier-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">مكلف</span><input type="number" class="stat-input soldier-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">مستاذن</span><input type="number" class="stat-input soldier-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">دورة</span><input type="number" class="stat-input soldier-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">مرافقين</span><input type="number" class="stat-input soldier-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">متأخر</span><input type="number" class="stat-input soldier-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">غياب</span><input type="number" class="stat-input soldier-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">سجن</span><input type="number" class="stat-input soldier-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">الاسرى</span><input type="number" class="stat-input soldier-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">شهداء</span><input type="number" class="stat-input soldier-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">جرحى</span><input type="number" class="stat-input soldier-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">الإعاقة الدائمة</span><input type="number" class="stat-input soldier-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">الهروب</span><input type="number" class="stat-input soldier-stat" value=""></div>
+            <div id="fingerprintStatus" class="file-status"><span>الحالة: <span class="text-muted">لم يتم رفع ملف</span></span><span id="fingerprintCount">—</span></div>
+            <div class="flex-between mt-12">
+                <button class="btn btn-primary" id="btnProcessFingerprint" disabled onclick="processFingerprint()">معالجة البصمات وإصدار كشف الحضور</button>
+                <button class="btn btn-success" id="btnExportAttendance" disabled onclick="exportAttendance()">تصدير كشف الحضور بالبصمة</button>
             </div>
-          </div>
-
-          <!-- موظف -->
-          <div id="row-employees" class="stats-card">
-            <div class="card-header">
-              <span class="rank-title">موظف</span>
-              <div class="quota-group">
-                <label>الملاك:</label>
-                <input type="number" class="quota-input" value="0" min="0" data-row="employees" readonly>
-              </div>
+            <div id="attendancePreview" class="table-wrap hidden" style="margin-top:12px;"><table><thead><tr><th>م</th><th>ID</th><th>الاسم</th><th>تاريخ البصمة</th><th>وقت البصمة</th></tr></thead><tbody id="attendanceBody"></tbody></table></div>
+            <div id="missingList" class="mt-12 hidden">
+                <div style="background:#fef3c7;border-radius:14px;padding:14px 20px;border:1px solid #f59e0b;">
+                    <span style="font-weight:700;color:#92400e;">⚠️ المتبقيون (لم يصموا)</span>
+                    <div class="table-wrap" style="margin-top:8px;background:#fff;"><table><thead><tr><th>#</th><th>ID</th><th>الاسم</th><th>القطاع</th><th>النقطة</th><th>الوظيفة</th></tr></thead><tbody id="missingBody"></tbody></table></div>
+                </div>
             </div>
-            <div class="stats-grid">
-              <div class="stat-item"><span class="stat-label">المعسكر</span><input type="number" class="stat-input employee-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">موقع دفاعي</span><input type="number" class="stat-input employee-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">إجازة</span><input type="number" class="stat-input employee-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">مستشفى</span><input type="number" class="stat-input employee-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">مهمة</span><input type="number" class="stat-input employee-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">مكلف</span><input type="number" class="stat-input employee-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">مستاذن</span><input type="number" class="stat-input employee-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">دورة</span><input type="number" class="stat-input employee-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">مرافقين</span><input type="number" class="stat-input employee-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">متأخر</span><input type="number" class="stat-input employee-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">غياب</span><input type="number" class="stat-input employee-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">سجن</span><input type="number" class="stat-input employee-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">الاسرى</span><input type="number" class="stat-input employee-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">شهداء</span><input type="number" class="stat-input employee-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">جرحى</span><input type="number" class="stat-input employee-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">الإعاقة الدائمة</span><input type="number" class="stat-input employee-stat" value=""></div>
-              <div class="stat-item"><span class="stat-label">الهروب</span><input type="number" class="stat-input employee-stat" value=""></div>
+        </div>
+
+        <div class="card mt-20">
+            <div class="card-title">3. استيراد الملفات الفرعية (اختياري – أي عدد من الملفات) <span class="sub">إجازات – دورات – مهام – منتدبين – مرافقين – أذونات</span></div>
+            <div class="file-drop">
+                <span class="icon">📦</span>
+                <div class="label">ارفع الملفات الفرعية (يمكنك اختيار أي عدد من الملفات)</div>
+                <div class="hint">xlsx / xls – سيتم التعرف على نوع كل ملف تلقائياً</div>
+                <input type="file" accept=".xlsx,.xls" id="fileSub" multiple />
             </div>
-          </div>
+            <div id="subStatus" class="file-status"><span>الحالة: <span class="text-muted">لم يتم رفع ملفات</span></span><span id="subCount">0/7</span></div>
+            <button class="btn btn-warning mt-12" id="btnProcessSub" disabled onclick="processSubFiles()">معالجة جميع الملفات الفرعية</button>
         </div>
-      </div>
 
-      <!-- جدول الموظفين -->
-      <div class="table-section" id="personnel-section">
-        <div class="table-header-actions">
-          <h2>تحديث حالات الموظفين</h2>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button id="add-person-btn" class="btn btn-success">إضافة موظف</button>
-            <button id="add-vacant-btn" class="btn btn-vacant">إضافة شاغر</button>
-          </div>
+        <div class="flex-between mt-20" style="background:#f8fafc;border-radius:18px;padding:16px 20px;border:1px solid #e9edf2;flex-wrap:wrap;gap:12px;">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <button class="btn btn-info" id="btnMergeMonthly" disabled onclick="mergeToMonthly()">تجميع إلى كشف القوة الشهري</button>
+                <button class="btn btn-success" id="btnExportMonthly" disabled onclick="exportMonthly()">تنزيل الكشف الشهري</button>
+                <button class="btn btn-primary" id="btnExportRange" disabled onclick="openDateRangeModal()">تنزيل كشف القوة الفعلية</button>
+            </div>
+            <div class="day-selector">
+                <label>الشهر:</label>
+                <input type="number" id="monthInput" min="1" max="12" value="1" />
+                <label>السنة:</label>
+                <input type="number" id="yearInput" value="2025" />
+                <button class="btn btn-sm btn-outline" onclick="updateMonthData()">تحديث</button>
+            </div>
         </div>
-        <div class="table-responsive">
-          <table id="personnel-table">
-            <thead><tr><th>#</th><th>الاسم</th><th>النقطة</th><th>الوظيفة</th><th>الحالة</th><th>حذف</th></tr></thead>
-            <tbody></tbody>
-          </table>
+
+        <div class="mt-20">
+            <div class="flex-between"><span style="font-weight:600;">سجل العمليات</span><button class="btn btn-outline btn-sm" onclick="clearLog()">مسح السجل</button></div>
+            <div class="log-area" id="logArea"><div class="log-entry text-muted">في انتظار رفع الملفات...</div></div>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- مودال التثبيت المنبثق -->
-  <div id="install-modal" class="install-modal">
-    <div class="install-modal-content">
-      <h3>📲 قم بتثبيت التطبيق</h3>
-      <p>للحصول على تجربة أفضل وسرعة في الوصول، قم بتثبيت التطبيق على جهازك. سيصبح مثل أي تطبيق آخر في قائمة التطبيقات.</p>
-      <button id="install-modal-btn" class="btn-install-modal">تثبيت التطبيق</button>
-      <button id="install-modal-close" class="btn-close-modal">تخطي</button>
-    </div>
-  </div>
-
-  <!-- زر تحديث التطبيق (للمطور فقط) -->
-  <button id="update-app-btn" class="update-btn-hidden">🔄 تحديث التطبيق</button>
-
-  <!-- بقية المودالات (نفسها) -->
-  <div id="user-management-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-box" style="max-width: 700px;">
-      <h3>إدارة المستخدمين</h3>
-      <button id="close-user-management" style="float:left; background:transparent; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
-      <div style="clear:both;"></div>
-      <div class="add-user-form">
-        <input type="text" id="add-username" placeholder="اسم المستخدم">
-        <input type="password" id="add-password" placeholder="كلمة المرور">
-        <input type="number" id="add-officers-quota" placeholder="ضباط" min="0">
-        <input type="number" id="add-soldiers-quota" placeholder="أفراد" min="0">
-        <input type="number" id="add-employees-quota" placeholder="موظفين" min="0">
-        <button id="add-user-btn">إضافة مستخدم</button>
-      </div>
-      <table class="user-management-table">
-        <thead><tr><th>المستخدم</th><th>مدير</th><th>ملاك الضباط</th><th>ملاك الأفراد</th><th>ملاك الموظفين</th><th>إجراءات</th></tr></thead>
-        <tbody id="user-table-body"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div id="edit-quota-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-box">
-      <h3>تعديل الملاك</h3>
-      <div class="modal-form">
-        <div class="form-group"><label>ضباط:</label><input type="number" id="edit-officers-quota" min="0"></div>
-        <div class="form-group"><label>أفراد مقاتلين:</label><input type="number" id="edit-soldiers-quota" min="0"></div>
-        <div class="form-group"><label>موظفين:</label><input type="number" id="edit-employees-quota" min="0"></div>
-        <div class="modal-actions">
-          <button id="cancel-quota-edit" class="btn btn-cancel">إلغاء</button>
-          <button id="save-quota-edit" class="btn btn-save">حفظ</button>
+        <div id="dayButtonsContainer" class="mt-12 hidden">
+            <div class="flex-between mb-8">
+                <span style="font-weight:700;font-size:16px;">📅 أيام الشهر</span>
+                <span id="dayInfo" class="text-muted">اختر يوم لعرض التفاصيل</span>
+            </div>
+            <div class="day-buttons" id="dayButtons"></div>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <div id="add-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-box">
-      <h3>إضافة موظف جديد</h3>
-      <div class="modal-form">
-        <div class="form-group"><label>الاسم:</label><input type="text" id="new-name" placeholder="أدخل الاسم"></div>
-        <div class="form-group"><label>النقطة:</label><input type="text" id="new-point" placeholder="أدخل النقطة"></div>
-        <div class="form-group"><label>الوظيفة:</label><input type="text" id="new-job" placeholder="أدخل الوظيفة"></div>
-        <div class="modal-actions"><button id="modal-cancel" class="btn btn-cancel">إلغاء</button><button id="modal-save" class="btn btn-save">حفظ وإضافة</button></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="add-vacant-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-box">
-      <h3>إضافة شاغر</h3>
-      <p style="color:#64748b; font-size:0.9rem;">(الاسم سيترك فارغاً)</p>
-      <div class="modal-form">
-        <div class="form-group"><label>النقطة:</label><input type="text" id="vacant-point" placeholder="أدخل النقطة"></div>
-        <div class="form-group"><label>الوظيفة:</label><input type="text" id="vacant-job" placeholder="أدخل الوظيفة"></div>
-        <div class="modal-actions"><button id="vacant-modal-cancel" class="btn btn-cancel">إلغاء</button><button id="vacant-modal-save" class="btn btn-save">حفظ وإضافة</button></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="export-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-box">
-      <h3>تصدير التقرير</h3>
-      <div class="modal-form">
-        <div class="form-group">
-          <label>اسم الملف:</label>
-          <input type="text" id="export-filename" placeholder="أدخل اسم الملف" value="تقرير_السرية">
+        <div id="monthlyPreviewSection" class="mt-20 hidden">
+            <div class="flex-between">
+                <span style="font-weight:700;font-size:18px;">كشف القوة الشهري</span>
+                <span id="monthlyCount" class="text-muted">0 فرد</span>
+                <span id="monthlyDayLabel" class="text-muted">جميع الأيام</span>
+            </div>
+            <div class="table-wrap" style="max-height:500px;overflow-y:auto;"><table><thead id="monthlyHeader"></thead><tbody id="monthlyBody"></tbody></table></div>
         </div>
-        <div class="form-group">
-          <label>التاريخ:</label>
-          <input type="date" id="export-date">
+
+        <div id="errorSection" class="mt-20 hidden">
+            <div style="background:#fef3c7;border-radius:14px;padding:14px 20px;border:1px solid #f59e0b;">
+                <div class="flex-between"><span style="font-weight:700;color:#92400e;">تقرير الأخطاء</span><span id="errorCount" class="text-muted">0</span></div>
+                <div class="table-wrap" style="margin-top:8px;background:#fff;"><table><thead><tr><th>#</th><th>ID</th><th>الاسم</th><th>نوع الخطأ</th><th>المصدر</th></tr></thead><tbody id="errorBody"></tbody></table></div>
+            </div>
         </div>
-        <div class="modal-actions">
-          <button id="export-modal-cancel" class="btn btn-cancel">إلغاء</button>
-          <button id="export-modal-confirm" class="btn btn-primary">تصدير</button>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <!-- كود PWA والتثبيت المنبثق -->
-  <script>
-    // 1. تسجيل Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/web/sw.js')
-          .then(registration => {
-            console.log('✅ Service Worker مسجل بنجاح:', registration);
-          })
-          .catch(error => {
-            console.log('❌ فشل تسجيل Service Worker:', error);
-          });
-      });
-    }
+    <div class="modal-overlay" id="dateModal">
+        <div class="modal-box">
+            <h3>📅 تحديد نطاق التاريخ للتنزيل</h3>
+            <div class="form-group">
+                <label>من تاريخ:</label>
+                <input type="date" id="dateFrom" />
+            </div>
+            <div class="form-group">
+                <label>إلى تاريخ:</label>
+                <input type="date" id="dateTo" />
+            </div>
+            <div id="dateRangeInfo" class="text-muted" style="font-size:13px;margin-bottom:12px;"></div>
+            <div class="actions">
+                <button class="btn btn-outline" onclick="closeDateRangeModal()">إلغاء</button>
+                <button class="btn btn-primary" onclick="exportDateRange()">تنزيل</button>
+            </div>
+        </div>
+    </div>
 
-    // 2. إدارة المودال المنبثق للتثبيت
-    let deferredPrompt = null;
-    const installModal = document.getElementById('install-modal');
-    const installModalBtn = document.getElementById('install-modal-btn');
-    const installModalClose = document.getElementById('install-modal-close');
-    const installBtnHeader = document.getElementById('install-app-btn');
-
-    // التحقق مما إذا كان التطبيق مثبتاً بالفعل (في وضع standalone)
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    if (isStandalone) {
-      if (installModal) installModal.style.display = 'none';
-      if (installBtnHeader) installBtnHeader.classList.add('hidden');
-    }
-
-    // استقبال حدث beforeinstallprompt (يُطلق عندما يكون التطبيق قابلاً للتثبيت)
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-
-      // إظهار المودال المنبثق (مرة واحدة فقط لكل جلسة)
-      if (!sessionStorage.getItem('installPromptShown') && !isStandalone) {
-        sessionStorage.setItem('installPromptShown', 'true');
-        installModal.classList.add('show');
-      }
-
-      // إظهار الزر في الهيدر أيضاً
-      if (installBtnHeader) installBtnHeader.classList.remove('hidden');
-    });
-
-    // عند الضغط على زر التثبيت في المودال
-    installModalBtn.addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const result = await deferredPrompt.userChoice;
-        console.log('نتيجة التثبيت:', result);
-        deferredPrompt = null;
-        installModal.classList.remove('show');
-        if (installBtnHeader) installBtnHeader.classList.add('hidden');
-        if (result.outcome === 'accepted') {
-          sessionStorage.setItem('appInstalled', 'true');
-        }
-      } else {
-        alert('عذراً، التثبيت غير متاح حالياً. استخدم القائمة في المتصفح.');
-        installModal.classList.remove('show');
-      }
-    });
-
-    // إغلاق المودال (تخطي)
-    installModalClose.addEventListener('click', () => {
-      installModal.classList.remove('show');
-      sessionStorage.setItem('installPromptShown', 'true');
-    });
-
-    // إذا تم تثبيت التطبيق
-    window.addEventListener('appinstalled', () => {
-      installModal.classList.remove('show');
-      if (installBtnHeader) installBtnHeader.classList.add('hidden');
-      sessionStorage.setItem('appInstalled', 'true');
-      console.log('✅ تم تثبيت التطبيق');
-    });
-
-    // 3. زر تحديث التطبيق (للمطور فقط)
-    document.getElementById('update-app-btn').addEventListener('click', function() {
-      if (confirm('تحديث التطبيق؟ سيتم تحميل أحدث إصدار ولن تفقد بياناتك المخزنة.')) {
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.ready.then(registration => {
-            registration.update();
-            setTimeout(() => window.location.reload(true), 1000);
-          }).catch(e => {
-            alert('خطأ في التحديث: ' + e.message);
-          });
-        } else {
-          window.location.reload(true);
-        }
-      }
-    });
-  </script>
-
-  <!-- تحميل ملف renderer.js -->
-  <script src="/web/renderer.js"></script>
+    <script src="renderer.js"></script>
 </body>
 </html>
