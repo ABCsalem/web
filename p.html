@@ -1,0 +1,2418 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>نظام الكشوف المتعددة</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js">
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: #f4f7fc;
+            margin: 0;
+            padding: 20px;
+            direction: rtl;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.07);
+        }
+        h1 {
+            color: #1e2a3a;
+            border-bottom: 2px solid #e9edf4;
+            padding-bottom: 12px;
+            margin-top: 0;
+        }
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            background: #f8faff;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .toolbar label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .toolbar input[type="file"] {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #fff;
+            max-width: 200px;
+        }
+        .toolbar button {
+            background: #2c7be0;
+            color: #fff;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+        .toolbar button:hover {
+            background: #1a5bbf;
+        }
+        .toolbar button.success {
+            background: #28a745;
+        }
+        .toolbar button.success:hover {
+            background: #1e7e34;
+        }
+        .toolbar button.danger {
+            background: #dc3545;
+        }
+        .toolbar button.danger:hover {
+            background: #b02a37;
+        }
+        .toolbar button.warning {
+            background: #f0ad4e;
+            color: #1e2a3a;
+        }
+        .toolbar button.warning:hover {
+            background: #d58512;
+        }
+        .toolbar button.secondary {
+            background: #6c7a89;
+        }
+        .toolbar button.secondary:hover {
+            background: #4e5b68;
+        }
+        .toolbar button.info {
+            background: #17a2b8;
+            color: #fff;
+        }
+        .toolbar button.info:hover {
+            background: #138496;
+        }
+        .toolbar input[type="text"] {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            min-width: 180px;
+            font-size: 14px;
+        }
+        .flex-spacer {
+            flex: 1;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 6px;
+            border-bottom: 2px solid #e9edf4;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        .tabs button {
+            background: transparent;
+            border: none;
+            padding: 10px 22px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #6c7a89;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: 0.2s;
+        }
+        .tabs button.active {
+            color: #1e2a3a;
+            background: #e9edf4;
+        }
+        .tabs button:hover {
+            background: #e9edf4;
+        }
+        .table-wrap {
+            overflow: auto;
+            max-height: 520px;
+            margin-top: 6px;
+            border-radius: 12px;
+            border: 1px solid #e6eaef;
+            position: relative;
+        }
+        .table-wrap table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            background: #fff;
+            min-width: 1200px;
+        }
+        .table-wrap thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #e9edf4;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .table-wrap thead th:first-child {
+            z-index: 11;
+            left: 0;
+            position: sticky;
+            background: #e9edf4;
+        }
+        .table-wrap tbody td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 5;
+            background: #fff;
+        }
+        .table-wrap tbody tr:hover td:first-child {
+            background: #f8faff;
+        }
+        .table-wrap th {
+            background: #e9edf4;
+            color: #1e2a3a;
+            font-weight: 600;
+            padding: 10px 6px;
+            white-space: nowrap;
+            border-bottom: 2px solid #d0d8e3;
+            text-align: center;
+        }
+        .table-wrap td {
+            padding: 8px 5px;
+            border-bottom: 1px solid #e6eaef;
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+        .table-wrap tr:hover td {
+            background: #f8faff;
+        }
+        .checkbox-col {
+            width: 36px;
+            min-width: 36px;
+            max-width: 36px;
+        }
+        .checkbox-col input[type="checkbox"] {
+            width: 17px;
+            height: 17px;
+            cursor: pointer;
+        }
+        .clickable-name {
+            color: #2c7be0;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: underline dotted;
+        }
+        .clickable-name:hover {
+            color: #1a5bbf;
+        }
+        .actions-row {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+        .actions-row button {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #2c7be0;
+            color: #fff;
+            transition: 0.2s;
+        }
+        .actions-row button:hover {
+            background: #1a5bbf;
+        }
+        .actions-row button.secondary {
+            background: #6c7a89;
+        }
+        .actions-row button.secondary:hover {
+            background: #4e5b68;
+        }
+        .actions-row button.danger {
+            background: #dc3545;
+        }
+        .actions-row button.danger:hover {
+            background: #b02a37;
+        }
+        .actions-row button.success {
+            background: #28a745;
+        }
+        .actions-row button.success:hover {
+            background: #1e7e34;
+        }
+        .actions-row button.warning {
+            background: #f0ad4e;
+            color: #1e2a3a;
+        }
+        .actions-row button.warning:hover {
+            background: #d58512;
+        }
+        .actions-row button.info {
+            background: #17a2b8;
+            color: #fff;
+        }
+        .actions-row button.info:hover {
+            background: #138496;
+        }
+        .actions-row button.promotion-btn {
+            background: #6f42c1;
+            color: #fff;
+        }
+        .actions-row button.promotion-btn:hover {
+            background: #5a32a3;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(3px);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-box {
+            background: #fff;
+            border-radius: 18px;
+            max-width: 98vw;
+            width: 100%;
+            max-height: 92vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        .modal-header {
+            padding: 16px 24px;
+            background: #f0f4fa;
+            border-bottom: 1px solid #d0d8e3;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+        }
+        .modal-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #6c7a89;
+            line-height: 1;
+        }
+        .modal-header .close-btn:hover {
+            color: #1e2a3a;
+        }
+        .modal-body {
+            padding: 18px 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .modal-body .table-wrap {
+            margin: 0;
+            max-height: 400px;
+        }
+        .modal-body table input,
+        .modal-body table select {
+            width: 100%;
+            min-width: 60px;
+            padding: 4px 6px;
+            border: 1px solid #d0d8e3;
+            border-radius: 6px;
+            font-size: 13px;
+            background: #fff;
+        }
+        .modal-body table input:focus,
+        .modal-body table select:focus {
+            border-color: #2c7be0;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(44, 123, 224, 0.2);
+        }
+        .modal-body table input[readonly] {
+            background: #f0f2f5;
+        }
+        .modal-footer {
+            padding: 14px 24px;
+            background: #f8faff;
+            border-top: 1px solid #e6eaef;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+        .modal-footer button {
+            padding: 8px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .modal-footer button.primary {
+            background: #2c7be0;
+            color: #fff;
+        }
+        .modal-footer button.primary:hover {
+            background: #1a5bbf;
+        }
+        .modal-footer button.secondary {
+            background: #e9edf4;
+            color: #1e2a3a;
+        }
+        .modal-footer button.secondary:hover {
+            background: #d0d8e3;
+        }
+        .modal-footer button.success {
+            background: #28a745;
+            color: #fff;
+        }
+        .modal-footer button.success:hover {
+            background: #1e7e34;
+        }
+        .modal-footer button.danger {
+            background: #dc3545;
+            color: #fff;
+        }
+        .modal-footer button.danger:hover {
+            background: #b02a37;
+        }
+        .text-muted {
+            color: #6c7a89;
+        }
+
+        .promotion-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 12px 0;
+            padding: 12px 16px;
+            background: #f8faff;
+            border-radius: 8px;
+            border: 1px solid #e6eaef;
+        }
+        .promotion-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .promotion-checkbox label {
+            font-weight: 500;
+            font-size: 15px;
+            color: #1e2a3a;
+        }
+
+        .list-manager {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .list-group {
+            border: 1px solid #d0d8e3;
+            border-radius: 10px;
+            padding: 12px 16px;
+        }
+        .list-group h3 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            color: #1e2a3a;
+        }
+        .list-group .items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .list-group .items .badge {
+            background: #e9edf4;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .list-group .items .badge .del {
+            cursor: pointer;
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .list-group .add-item {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .list-group .add-item input {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        .list-group .add-item button {
+            padding: 4px 16px;
+            background: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .list-group .add-item button:hover {
+            background: #1e7e34;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 24px;
+        }
+        .form-grid .full-width {
+            grid-column: 1 / -1;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .form-group label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        .form-group input,
+        .form-group select {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 100%;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #2c7be0;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(44, 123, 224, 0.2);
+        }
+
+        @media (max-width: 700px) {
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .toolbar input[type="text"] {
+                min-width: unset;
+            }
+            .modal-body {
+                padding: 12px;
+            }
+            .modal-body table input {
+                min-width: 40px;
+                font-size: 12px;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .table-wrap {
+                max-height: 380px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>نظام الكشوف المتعددة</h1>
+
+        <div class="toolbar">
+            <label for="fileUpload">استيراد الكشف الرئيسي:</label>
+            <input type="file" id="fileUpload" accept=".xlsx,.xls" />
+            <button id="exportBtn" class="success">تصدير الكشف الحالي</button>
+            <button id="manageListsBtn" class="secondary">إدارة القوائم</button>
+            <button id="fullReportBtn" class="warning">توليد تقرير كامل</button>
+            <button id="refreshBtn" class="secondary">تحديث</button>
+            <div class="flex-spacer"></div>
+            <label for="searchInput">بحث:</label>
+            <input type="text" id="searchInput" placeholder="الاسم / ID / النقطة..." />
+        </div>
+
+        <div class="tabs" id="tabsContainer">
+            <button class="active" data-tab="main">الرئيسي</button>
+            <button data-tab="internal">الداخلي</button>
+            <button data-tab="separated">المفصولين</button>
+            <button data-tab="absent">المنقطعين</button>
+            <button data-tab="vacant">الشواغر</button>
+            <button data-tab="transferred">المنقولين</button>
+            <button data-tab="final">النهائي</button>
+        </div>
+
+        <div class="table-wrap">
+            <table id="mainTable">
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <div class="actions-row">
+            <button id="createInternalBtn" class="primary">إنشاء كشف داخلي</button>
+            <button id="bulkEditBtn" class="primary">تعديل داخلي (نقل جماعي)</button>
+            <button id="promotionBtn" class="promotion-btn">ترقية</button>
+            <button id="separateBtn" class="danger">فصل المحددين</button>
+            <button id="absentBtn" class="warning">تسجيل انقطاع للمحددين</button>
+            <button id="moveToVacantBtn" class="info">نقل إلى شاغر</button>
+            <button id="clearSelectionBtn" class="secondary">إلغاء التحديد</button>
+        </div>
+
+        <!-- مودال التعديل الجماعي -->
+        <div class="modal-overlay" id="bulkModal">
+            <div class="modal-box">
+                <div class="modal-header">
+                    <h2>تعديل الكشف الداخلي</h2>
+                    <button class="close-btn" data-close="bulkModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
+                        <button id="applyAllBtn" class="primary" style="padding:6px 18px;">تطبيق على الكل</button>
+                        <span class="text-muted" style="font-size:13px;">عدّل أي حقل داخلي في الصف الأول ثم اضغط الزر لتطبيقه على الباقي</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table id="bulkTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>الاسم</th>
+                                    <th>رقم الهوية</th>
+                                    <th>القطاع الداخلي</th>
+                                    <th>النقطة الداخلية</th>
+                                    <th>الوظيفة الداخلية</th>
+                                    <th>موقع العمل الداخلي</th>
+                                    <th>الرتبة</th>
+                                    <th>الراتب</th>
+                                    <th>الصرفة</th>
+                                    <th>العلاوة</th>
+                                    <th>اجمالي الصرفة</th>
+                                    <th>ملاحظة</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bulkTableBody"></tbody>
+                        </table>
+                    </div>
+                    <p class="text-muted" style="font-size:13px; margin-top:10px;">الحقول الداخلية فقط قابلة للتعديل. باقي البيانات ثابتة.</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="secondary" data-close="bulkModal">إلغاء</button>
+                    <button id="saveBulkBtn" class="success">حفظ التعديلات</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- مودال الترقية -->
+        <div class="modal-overlay" id="promotionModal">
+            <div class="modal-box" style="max-width:750px;">
+                <div class="modal-header">
+                    <h2>ترقية الموظف</h2>
+                    <button class="close-btn" data-close="promotionModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="margin-bottom:16px; padding:12px 16px; background:#f0f4fa; border-radius:8px;">
+                        <strong>الموظف المحدد:</strong> <span id="promotionEmployeeName"></span>
+                        <span style="margin-right:20px;"><strong>رقم الهوية:</strong> <span id="promotionEmployeeId"></span></span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="promo_sector">القطاع الداخلي</label>
+                            <select id="promo_sector"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="promo_point">النقطة الداخلية</label>
+                            <select id="promo_point"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="promo_job">الوظيفة الداخلية</label>
+                            <select id="promo_job"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="promo_location">موقع العمل الداخلي</label>
+                            <select id="promo_location"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="promo_rank">الرتبة</label>
+                            <select id="promo_rank"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="promo_salary">الراتب</label>
+                            <input type="number" id="promo_salary" step="0.01" />
+                        </div>
+                        <div class="form-group">
+                            <label for="promo_allowance">الصرفة</label>
+                            <input type="number" id="promo_allowance" step="0.01" />
+                        </div>
+                        <div class="form-group">
+                            <label for="promo_bonus">العلاوة</label>
+                            <input type="number" id="promo_bonus" step="0.01" />
+                        </div>
+                    </div>
+
+                    <div class="promotion-checkbox">
+                        <input type="checkbox" id="promo_keep_vacant" />
+                        <label for="promo_keep_vacant">ابقاء المنصب السابق شاغر (سيتم إنشاء شاغر في مكان الموظف القديم)</label>
+                    </div>
+                    <p class="text-muted" style="font-size:13px; margin-top:4px;">في حال عدم التحديد، سيتم تحديث بيانات الموظف فقط دون إنشاء شاغر في منصبه السابق.</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="secondary" data-close="promotionModal">إلغاء</button>
+                    <button id="executePromotionBtn" class="success">تنفيذ الترقية</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- مودال نقل إلى شاغر -->
+        <div class="modal-overlay" id="moveModal">
+            <div class="modal-box" style="max-width:700px;">
+                <div class="modal-header">
+                    <h2>نقل الموظف إلى وظيفة شاغرة</h2>
+                    <button class="close-btn" data-close="moveModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>اختر الموظف الذي تريد نقله (تم تحديده مسبقاً) ثم اختر الشاغر الذي سينقل إليه.</p>
+                    <div style="margin-bottom:12px;">
+                        <label><strong>الموظف المحدد:</strong> <span id="moveEmployeeName"></span></label>
+                    </div>
+                    <div>
+                        <label for="vacantSelect"><strong>اختر الشاغر:</strong></label>
+                        <select id="vacantSelect" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;"></select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="secondary" data-close="moveModal">إلغاء</button>
+                    <button id="executeMoveBtn" class="success">تنفيذ النقل</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- مودال إدارة القوائم -->
+        <div class="modal-overlay" id="listsModal">
+            <div class="modal-box" style="max-width:700px;">
+                <div class="modal-header">
+                    <h2>إدارة القوائم (القطاع، النقطة، الوظيفة، الرتبة، موقع العمل)</h2>
+                    <button class="close-btn" data-close="listsModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="list-manager" id="listManagerContainer"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="secondary" data-close="listsModal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ================================================================
+        // الثوابت والمتغيرات العامة
+        // ================================================================
+
+        const STORAGE_MAIN = 'employees_main';
+        const STORAGE_INTERNAL = 'employees_internal';
+        const STORAGE_SEPARATED = 'employees_separated';
+        const STORAGE_ABSENT = 'employees_absent';
+        const STORAGE_VACANT = 'employees_vacant';
+        const STORAGE_TRANSFERRED = 'employees_transferred';
+        const STORAGE_FINAL = 'employees_final';
+        const STORAGE_LOG = 'transfer_log';
+
+        const LIST_KEYS = ['قطاع', 'نقطة', 'وظيفة', 'رتبة', 'موقع'];
+        const LIST_STORAGE_PREFIX = 'dropdown_';
+
+        const MAIN_COLS = [
+            'ID', 'الاسم حسب الهوية', 'اسم الأم', 'رقم الهوية', 'ميلاد', 'الهاتف', 'العنوان',
+            'القطاع الخارجي', 'النقطة الخارجية', 'الوظيفة الخارجية', 'موقع العمل الخارجي',
+            'الرتبة', 'الراتب', 'الصرفة', 'العلاوة', 'اجمالي الصرفة', 'ملاحظة'
+        ];
+
+        const INTERNAL_COLS = [
+            'ID', 'الاسم حسب الهوية', 'اسم الأم', 'رقم الهوية', 'ميلاد', 'الهاتف', 'العنوان',
+            'القطاع الداخلي', 'النقطة الداخلية', 'الوظيفة الداخلية', 'موقع العمل الداخلي',
+            'الرتبة', 'الراتب', 'الصرفة', 'العلاوة', 'اجمالي الصرفة', 'ملاحظة'
+        ];
+
+        const FINAL_COLS = [
+            'ID', 'الاسم حسب الهوية', 'اسم الأم', 'رقم الهوية', 'ميلاد', 'الهاتف', 'العنوان',
+            'القطاع الخارجي', 'القطاع الداخلي',
+            'النقطة الخارجية', 'النقطة الداخلية',
+            'الوظيفة الخارجية', 'الوظيفة الداخلية',
+            'موقع العمل الخارجي', 'موقع العمل الداخلي',
+            'الرتبة', 'الراتب', 'الصرفة', 'العلاوة', 'اجمالي الصرفة', 'ملاحظة'
+        ];
+
+        const SEPARATED_COLS = [
+            'ID', 'الاسم حسب الهوية', 'اسم الأم', 'رقم الهوية', 'ميلاد', 'الهاتف', 'العنوان',
+            'القطاع الخارجي', 'النقطة الخارجية', 'الوظيفة الخارجية', 'موقع العمل الخارجي',
+            'الرتبة', 'الراتب', 'الصرفة', 'العلاوة', 'اجمالي الصرفة', 'تاريخ الإجراء', 'ملاحظة'
+        ];
+
+        const TRANSFERRED_COLS = [
+            'ID', 'الاسم حسب الهوية', 'رقم الهوية',
+            'القطاع الخارجي', 'القطاع الداخلي',
+            'النقطة الخارجية', 'النقطة الداخلية',
+            'الوظيفة الخارجية', 'الوظيفة الداخلية',
+            'موقع العمل الخارجي', 'موقع العمل الداخلي',
+            'ملاحظة'
+        ];
+
+        let mainData = [];
+        let internalData = [];
+        let separatedData = [];
+        let absentData = [];
+        let vacantData = [];
+        let transferredData = [];
+        let finalData = [];
+
+        let currentTab = 'main';
+        let searchFilter = '';
+
+        // ================================================================
+        // دوال مساعدة
+        // ================================================================
+
+        function calcTotal(emp) {
+            const r = parseFloat(emp.الراتب) || 0;
+            const s = parseFloat(emp.الصرفة) || 0;
+            const b = parseFloat(emp.العلاوة) || 0;
+            return (r + s + b).toFixed(2);
+        }
+
+        function updateTotal(emp) {
+            emp['اجمالي الصرفة'] = calcTotal(emp);
+            return emp;
+        }
+
+        function loadFromStorage(key, defaultVal) {
+            const stored = localStorage.getItem(key);
+            if (stored) {
+                try { return JSON.parse(stored); } catch (e) { return defaultVal; }
+            }
+            return defaultVal;
+        }
+
+        function saveToStorage(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        function saveAll() {
+            saveToStorage(STORAGE_MAIN, mainData);
+            saveToStorage(STORAGE_INTERNAL, internalData);
+            saveToStorage(STORAGE_SEPARATED, separatedData);
+            saveToStorage(STORAGE_ABSENT, absentData);
+            saveToStorage(STORAGE_VACANT, vacantData);
+            saveToStorage(STORAGE_TRANSFERRED, transferredData);
+            saveToStorage(STORAGE_FINAL, finalData);
+        }
+
+        function getList(key) {
+            const stored = localStorage.getItem(LIST_STORAGE_PREFIX + key);
+            if (stored) {
+                try { return JSON.parse(stored); } catch (e) { return []; }
+            }
+            return [];
+        }
+
+        function saveList(key, list) {
+            localStorage.setItem(LIST_STORAGE_PREFIX + key, JSON.stringify(list));
+        }
+
+        function initDefaultLists() {
+            const defaults = {
+                'قطاع': ['اللواء 34 عمالقة', 'اللواء 31 عمالقة', 'اللواء 32 عمالقة', 'اللواء 33 عمالقة', 'قيادة الفرقة'],
+                'نقطة': ['ك2 - س1 -ف1', 'ك1 - س3 -ف2', 'ك3 - س4 -ف3', 'ك1 - س1 -ف4', 'التشكيلات المساندة', 'ك4 - س1 -ف2'],
+                'وظيفة': ['جندي', 'قائد سرية', 'نائب قائد سرية', 'قائد فصيل', 'ضابط عمليات'],
+                'رتبة': ['فرد', 'ضابط'],
+                'موقع': ['عدن - راس عباس', 'عدن - بئر احمد', 'عدن - الفيران', 'عدن - صلاح الدين', 'عدن - التواهي']
+            };
+            LIST_KEYS.forEach(k => {
+                if (!localStorage.getItem(LIST_STORAGE_PREFIX + k)) {
+                    saveList(k, defaults[k] || []);
+                }
+            });
+        }
+        initDefaultLists();
+
+        function getDefaultMain() {
+            return [
+                { 'ID': '10011', 'الاسم حسب الهوية': 'سالم صلاح سالم محمد', 'اسم الأم': 'فائزة احمد محمد عبدالله',
+                    'رقم الهوية': '15875854', 'ميلاد': '05/09/2000', 'الهاتف': '774350283',
+                    'العنوان': 'ابين - زنجبار - العصلة', 'القطاع الخارجي': 'اللواء 34 عمالقة',
+                    'النقطة الخارجية': 'ك2 - س1 -ف1', 'الوظيفة الخارجية': 'جندي',
+                    'موقع العمل الخارجي': 'عدن - راس عباس', 'الرتبة': 'فرد',
+                    'الراتب': '1000', 'الصرفة': '6', 'العلاوة': '2', 'ملاحظة': '' },
+                { 'ID': '10012', 'الاسم حسب الهوية': 'جمال ناصر علي ناصر', 'اسم الأم': 'مريم احمد صالح',
+                    'رقم الهوية': '15875855', 'ميلاد': '06/02/1995', 'الهاتف': '774350284',
+                    'العنوان': 'لحج - الحوطة', 'القطاع الخارجي': 'اللواء 31 عمالقة',
+                    'النقطة الخارجية': 'ك1 - س3 -ف2', 'الوظيفة الخارجية': 'جندي',
+                    'موقع العمل الخارجي': 'عدن - بئر احمد', 'الرتبة': 'فرد',
+                    'الراتب': '1000', 'الصرفة': '5', 'العلاوة': '2', 'ملاحظة': '' },
+                { 'ID': '10013', 'الاسم حسب الهوية': 'منصور سالم منصور', 'اسم الأم': 'سارة علي احمد',
+                    'رقم الهوية': '15875856', 'ميلاد': '07/09/1990', 'الهاتف': '774350285',
+                    'العنوان': 'عدن -البريقة', 'القطاع الخارجي': 'اللواء 32 عمالقة',
+                    'النقطة الخارجية': 'ك3 - س4 -ف3', 'الوظيفة الخارجية': 'جندي',
+                    'موقع العمل الخارجي': 'عدن - راس عباس', 'الرتبة': 'فرد',
+                    'الراتب': '1000', 'الصرفة': '4', 'العلاوة': '2', 'ملاحظة': '' },
+                { 'ID': '10014', 'الاسم حسب الهوية': 'إبراهيم علي محمد', 'اسم الأم': 'طلحة امجد امجد',
+                    'رقم الهوية': '15875857', 'ميلاد': '08/01/2001', 'الهاتف': '774350286',
+                    'العنوان': 'شبوة - بيحان - السوق', 'القطاع الخارجي': 'اللواء 33 عمالقة',
+                    'النقطة الخارجية': 'ك1 - س1 -ف4', 'الوظيفة الخارجية': 'جندي',
+                    'موقع العمل الخارجي': 'عدن - الفيران', 'الرتبة': 'ضابط',
+                    'الراتب': '1000', 'الصرفة': '4', 'العلاوة': '2', 'ملاحظة': '' },
+                { 'ID': '10015', 'الاسم حسب الهوية': 'صالح علي صالح خالد', 'اسم الأم': 'ياسمين ناصر علي',
+                    'رقم الهوية': '15875858', 'ميلاد': '15/03/2002', 'الهاتف': '774350287',
+                    'العنوان': 'حضرموت - المكلا - الخور', 'القطاع الخارجي': 'قيادة الفرقة',
+                    'النقطة الخارجية': 'التشكيلات المساندة', 'الوظيفة الخارجية': 'جندي',
+                    'موقع العمل الخارجي': 'عدن - صلاح الدين', 'الرتبة': 'فرد',
+                    'الراتب': '1000', 'الصرفة': '4', 'العلاوة': '2', 'ملاحظة': '' }
+            ].map(emp => updateTotal(emp));
+        }
+
+        // ================================================================
+        // تحميل البيانات وبناء الكشوف
+        // ================================================================
+
+        function loadAll() {
+            mainData = loadFromStorage(STORAGE_MAIN, getDefaultMain());
+            mainData = mainData.map(emp => updateTotal(emp));
+
+            internalData = loadFromStorage(STORAGE_INTERNAL, []);
+            internalData = internalData.map(emp => updateTotal(emp));
+
+            separatedData = loadFromStorage(STORAGE_SEPARATED, []);
+            separatedData = separatedData.map(emp => updateTotal(emp));
+
+            absentData = loadFromStorage(STORAGE_ABSENT, []);
+            absentData = absentData.map(emp => updateTotal(emp));
+
+            vacantData = loadFromStorage(STORAGE_VACANT, []);
+            vacantData = vacantData.map(emp => updateTotal(emp));
+
+            transferredData = loadFromStorage(STORAGE_TRANSFERRED, []);
+
+            finalData = loadFromStorage(STORAGE_FINAL, []);
+            finalData = finalData.map(emp => updateTotal(emp));
+
+            if (mainData.length > 0 && internalData.length === 0) {
+                internalData = mainData.map(emp => {
+                    const newEmp = { ...emp };
+                    newEmp['القطاع الداخلي'] = emp['القطاع الخارجي'] || '';
+                    newEmp['النقطة الداخلية'] = emp['النقطة الخارجية'] || '';
+                    newEmp['الوظيفة الداخلية'] = emp['الوظيفة الخارجية'] || '';
+                    newEmp['موقع العمل الداخلي'] = emp['موقع العمل الخارجي'] || '';
+                    newEmp['الرتبة'] = emp['الرتبة'] || '';
+                    return updateTotal(newEmp);
+                });
+                saveToStorage(STORAGE_INTERNAL, internalData);
+            }
+
+            buildFinal();
+        }
+
+        function buildFinal() {
+            const mainMap = {};
+            mainData.forEach(emp => {
+                const id = emp['رقم الهوية'] || emp['ID'] || '';
+                if (id) mainMap[id] = emp;
+            });
+
+            finalData = internalData.map(emp => {
+                const id = emp['رقم الهوية'] || emp['ID'] || '';
+                const main = mainMap[id] || {};
+                const merged = { ...main, ...emp };
+                MAIN_COLS.forEach(col => {
+                    if (!merged[col] && main[col] !== undefined) merged[col] = main[col];
+                    else if (!merged[col]) merged[col] = '';
+                });
+                INTERNAL_COLS.forEach(col => {
+                    if (!merged[col] && emp[col] !== undefined) merged[col] = emp[col];
+                    else if (!merged[col]) merged[col] = '';
+                });
+                return updateTotal(merged);
+            });
+
+            const transferred = internalData.filter(emp => {
+                const id = emp['رقم الهوية'] || emp['ID'] || '';
+                if (!id) return false;
+                const ext = mainData.find(e => (e['رقم الهوية'] || e['ID']) === id);
+                if (!ext) return false;
+                if (!ext['الاسم حسب الهوية'] || ext['الاسم حسب الهوية'].trim() === '') return false;
+                return (emp['القطاع الداخلي'] !== ext['القطاع الخارجي'] ||
+                    emp['النقطة الداخلية'] !== ext['النقطة الخارجية'] ||
+                    emp['الوظيفة الداخلية'] !== ext['الوظيفة الخارجية'] ||
+                    emp['موقع العمل الداخلي'] !== ext['موقع العمل الخارجي']);
+            });
+            transferredData = transferred.map(emp => {
+                const ext = mainData.find(e => (e['رقم الهوية'] || e['ID']) === (emp['رقم الهوية'] || emp['ID']));
+                return {
+                    'ID': emp['ID'] || '',
+                    'الاسم حسب الهوية': emp['الاسم حسب الهوية'] || '',
+                    'رقم الهوية': emp['رقم الهوية'] || '',
+                    'القطاع الخارجي': ext ? ext['القطاع الخارجي'] || '' : '',
+                    'القطاع الداخلي': emp['القطاع الداخلي'] || '',
+                    'النقطة الخارجية': ext ? ext['النقطة الخارجية'] || '' : '',
+                    'النقطة الداخلية': emp['النقطة الداخلية'] || '',
+                    'الوظيفة الخارجية': ext ? ext['الوظيفة الخارجية'] || '' : '',
+                    'الوظيفة الداخلية': emp['الوظيفة الداخلية'] || '',
+                    'موقع العمل الخارجي': ext ? ext['موقع العمل الخارجي'] || '' : '',
+                    'موقع العمل الداخلي': emp['موقع العمل الداخلي'] || '',
+                    'ملاحظة': emp['ملاحظة'] || ''
+                };
+            });
+            saveToStorage(STORAGE_TRANSFERRED, transferredData);
+
+            vacantData = internalData.filter(emp => {
+                const name = (emp['الاسم حسب الهوية'] || '').trim();
+                const id = (emp['رقم الهوية'] || '').trim();
+                return name === '' && id === '';
+            });
+            saveToStorage(STORAGE_VACANT, vacantData);
+            saveToStorage(STORAGE_FINAL, finalData);
+        }
+
+        // ================================================================
+        // عرض الجدول
+        // ================================================================
+
+        function getCurrentData() {
+            switch (currentTab) {
+                case 'main':
+                    return mainData;
+                case 'internal':
+                    return internalData;
+                case 'separated':
+                    return separatedData;
+                case 'absent':
+                    return absentData;
+                case 'vacant':
+                    return vacantData;
+                case 'transferred':
+                    return transferredData;
+                case 'final':
+                    return finalData;
+                default:
+                    return mainData;
+            }
+        }
+
+        function getCurrentCols() {
+            switch (currentTab) {
+                case 'main':
+                    return MAIN_COLS;
+                case 'internal':
+                    return INTERNAL_COLS;
+                case 'separated':
+                    return SEPARATED_COLS;
+                case 'absent':
+                    return SEPARATED_COLS;
+                case 'vacant':
+                    return SEPARATED_COLS;
+                case 'transferred':
+                    return TRANSFERRED_COLS;
+                case 'final':
+                    return FINAL_COLS;
+                default:
+                    return MAIN_COLS;
+            }
+        }
+
+        function renderTable() {
+            const data = getCurrentData();
+            const cols = getCurrentCols();
+            const tbody = document.getElementById('tableBody');
+            const thead = document.getElementById('tableHead');
+            tbody.innerHTML = '';
+            thead.innerHTML = '';
+
+            const headerRow = document.createElement('tr');
+            const thCheck = document.createElement('th');
+            thCheck.className = 'checkbox-col';
+            const chkAll = document.createElement('input');
+            chkAll.type = 'checkbox';
+            chkAll.id = 'selectAll';
+            thCheck.appendChild(chkAll);
+            headerRow.appendChild(thCheck);
+            const thNum = document.createElement('th');
+            thNum.textContent = '#';
+            headerRow.appendChild(thNum);
+
+            cols.forEach(col => {
+                const th = document.createElement('th');
+                th.textContent = col;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+
+            if (data.length === 0) {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = cols.length + 2;
+                td.style.textAlign = 'center';
+                td.style.padding = '30px';
+                td.style.color = '#6c7a89';
+                td.textContent = 'لا توجد بيانات في هذا الكشف.';
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+                return;
+            }
+
+            let filtered = data;
+            if (searchFilter.trim()) {
+                const keyword = searchFilter.trim().toLowerCase();
+                filtered = data.filter(emp => {
+                    const name = (emp['الاسم حسب الهوية'] || '').toLowerCase();
+                    const id = (emp['رقم الهوية'] || '').toLowerCase();
+                    const point = (emp['النقطة الداخلية'] || emp['النقطة الخارجية'] || '').toLowerCase();
+                    return name.includes(keyword) || id.includes(keyword) || point.includes(keyword);
+                });
+            }
+
+            filtered.forEach((emp, idx) => {
+                const tr = document.createElement('tr');
+                const tdCheck = document.createElement('td');
+                tdCheck.className = 'checkbox-col';
+                const chk = document.createElement('input');
+                chk.type = 'checkbox';
+                chk.dataset.id = emp['رقم الهوية'] || emp['ID'] || '';
+                chk.className = 'row-checkbox';
+                const hasIdentity = (emp['رقم الهوية'] && emp['رقم الهوية'].trim() !== '') &&
+                    (emp['الاسم حسب الهوية'] && emp['الاسم حسب الهوية'].trim() !== '');
+                if (hasIdentity) {
+                    tdCheck.appendChild(chk);
+                }
+                tr.appendChild(tdCheck);
+
+                const tdNum = document.createElement('td');
+                tdNum.textContent = idx + 1;
+                tr.appendChild(tdNum);
+
+                cols.forEach(col => {
+                    const td = document.createElement('td');
+                    let value = emp[col] || '';
+                    if (col === 'الاسم حسب الهوية') {
+                        if (value.trim() !== '') {
+                            const span = document.createElement('span');
+                            span.className = 'clickable-name';
+                            span.textContent = value;
+                            span.dataset.id = emp['رقم الهوية'] || emp['ID'] || '';
+                            span.addEventListener('click', () => showEmployeeLog(span.dataset.id));
+                            td.appendChild(span);
+                        } else {
+                            td.textContent = value;
+                        }
+                    } else {
+                        td.textContent = value;
+                    }
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+
+            const selectAll = document.getElementById('selectAll');
+            if (selectAll) {
+                selectAll.addEventListener('change', function() {
+                    const checked = this.checked;
+                    document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = checked);
+                });
+            }
+        }
+
+        // ================================================================
+        // أحداث التبويبات والبحث
+        // ================================================================
+
+        document.querySelectorAll('[data-tab]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-tab]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentTab = this.dataset.tab;
+                renderTable();
+            });
+        });
+
+        document.getElementById('searchInput').addEventListener('input', function() {
+            searchFilter = this.value;
+            renderTable();
+        });
+
+        document.getElementById('refreshBtn').addEventListener('click', function() {
+            loadAll();
+            renderTable();
+        });
+
+        // ================================================================
+        // استيراد الكشف الرئيسي
+        // ================================================================
+
+        document.getElementById('fileUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(loadEvent) {
+                try {
+                    const data = new Uint8Array(loadEvent.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+                    const mainTemp = [];
+                    const internalTemp = [];
+                    const vacantTemp = [];
+
+                    json.forEach(row => {
+                        const id = String(row['رقم الهوية'] || row['ID'] || '').trim();
+                        const name = String(row['الاسم حسب الهوية'] || row['الاسم'] || '').trim();
+
+                        const getVal = (col, altCols) => {
+                            let val = row[col];
+                            if (val !== undefined && String(val).trim() !== '') return String(val);
+                            if (altCols) {
+                                for (let a of altCols) {
+                                    if (row[a] !== undefined && String(row[a]).trim() !== '') return String(row[
+                                    a]);
+                                }
+                            }
+                            return '';
+                        };
+
+                        if (id === '' || name === '') {
+                            const mainVacant = {};
+                            MAIN_COLS.forEach(col => {
+                                let val = '';
+                                if (col === 'الاسم حسب الهوية') val = '';
+                                else if (col === 'اسم الأم') val = '';
+                                else if (col === 'رقم الهوية') val = '';
+                                else if (col === 'ميلاد') val = '';
+                                else if (col === 'الهاتف') val = '';
+                                else if (col === 'العنوان') val = '';
+                                else if (col === 'ID') val = '';
+                                else if (col === 'القطاع الخارجي') val = getVal('القطاع الخارجي', [
+                                    'القطاع الخارجي'
+                                ]);
+                                else if (col === 'النقطة الخارجية') val = getVal('النقطة الخارجية', [
+                                    'النقطة الخارجية'
+                                ]);
+                                else if (col === 'الوظيفة الخارجية') val = getVal('الوظيفة الخارجية', [
+                                    'الوظيفة الخارجية'
+                                ]);
+                                else if (col === 'موقع العمل الخارجي') val = getVal('موقع العمل الخارجي', [
+                                    'موقع العمل الخارجي'
+                                ]);
+                                else if (col === 'الرتبة') val = getVal('الرتبة', ['الرتبة']);
+                                else if (col === 'الراتب') val = getVal('الراتب', ['الراتب']);
+                                else if (col === 'الصرفة') val = getVal('الصرفة', ['الصرفة']);
+                                else if (col === 'العلاوة') val = getVal('العلاوة', ['العلاوة']);
+                                else if (col === 'اجمالي الصرفة') val = getVal('اجمالي الصرفة', [
+                                    'اجمالي الصرفة'
+                                ]);
+                                else if (col === 'ملاحظة') {
+                                    val = getVal('ملاحظة', ['ملاحظة']);
+                                    if (!val || val.trim() === '') val = 'شاغر';
+                                }
+                                mainVacant[col] = val;
+                            });
+                            mainTemp.push(updateTotal(mainVacant));
+
+                            const internalVacant = {};
+                            INTERNAL_COLS.forEach(col => {
+                                let val = '';
+                                if (col === 'الاسم حسب الهوية') val = '';
+                                else if (col === 'اسم الأم') val = '';
+                                else if (col === 'رقم الهوية') val = '';
+                                else if (col === 'ميلاد') val = '';
+                                else if (col === 'الهاتف') val = '';
+                                else if (col === 'العنوان') val = '';
+                                else if (col === 'ID') val = '';
+                                else if (col === 'القطاع الداخلي') val = getVal('القطاع الداخلي', [
+                                    'القطاع الخارجي', 'القطاع الداخلي'
+                                ]);
+                                else if (col === 'النقطة الداخلية') val = getVal('النقطة الداخلية', [
+                                    'النقطة الخارجية', 'النقطة الداخلية'
+                                ]);
+                                else if (col === 'الوظيفة الداخلية') val = getVal('الوظيفة الداخلية', [
+                                    'الوظيفة الخارجية', 'الوظيفة الداخلية'
+                                ]);
+                                else if (col === 'موقع العمل الداخلي') val = getVal('موقع العمل الداخلي', [
+                                    'موقع العمل الخارجي', 'موقع العمل الداخلي'
+                                ]);
+                                else if (col === 'الرتبة') val = getVal('الرتبة', ['الرتبة']);
+                                else if (col === 'الراتب') val = getVal('الراتب', ['الراتب']);
+                                else if (col === 'الصرفة') val = getVal('الصرفة', ['الصرفة']);
+                                else if (col === 'العلاوة') val = getVal('العلاوة', ['العلاوة']);
+                                else if (col === 'اجمالي الصرفة') val = getVal('اجمالي الصرفة', [
+                                    'اجمالي الصرفة'
+                                ]);
+                                else if (col === 'ملاحظة') {
+                                    val = getVal('ملاحظة', ['ملاحظة']);
+                                    if (!val || val.trim() === '') val = 'شاغر';
+                                }
+                                internalVacant[col] = val;
+                            });
+                            internalTemp.push(updateTotal(internalVacant));
+                            vacantTemp.push(internalVacant);
+                        } else {
+                            const emp = {};
+                            MAIN_COLS.forEach(col => {
+                                let key = col;
+                                if (col === 'الاسم حسب الهوية' && row['الاسم حسب الهوية']) key =
+                                    'الاسم حسب الهوية';
+                                else if (col === 'اسم الأم' && row['اسم الأم']) key = 'اسم الأم';
+                                else if (col === 'رقم الهوية' && row['رقم الهوية']) key = 'رقم الهوية';
+                                else if (col === 'ميلاد' && row['ميلاد']) key = 'ميلاد';
+                                else if (col === 'الهاتف' && row['الهاتف']) key = 'الهاتف';
+                                else if (col === 'العنوان' && row['العنوان']) key = 'العنوان';
+                                else if (col === 'القطاع الخارجي' && row['القطاع الخارجي']) key =
+                                    'القطاع الخارجي';
+                                else if (col === 'النقطة الخارجية' && row['النقطة الخارجية']) key =
+                                    'النقطة الخارجية';
+                                else if (col === 'الوظيفة الخارجية' && row['الوظيفة الخارجية']) key =
+                                    'الوظيفة الخارجية';
+                                else if (col === 'موقع العمل الخارجي' && row['موقع العمل الخارجي']) key =
+                                    'موقع العمل الخارجي';
+                                else if (col === 'الرتبة' && row['الرتبة']) key = 'الرتبة';
+                                else if (col === 'الراتب' && row['الراتب']) key = 'الراتب';
+                                else if (col === 'الصرفة' && row['الصرفة']) key = 'الصرفة';
+                                else if (col === 'العلاوة' && row['العلاوة']) key = 'العلاوة';
+                                else if (col === 'اجمالي الصرفة' && row['اجمالي الصرفة']) key =
+                                    'اجمالي الصرفة';
+                                else if (col === 'ملاحظة' && row['ملاحظة']) key = 'ملاحظة';
+                                if (col === 'ID' && row['ID']) key = 'ID';
+                                emp[col] = row[key] !== undefined ? String(row[key]) : '';
+                            });
+                            if (!emp['رقم الهوية'] && row['رقم الهوية']) emp['رقم الهوية'] = String(row[
+                            'رقم الهوية']);
+                            if (!emp['رقم الهوية'] && row['ID']) emp['رقم الهوية'] = String(row['ID']);
+                            if (!emp['ID'] && row['ID']) emp['ID'] = String(row['ID']);
+                            mainTemp.push(updateTotal(emp));
+                        }
+                    });
+
+                    if (mainTemp.length > 0 || internalTemp.length > 0) {
+                        mainData = mainTemp;
+                        saveToStorage(STORAGE_MAIN, mainData);
+
+                        internalData = mainData.map(emp => {
+                            const newEmp = { ...emp };
+                            newEmp['القطاع الداخلي'] = emp['القطاع الخارجي'] || '';
+                            newEmp['النقطة الداخلية'] = emp['النقطة الخارجية'] || '';
+                            newEmp['الوظيفة الداخلية'] = emp['الوظيفة الخارجية'] || '';
+                            newEmp['موقع العمل الداخلي'] = emp['موقع العمل الخارجي'] || '';
+                            newEmp['الرتبة'] = emp['الرتبة'] || '';
+                            return updateTotal(newEmp);
+                        });
+
+                        vacantTemp.forEach(v => {
+                            internalData.push(updateTotal(v));
+                        });
+
+                        saveToStorage(STORAGE_INTERNAL, internalData);
+                        separatedData = [];
+                        absentData = [];
+                        transferredData = [];
+                        buildFinal();
+                        renderTable();
+                        const cnt = mainTemp.filter(e => e['الاسم حسب الهوية'] && e['الاسم حسب الهوية'].trim() !==
+                            '').length;
+                        const vac = mainTemp.filter(e => !e['الاسم حسب الهوية'] || e['الاسم حسب الهوية'].trim() ===
+                            '').length;
+                        alert('تم استيراد ' + cnt + ' موظف و ' + vac + ' شاغر.');
+                    } else {
+                        alert('لم يتم العثور على بيانات صالحة.');
+                    }
+                } catch (err) {
+                    alert('خطأ: ' + err.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            e.target.value = '';
+        });
+
+        // ================================================================
+        // تصدير الكشف الحالي
+        // ================================================================
+
+        document.getElementById('exportBtn').addEventListener('click', function() {
+            const data = getCurrentData();
+            const cols = getCurrentCols();
+            if (data.length === 0) {
+                alert('لا توجد بيانات للتصدير.');
+                return;
+            }
+            const exportData = data.map(emp => {
+                const row = {};
+                cols.forEach(col => {
+                    row[col] = emp[col] || '';
+                });
+                return row;
+            });
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+            ws['!cols'] = cols.map(() => ({ wch: 20 }));
+
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            for (let C = range.s.c; C <= range.e.c; C++) {
+                const addr = XLSX.utils.encode_cell({ r: 0, c: C });
+                if (!ws[addr]) continue;
+                ws[addr].s = {
+                    fill: { fgColor: { rgb: "D3D3D3" } },
+                    font: { bold: true },
+                    alignment: { horizontal: "center" }
+                };
+            }
+            for (let R = 1; R <= range.e.r; R++) {
+                for (let C = range.s.c; C <= range.e.c; C++) {
+                    const addr = XLSX.utils.encode_cell({ r: R, c: C });
+                    if (!ws[addr]) continue;
+                    ws[addr].s = {
+                        alignment: { horizontal: "center" }
+                    };
+                }
+            }
+
+            const filename = currentTab + '_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+            XLSX.writeFile(wb, filename);
+        });
+
+        // ================================================================
+        // إدارة القوائم
+        // ================================================================
+
+        document.getElementById('manageListsBtn').addEventListener('click', function() {
+            renderListManager();
+            document.getElementById('listsModal').classList.add('active');
+        });
+
+        function renderListManager() {
+            const container = document.getElementById('listManagerContainer');
+            container.innerHTML = '';
+            LIST_KEYS.forEach(key => {
+                const list = getList(key);
+                const group = document.createElement('div');
+                group.className = 'list-group';
+                group.innerHTML = `
+                    <h3>قائمة ${key}</h3>
+                    <div class="items" id="items_${key}">
+                        ${list.map((item, idx) => `
+                            <span class="badge">
+                                ${item}
+                                <span class="del" data-key="${key}" data-idx="${idx}">×</span>
+                            </span>
+                        `).join('')}
+                    </div>
+                    <div class="add-item">
+                        <input type="text" id="newItem_${key}" placeholder="أضف قيمة جديدة" />
+                        <button data-key="${key}">إضافة</button>
+                    </div>
+                `;
+                container.appendChild(group);
+
+                group.querySelector('.add-item button').addEventListener('click', function() {
+                    const input = document.getElementById('newItem_' + key);
+                    const val = input.value.trim();
+                    if (val === '') return;
+                    const current = getList(key);
+                    if (!current.includes(val)) {
+                        current.push(val);
+                        saveList(key, current);
+                        renderListManager();
+                    }
+                    input.value = '';
+                });
+
+                group.querySelectorAll('.items .del').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const idx = parseInt(this.dataset.idx);
+                        const current = getList(key);
+                        current.splice(idx, 1);
+                        saveList(key, current);
+                        renderListManager();
+                    });
+                });
+            });
+        }
+
+        // ================================================================
+        // توليد تقرير كامل
+        // ================================================================
+
+        document.getElementById('fullReportBtn').addEventListener('click', function() {
+            if (mainData.length === 0 && internalData.length === 0) {
+                alert('لا توجد بيانات لإنشاء التقرير.');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+
+            if (transferredData.length > 0) {
+                const ws1 = XLSX.utils.json_to_sheet(transferredData);
+                XLSX.utils.book_append_sheet(wb, ws1, 'التنقلات');
+            }
+
+            if (separatedData.length > 0) {
+                const ws2 = XLSX.utils.json_to_sheet(separatedData);
+                XLSX.utils.book_append_sheet(wb, ws2, 'المفصولين');
+            }
+
+            if (absentData.length > 0) {
+                const ws3 = XLSX.utils.json_to_sheet(absentData);
+                XLSX.utils.book_append_sheet(wb, ws3, 'المنقطعين');
+            }
+
+            if (vacantData.length > 0) {
+                const ws4 = XLSX.utils.json_to_sheet(vacantData);
+                XLSX.utils.book_append_sheet(wb, ws4, 'الشواغر');
+            }
+
+            if (finalData.length > 0) {
+                const ws5 = XLSX.utils.json_to_sheet(finalData);
+                XLSX.utils.book_append_sheet(wb, ws5, 'اجمالي القوة');
+            }
+
+            if (wb.SheetNames.length === 0) {
+                alert('لا توجد بيانات كافية لإنشاء التقرير.');
+                return;
+            }
+
+            wb.SheetNames.forEach(name => {
+                const ws = wb.Sheets[name];
+                if (ws['!ref']) {
+                    const range = XLSX.utils.decode_range(ws['!ref']);
+                    for (let C = range.s.c; C <= range.e.c; C++) {
+                        const addr = XLSX.utils.encode_cell({ r: 0, c: C });
+                        if (ws[addr]) {
+                            ws[addr].s = {
+                                fill: { fgColor: { rgb: "D3D3D3" } },
+                                font: { bold: true },
+                                alignment: { horizontal: "center" }
+                            };
+                        }
+                    }
+                    ws['!cols'] = [];
+                    for (let C = range.s.c; C <= range.e.c; C++) {
+                        ws['!cols'].push({ wch: 20 });
+                    }
+                }
+            });
+
+            const filename = 'تقرير_كامل_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+            XLSX.writeFile(wb, filename);
+        });
+
+        // ================================================================
+        // إنشاء كشف داخلي
+        // ================================================================
+
+        document.getElementById('createInternalBtn').addEventListener('click', function() {
+            if (mainData.length === 0) {
+                alert('الرجاء استيراد الكشف الرئيسي أولاً.');
+                return;
+            }
+            if (confirm('سيتم إعادة إنشاء الكشف الداخلي من الرئيسي، وسيتم فقدان أي تعديلات حالية. هل تريد المتابعة؟')) {
+                internalData = mainData.map(emp => {
+                    const newEmp = { ...emp };
+                    newEmp['القطاع الداخلي'] = emp['القطاع الخارجي'] || '';
+                    newEmp['النقطة الداخلية'] = emp['النقطة الخارجية'] || '';
+                    newEmp['الوظيفة الداخلية'] = emp['الوظيفة الخارجية'] || '';
+                    newEmp['موقع العمل الداخلي'] = emp['موقع العمل الخارجي'] || '';
+                    newEmp['الرتبة'] = emp['الرتبة'] || '';
+                    return updateTotal(newEmp);
+                });
+                const existingVacants = internalData.filter(emp => {
+                    const name = (emp['الاسم حسب الهوية'] || '').trim();
+                    const id = (emp['رقم الهوية'] || '').trim();
+                    return name === '' && id === '';
+                });
+                internalData = internalData.concat(existingVacants);
+                saveToStorage(STORAGE_INTERNAL, internalData);
+                buildFinal();
+                renderTable();
+                alert('تم إنشاء الكشف الداخلي بنجاح.');
+            }
+        });
+
+        // ================================================================
+        // تعديل داخلي (نقل جماعي)
+        // ================================================================
+
+        document.getElementById('bulkEditBtn').addEventListener('click', function() {
+            if (internalData.length === 0) {
+                alert('الرجاء إنشاء الكشف الداخلي أولاً.');
+                return;
+            }
+            const checkedIds = Array.from(document.querySelectorAll('.row-checkbox:checked'))
+                .map(cb => String(cb.dataset.id || ''))
+                .filter(id => id.trim() !== '');
+            if (checkedIds.length === 0) {
+                alert('الرجاء تحديد موظف واحد على الأقل.');
+                return;
+            }
+            const selected = internalData.filter(emp => {
+                const id = String(emp['رقم الهوية'] || emp['ID'] || '');
+                return checkedIds.includes(id);
+            });
+            if (selected.length === 0) {
+                alert('لم يتم العثور على الموظفين المحددين في الكشف الداخلي.');
+                return;
+            }
+            openBulkModal(selected);
+        });
+
+        let bulkEmployees = [];
+
+        function openBulkModal(selected) {
+            bulkEmployees = selected.map(emp => ({ ...emp }));
+            const tbody = document.getElementById('bulkTableBody');
+            tbody.innerHTML = '';
+
+            const lists = {};
+            LIST_KEYS.forEach(k => {
+                lists[k] = getList(k);
+            });
+
+            bulkEmployees.forEach((emp, idx) => {
+                const tr = document.createElement('tr');
+                const tdNum = document.createElement('td');
+                tdNum.textContent = idx + 1;
+                tr.appendChild(tdNum);
+
+                const fixedFields = [
+                    { key: 'الاسم حسب الهوية', editable: false },
+                    { key: 'رقم الهوية', editable: false }
+                ];
+
+                const dropdownFields = [
+                    { key: 'القطاع الداخلي', listKey: 'قطاع' },
+                    { key: 'النقطة الداخلية', listKey: 'نقطة' },
+                    { key: 'الوظيفة الداخلية', listKey: 'وظيفة' },
+                    { key: 'موقع العمل الداخلي', listKey: 'موقع' },
+                    { key: 'الرتبة', listKey: 'رتبة' }
+                ];
+
+                const numberFields = ['الراتب', 'الصرفة', 'العلاوة'];
+
+                fixedFields.forEach(({ key, editable }) => {
+                    const td = document.createElement('td');
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = emp[key] || '';
+                    input.readOnly = true;
+                    input.style.backgroundColor = '#f0f2f5';
+                    input.dataset.col = key;
+                    input.dataset.index = idx;
+                    input.className = 'bulk-input';
+                    td.appendChild(input);
+                    tr.appendChild(td);
+                });
+
+                dropdownFields.forEach(({ key, listKey }) => {
+                    const td = document.createElement('td');
+                    const select = document.createElement('select');
+                    select.dataset.col = key;
+                    select.dataset.index = idx;
+                    select.className = 'bulk-select';
+                    const emptyOpt = document.createElement('option');
+                    emptyOpt.value = '';
+                    emptyOpt.textContent = '-- اختر --';
+                    select.appendChild(emptyOpt);
+                    const items = lists[listKey] || [];
+                    items.forEach(item => {
+                        const opt = document.createElement('option');
+                        opt.value = item;
+                        opt.textContent = item;
+                        if (item === (emp[key] || '')) {
+                            opt.selected = true;
+                        }
+                        select.appendChild(opt);
+                    });
+                    const currentVal = emp[key] || '';
+                    if (currentVal && !items.includes(currentVal)) {
+                        const extraOpt = document.createElement('option');
+                        extraOpt.value = currentVal;
+                        extraOpt.textContent = currentVal;
+                        extraOpt.selected = true;
+                        select.appendChild(extraOpt);
+                    }
+                    select.addEventListener('change', function() {
+                        const col = this.dataset.col;
+                        const idx2 = parseInt(this.dataset.index);
+                        bulkEmployees[idx2][col] = this.value;
+                    });
+                    td.appendChild(select);
+                    tr.appendChild(td);
+                });
+
+                numberFields.forEach(key => {
+                    const td = document.createElement('td');
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = emp[key] || '';
+                    input.dataset.col = key;
+                    input.dataset.index = idx;
+                    input.className = 'bulk-input';
+                    input.addEventListener('input', function() {
+                        const col = this.dataset.col;
+                        const idx2 = parseInt(this.dataset.index);
+                        bulkEmployees[idx2][col] = this.value;
+                        if (['الراتب', 'الصرفة', 'العلاوة'].includes(col)) {
+                            const empObj = bulkEmployees[idx2];
+                            const total = calcTotal(empObj);
+                            empObj['اجمالي الصرفة'] = total;
+                            const row = this.closest('tr');
+                            const totalInput = row.querySelector('input[data-col="اجمالي الصرفة"]');
+                            if (totalInput) totalInput.value = total;
+                        }
+                    });
+                    td.appendChild(input);
+                    tr.appendChild(td);
+                });
+
+                const totalTd = document.createElement('td');
+                const totalInput = document.createElement('input');
+                totalInput.type = 'text';
+                totalInput.value = emp['اجمالي الصرفة'] || '';
+                totalInput.readOnly = true;
+                totalInput.style.backgroundColor = '#f0f2f5';
+                totalInput.dataset.col = 'اجمالي الصرفة';
+                totalInput.dataset.index = idx;
+                totalInput.className = 'bulk-input';
+                totalTd.appendChild(totalInput);
+                tr.appendChild(totalTd);
+
+                const noteTd = document.createElement('td');
+                const noteInput = document.createElement('input');
+                noteInput.type = 'text';
+                noteInput.value = emp['ملاحظة'] || '';
+                noteInput.dataset.col = 'ملاحظة';
+                noteInput.dataset.index = idx;
+                noteInput.className = 'bulk-input';
+                noteInput.addEventListener('input', function() {
+                    const col = this.dataset.col;
+                    const idx2 = parseInt(this.dataset.index);
+                    bulkEmployees[idx2][col] = this.value;
+                });
+                noteTd.appendChild(noteInput);
+                tr.appendChild(noteTd);
+
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('bulkModal').classList.add('active');
+        }
+
+        // ================================================================
+        // تطبيق على الكل
+        // ================================================================
+
+        document.getElementById('applyAllBtn').addEventListener('click', function() {
+            const rows = document.querySelectorAll('#bulkTableBody tr');
+            if (rows.length < 2) {
+                alert('يجب أن يكون هناك صفان على الأقل.');
+                return;
+            }
+            const firstRowInputs = rows[0].querySelectorAll('.bulk-input');
+            const firstRowSelects = rows[0].querySelectorAll('.bulk-select');
+            const firstValues = {};
+            firstRowInputs.forEach(inp => {
+                firstValues[inp.dataset.col] = inp.value;
+            });
+            firstRowSelects.forEach(sel => {
+                firstValues[sel.dataset.col] = sel.value;
+            });
+
+            for (let i = 1; i < rows.length; i++) {
+                const inputs = rows[i].querySelectorAll('.bulk-input');
+                const selects = rows[i].querySelectorAll('.bulk-select');
+                inputs.forEach(inp => {
+                    if (!inp.readOnly) {
+                        inp.value = firstValues[inp.dataset.col] || '';
+                        const idx = parseInt(inp.dataset.index);
+                        bulkEmployees[idx][inp.dataset.col] = inp.value;
+                        if (['الراتب', 'الصرفة', 'العلاوة'].includes(inp.dataset.col)) {
+                            const empObj = bulkEmployees[idx];
+                            const total = calcTotal(empObj);
+                            empObj['اجمالي الصرفة'] = total;
+                            const totalInput = rows[i].querySelector('input[data-col="اجمالي الصرفة"]');
+                            if (totalInput) totalInput.value = total;
+                        }
+                    }
+                });
+                selects.forEach(sel => {
+                    const col = sel.dataset.col;
+                    if (firstValues[col] !== undefined) {
+                        sel.value = firstValues[col];
+                        const idx = parseInt(sel.dataset.index);
+                        bulkEmployees[idx][col] = sel.value;
+                    }
+                });
+            }
+        });
+
+        // ================================================================
+        // حفظ التعديلات
+        // ================================================================
+
+        document.getElementById('saveBulkBtn').addEventListener('click', function() {
+            const rows = document.querySelectorAll('#bulkTableBody tr');
+            rows.forEach((row, idx) => {
+                const inputs = row.querySelectorAll('.bulk-input');
+                const selects = row.querySelectorAll('.bulk-select');
+                inputs.forEach(inp => {
+                    const col = inp.dataset.col;
+                    const index = parseInt(inp.dataset.index);
+                    bulkEmployees[index][col] = inp.value;
+                });
+                selects.forEach(sel => {
+                    const col = sel.dataset.col;
+                    const index = parseInt(sel.dataset.index);
+                    bulkEmployees[index][col] = sel.value;
+                });
+            });
+
+            const updatedMap = {};
+            bulkEmployees.forEach(emp => {
+                const id = emp['رقم الهوية'] || emp['ID'] || '';
+                if (id) updatedMap[id] = emp;
+            });
+
+            internalData = internalData.map(emp => {
+                const id = emp['رقم الهوية'] || emp['ID'] || '';
+                if (updatedMap[id]) {
+                    const updated = { ...emp };
+                    const fields = ['القطاع الداخلي', 'النقطة الداخلية', 'الوظيفة الداخلية',
+                        'موقع العمل الداخلي', 'الرتبة', 'الراتب', 'الصرفة', 'العلاوة', 'ملاحظة'
+                    ];
+                    fields.forEach(f => {
+                        updated[f] = updatedMap[id][f] || '';
+                    });
+                    return updateTotal(updated);
+                }
+                return emp;
+            });
+
+            saveToStorage(STORAGE_INTERNAL, internalData);
+            buildFinal();
+            renderTable();
+            document.getElementById('bulkModal').classList.remove('active');
+            alert('تم حفظ التعديلات بنجاح.');
+        });
+
+        // ================================================================
+        // زر الترقية - فتح المودال
+        // ================================================================
+
+        document.getElementById('promotionBtn').addEventListener('click', function() {
+            if (currentTab !== 'internal') {
+                alert('الرجاء التبديل إلى تبويب "الداخلي" لتنفيذ الترقية.');
+                return;
+            }
+            const checkedIds = Array.from(document.querySelectorAll('.row-checkbox:checked'))
+                .map(cb => String(cb.dataset.id || ''))
+                .filter(id => id.trim() !== '');
+            if (checkedIds.length !== 1) {
+                alert('الرجاء تحديد موظف واحد فقط للترقية.');
+                return;
+            }
+            const empId = checkedIds[0];
+            const emp = internalData.find(e => String(e['رقم الهوية'] || e['ID'] || '') === empId);
+            if (!emp) {
+                alert('الموظف غير موجود في الكشف الداخلي.');
+                return;
+            }
+            if (!emp['الاسم حسب الهوية'] || emp['الاسم حسب الهوية'].trim() === '') {
+                alert('لا يمكن ترقية شاغر. الرجاء اختيار موظف فعلي.');
+                return;
+            }
+
+            document.getElementById('promotionEmployeeName').textContent = emp['الاسم حسب الهوية'] || '';
+            document.getElementById('promotionEmployeeId').textContent = emp['رقم الهوية'] || emp['ID'] || '';
+
+            const lists = {};
+            LIST_KEYS.forEach(k => {
+                lists[k] = getList(k);
+            });
+
+            const selectMap = {
+                'promo_sector': 'قطاع',
+                'promo_point': 'نقطة',
+                'promo_job': 'وظيفة',
+                'promo_location': 'موقع',
+                'promo_rank': 'رتبة'
+            };
+
+            Object.keys(selectMap).forEach(selectId => {
+                const select = document.getElementById(selectId);
+                const listKey = selectMap[selectId];
+                const items = lists[listKey] || [];
+                select.innerHTML = '';
+                const emptyOpt = document.createElement('option');
+                emptyOpt.value = '';
+                emptyOpt.textContent = '-- اختر --';
+                select.appendChild(emptyOpt);
+                items.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item;
+                    opt.textContent = item;
+                    const fieldMap = {
+                        'promo_sector': 'القطاع الداخلي',
+                        'promo_point': 'النقطة الداخلية',
+                        'promo_job': 'الوظيفة الداخلية',
+                        'promo_location': 'موقع العمل الداخلي',
+                        'promo_rank': 'الرتبة'
+                    };
+                    if (item === (emp[fieldMap[selectId]] || '')) {
+                        opt.selected = true;
+                    }
+                    select.appendChild(opt);
+                });
+                const fieldMap = {
+                    'promo_sector': 'القطاع الداخلي',
+                    'promo_point': 'النقطة الداخلية',
+                    'promo_job': 'الوظيفة الداخلية',
+                    'promo_location': 'موقع العمل الداخلي',
+                    'promo_rank': 'الرتبة'
+                };
+                const currentVal = emp[fieldMap[selectId]] || '';
+                if (currentVal && !items.includes(currentVal)) {
+                    const extraOpt = document.createElement('option');
+                    extraOpt.value = currentVal;
+                    extraOpt.textContent = currentVal;
+                    extraOpt.selected = true;
+                    select.appendChild(extraOpt);
+                }
+            });
+
+            document.getElementById('promo_salary').value = emp['الراتب'] || '';
+            document.getElementById('promo_allowance').value = emp['الصرفة'] || '';
+            document.getElementById('promo_bonus').value = emp['العلاوة'] || '';
+
+            document.getElementById('promo_keep_vacant').checked = false;
+
+            document.getElementById('promotionModal').classList.add('active');
+        });
+
+        // ================================================================
+        // تنفيذ الترقية
+        // ================================================================
+
+        document.getElementById('executePromotionBtn').addEventListener('click', function() {
+            const empId = document.getElementById('promotionEmployeeId').textContent.trim();
+            const emp = internalData.find(e => String(e['رقم الهوية'] || e['ID'] || '') === empId);
+            if (!emp) {
+                alert('الموظف غير موجود.');
+                return;
+            }
+
+            const newSector = document.getElementById('promo_sector').value;
+            const newPoint = document.getElementById('promo_point').value;
+            const newJob = document.getElementById('promo_job').value;
+            const newLocation = document.getElementById('promo_location').value;
+            const newRank = document.getElementById('promo_rank').value;
+            const newSalary = document.getElementById('promo_salary').value;
+            const newAllowance = document.getElementById('promo_allowance').value;
+            const newBonus = document.getElementById('promo_bonus').value;
+            const keepVacant = document.getElementById('promo_keep_vacant').checked;
+
+            if (!newSector || !newPoint || !newJob || !newLocation || !newRank) {
+                alert('الرجاء تعبئة جميع الحقول المطلوبة (القطاع، النقطة، الوظيفة، موقع العمل، الرتبة).');
+                return;
+            }
+
+            const oldData = {
+                'القطاع الداخلي': emp['القطاع الداخلي'] || '',
+                'النقطة الداخلية': emp['النقطة الداخلية'] || '',
+                'الوظيفة الداخلية': emp['الوظيفة الداخلية'] || '',
+                'موقع العمل الداخلي': emp['موقع العمل الداخلي'] || '',
+                'الرتبة': emp['الرتبة'] || '',
+                'الراتب': emp['الراتب'] || '',
+                'الصرفة': emp['الصرفة'] || '',
+                'العلاوة': emp['العلاوة'] || ''
+            };
+
+            emp['القطاع الداخلي'] = newSector;
+            emp['النقطة الداخلية'] = newPoint;
+            emp['الوظيفة الداخلية'] = newJob;
+            emp['موقع العمل الداخلي'] = newLocation;
+            emp['الرتبة'] = newRank;
+            emp['الراتب'] = newSalary || '0';
+            emp['الصرفة'] = newAllowance || '0';
+            emp['العلاوة'] = newBonus || '0';
+            emp['اجمالي الصرفة'] = calcTotal(emp);
+            emp['ملاحظة'] = (emp['ملاحظة'] || '') + ' (ترقية)';
+
+            if (keepVacant) {
+                const vacant = {
+                    'القطاع الداخلي': oldData['القطاع الداخلي'] || '',
+                    'النقطة الداخلية': oldData['النقطة الداخلية'] || '',
+                    'الوظيفة الداخلية': oldData['الوظيفة الداخلية'] || '',
+                    'موقع العمل الداخلي': oldData['موقع العمل الداخلي'] || '',
+                    'الرتبة': oldData['الرتبة'] || '',
+                    'الراتب': oldData['الراتب'] || '0',
+                    'الصرفة': oldData['الصرفة'] || '0',
+                    'العلاوة': oldData['العلاوة'] || '0',
+                    'اجمالي الصرفة': calcTotal({ الراتب: oldData['الراتب'] || '0', الصرفة: oldData['الصرفة'] || '0',
+                        العلاوة: oldData['العلاوة'] || '0' }),
+                    'ID': '',
+                    'الاسم حسب الهوية': '',
+                    'اسم الأم': '',
+                    'رقم الهوية': '',
+                    'ميلاد': '',
+                    'الهاتف': '',
+                    'العنوان': '',
+                    'ملاحظة': 'شاغر (بعد ترقية)'
+                };
+                internalData.push(updateTotal(vacant));
+            }
+
+            saveToStorage(STORAGE_INTERNAL, internalData);
+
+            const log = loadFromStorage(STORAGE_LOG, []);
+            log.push({
+                id: emp['رقم الهوية'] || emp['ID'] || '',
+                date: new Date().toISOString().slice(0, 10),
+                executor: 'المستخدم (ترقية)',
+                changes: {
+                    'القطاع الداخلي': oldData['القطاع الداخلي'] + ' -> ' + newSector,
+                    'النقطة الداخلية': oldData['النقطة الداخلية'] + ' -> ' + newPoint,
+                    'الوظيفة الداخلية': oldData['الوظيفة الداخلية'] + ' -> ' + newJob,
+                    'موقع العمل الداخلي': oldData['موقع العمل الداخلي'] + ' -> ' + newLocation,
+                    'الرتبة': oldData['الرتبة'] + ' -> ' + newRank,
+                    'الراتب': oldData['الراتب'] + ' -> ' + (newSalary || '0'),
+                    'الصرفة': oldData['الصرفة'] + ' -> ' + (newAllowance || '0'),
+                    'العلاوة': oldData['العلاوة'] + ' -> ' + (newBonus || '0')
+                }
+            });
+            saveToStorage(STORAGE_LOG, log);
+
+            buildFinal();
+            renderTable();
+            document.getElementById('promotionModal').classList.remove('active');
+            alert('تم تنفيذ الترقية بنجاح' + (keepVacant ? '، وتم إنشاء شاغر في المنصب السابق.' : '.'));
+        });
+
+        // ================================================================
+        // فصل المحددين
+        // ================================================================
+
+        document.getElementById('separateBtn').addEventListener('click', function() {
+            if (currentTab !== 'internal') {
+                alert('الرجاء التبديل إلى تبويب "الداخلي" لفصل الموظفين.');
+                return;
+            }
+            const checkedIds = Array.from(document.querySelectorAll('.row-checkbox:checked'))
+                .map(cb => String(cb.dataset.id || ''))
+                .filter(id => id.trim() !== '');
+            if (checkedIds.length === 0) {
+                alert('الرجاء تحديد موظفين لفصلهم.');
+                return;
+            }
+
+            if (!confirm('هل أنت متأكد من فصل الموظفين المحددين؟ سيتم نقلهم إلى كشف المفصولين، وسيُنشأ شاغر في مكان كل منهم.'))
+                return;
+
+            const toSeparate = internalData.filter(emp => {
+                const id = String(emp['رقم الهوية'] || emp['ID'] || '');
+                return checkedIds.includes(id);
+            });
+
+            if (toSeparate.length === 0) {
+                alert('لم يتم العثور على الموظفين المحددين في الكشف الداخلي.');
+                return;
+            }
+
+            const now = new Date().toISOString().slice(0, 10);
+            const separatedWithDate = toSeparate.map(emp => {
+                const newEmp = { ...emp };
+                newEmp['تاريخ الإجراء'] = now;
+                newEmp['النقطة الداخلية'] = 'مفصول';
+                newEmp['الوظيفة الداخلية'] = 'مفصول';
+                newEmp['موقع العمل الداخلي'] = 'مفصول';
+                newEmp['ملاحظة'] = (newEmp['ملاحظة'] || '') + ' (فصل)';
+                return newEmp;
+            });
+
+            separatedData = [...separatedData, ...separatedWithDate];
+            saveToStorage(STORAGE_SEPARATED, separatedData);
+
+            const idsToRemove = new Set(toSeparate.map(emp => String(emp['رقم الهوية'] || emp['ID'] || '')));
+            const newInternal = [];
+            internalData.forEach(emp => {
+                const id = String(emp['رقم الهوية'] || emp['ID'] || '');
+                if (idsToRemove.has(id)) {
+                    const vacant = {
+                        'القطاع الداخلي': emp['القطاع الداخلي'] || '',
+                        'النقطة الداخلية': emp['النقطة الداخلية'] || '',
+                        'الوظيفة الداخلية': emp['الوظيفة الداخلية'] || '',
+                        'موقع العمل الداخلي': emp['موقع العمل الداخلي'] || '',
+                        'الرتبة': emp['الرتبة'] || '',
+                        'الراتب': emp['الراتب'] || '0',
+                        'الصرفة': emp['الصرفة'] || '0',
+                        'العلاوة': emp['العلاوة'] || '0',
+                        'اجمالي الصرفة': calcTotal(emp),
+                        'ID': '',
+                        'الاسم حسب الهوية': '',
+                        'اسم الأم': '',
+                        'رقم الهوية': '',
+                        'ميلاد': '',
+                        'الهاتف': '',
+                        'العنوان': '',
+                        'ملاحظة': 'شاغر'
+                    };
+                    newInternal.push(updateTotal(vacant));
+                } else {
+                    newInternal.push(emp);
+                }
+            });
+            internalData = newInternal;
+            saveToStorage(STORAGE_INTERNAL, internalData);
+
+            buildFinal();
+            renderTable();
+            alert('تم فصل ' + toSeparate.length + ' موظف بنجاح، وتم إنشاء شواغر في أماكنهم.');
+        });
+
+        // ================================================================
+        // تسجيل انقطاع للمحددين
+        // ================================================================
+
+        document.getElementById('absentBtn').addEventListener('click', function() {
+            if (currentTab !== 'internal') {
+                alert('الرجاء التبديل إلى تبويب "الداخلي" لتسجيل الانقطاع.');
+                return;
+            }
+            const checkedIds = Array.from(document.querySelectorAll('.row-checkbox:checked'))
+                .map(cb => String(cb.dataset.id || ''))
+                .filter(id => id.trim() !== '');
+            if (checkedIds.length === 0) {
+                alert('الرجاء تحديد موظفين لتسجيل انقطاعهم.');
+                return;
+            }
+
+            if (!confirm('هل أنت متأكد من تسجيل انقطاع الموظفين المحددين؟ سيتم نقلهم إلى كشف المنقطعين، وسيُنشأ شاغر في مكان كل منهم.'))
+                return;
+
+            const toAbsent = internalData.filter(emp => {
+                const id = String(emp['رقم الهوية'] || emp['ID'] || '');
+                return checkedIds.includes(id);
+            });
+
+            if (toAbsent.length === 0) {
+                alert('لم يتم العثور على الموظفين المحددين في الكشف الداخلي.');
+                return;
+            }
+
+            const now = new Date().toISOString().slice(0, 10);
+            const absentWithDate = toAbsent.map(emp => {
+                const newEmp = { ...emp };
+                newEmp['تاريخ الإجراء'] = now;
+                newEmp['النقطة الداخلية'] = 'منقطع';
+                newEmp['الوظيفة الداخلية'] = 'منقطع';
+                newEmp['موقع العمل الداخلي'] = 'منقطع';
+                newEmp['ملاحظة'] = (newEmp['ملاحظة'] || '') + ' (منقطع)';
+                return newEmp;
+            });
+
+            absentData = [...absentData, ...absentWithDate];
+            saveToStorage(STORAGE_ABSENT, absentData);
+
+            const idsToRemove = new Set(toAbsent.map(emp => String(emp['رقم الهوية'] || emp['ID'] || '')));
+            const newInternal = [];
+            internalData.forEach(emp => {
+                const id = String(emp['رقم الهوية'] || emp['ID'] || '');
+                if (idsToRemove.has(id)) {
+                    const vacant = {
+                        'القطاع الداخلي': emp['القطاع الداخلي'] || '',
+                        'النقطة الداخلية': emp['النقطة الداخلية'] || '',
+                        'الوظيفة الداخلية': emp['الوظيفة الداخلية'] || '',
+                        'موقع العمل الداخلي': emp['موقع العمل الداخلي'] || '',
+                        'الرتبة': emp['الرتبة'] || '',
+                        'الراتب': emp['الراتب'] || '0',
+                        'الصرفة': emp['الصرفة'] || '0',
+                        'العلاوة': emp['العلاوة'] || '0',
+                        'اجمالي الصرفة': calcTotal(emp),
+                        'ID': '',
+                        'الاسم حسب الهوية': '',
+                        'اسم الأم': '',
+                        'رقم الهوية': '',
+                        'ميلاد': '',
+                        'الهاتف': '',
+                        'العنوان': '',
+                        'ملاحظة': 'شاغر'
+                    };
+                    newInternal.push(updateTotal(vacant));
+                } else {
+                    newInternal.push(emp);
+                }
+            });
+            internalData = newInternal;
+            saveToStorage(STORAGE_INTERNAL, internalData);
+
+            buildFinal();
+            renderTable();
+            alert('تم تسجيل انقطاع ' + toAbsent.length + ' موظف بنجاح، وتم إنشاء شواغر في أماكنهم.');
+        });
+
+        // ================================================================
+        // نقل إلى شاغر
+        // ================================================================
+
+        let moveEmployeeId = null;
+
+        document.getElementById('moveToVacantBtn').addEventListener('click', function() {
+            if (currentTab !== 'internal') {
+                alert('الرجاء التبديل إلى تبويب "الداخلي" لنقل الموظف إلى شاغر.');
+                return;
+            }
+            const checkedIds = Array.from(document.querySelectorAll('.row-checkbox:checked'))
+                .map(cb => String(cb.dataset.id || ''))
+                .filter(id => id.trim() !== '');
+            if (checkedIds.length !== 1) {
+                alert('الرجاء تحديد موظف واحد فقط لنقله إلى شاغر.');
+                return;
+            }
+            moveEmployeeId = checkedIds[0];
+            const emp = internalData.find(e => String(e['رقم الهوية'] || e['ID'] || '') === moveEmployeeId);
+            if (!emp) {
+                alert('الموظف غير موجود في الكشف الداخلي.');
+                return;
+            }
+            document.getElementById('moveEmployeeName').textContent = emp['الاسم حسب الهوية'] || '';
+
+            const vacantSelect = document.getElementById('vacantSelect');
+            vacantSelect.innerHTML = '';
+            const vacants = internalData.filter(e => {
+                const name = (e['الاسم حسب الهوية'] || '').trim();
+                const id = (e['رقم الهوية'] || '').trim();
+                return name === '' && id === '';
+            });
+            if (vacants.length === 0) {
+                alert('لا توجد وظائف شاغرة في الكشف الداخلي.');
+                return;
+            }
+            vacants.forEach((v, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.textContent = (v['القطاع الداخلي'] || '') + ' - ' + (v['النقطة الداخلية'] || '') + ' - ' + (v[
+                    'الوظيفة الداخلية'] || '') + ' (' + (v['موقع العمل الداخلي'] || '') + ')';
+                vacantSelect.appendChild(opt);
+            });
+
+            document.getElementById('moveModal').classList.add('active');
+        });
+
+        document.getElementById('executeMoveBtn').addEventListener('click', function() {
+            const vacantSelect = document.getElementById('vacantSelect');
+            const idx = parseInt(vacantSelect.value);
+            if (isNaN(idx)) {
+                alert('الرجاء اختيار شاغر.');
+                return;
+            }
+            const emp = internalData.find(e => String(e['رقم الهوية'] || e['ID'] || '') === moveEmployeeId);
+            if (!emp) {
+                alert('الموظف غير موجود.');
+                return;
+            }
+            const vacants = internalData.filter(e => {
+                const name = (e['الاسم حسب الهوية'] || '').trim();
+                const id = (e['رقم الهوية'] || '').trim();
+                return name === '' && id === '';
+            });
+            if (idx >= vacants.length) {
+                alert('الشاغر المحدد غير صحيح.');
+                return;
+            }
+            const vacant = vacants[idx];
+
+            const vacantPosition = {
+                القطاع: vacant['القطاع الداخلي'] || '',
+                النقطة: vacant['النقطة الداخلية'] || '',
+                الوظيفة: vacant['الوظيفة الداخلية'] || '',
+                الموقع: vacant['موقع العمل الداخلي'] || '',
+                الرتبة: vacant['الرتبة'] || '',
+                الراتب: vacant['الراتب'] || '0',
+                الصرفة: vacant['الصرفة'] || '0',
+                العلاوة: vacant['العلاوة'] || '0'
+            };
+
+            const oldPosition = {
+                القطاع: emp['القطاع الداخلي'] || '',
+                النقطة: emp['النقطة الداخلية'] || '',
+                الوظيفة: emp['الوظيفة الداخلية'] || '',
+                الموقع: emp['موقع العمل الداخلي'] || '',
+                الرتبة: emp['الرتبة'] || '',
+                الراتب: emp['الراتب'] || '0',
+                الصرفة: emp['الصرفة'] || '0',
+                العلاوة: emp['العلاوة'] || '0'
+            };
+
+            emp['القطاع الداخلي'] = vacantPosition.القطاع;
+            emp['النقطة الداخلية'] = vacantPosition.النقطة;
+            emp['الوظيفة الداخلية'] = vacantPosition.الوظيفة;
+            emp['موقع العمل الداخلي'] = vacantPosition.الموقع;
+            emp['الرتبة'] = vacantPosition.الرتبة;
+            emp['الراتب'] = vacantPosition.الراتب;
+            emp['الصرفة'] = vacantPosition.الصرفة;
+            emp['العلاوة'] = vacantPosition.العلاوة;
+            emp['اجمالي الصرفة'] = calcTotal(emp);
+            emp['ملاحظة'] = (emp['ملاحظة'] || '') + ' (نقل إلى شاغر)';
+
+            const newVacant = {
+                'القطاع الداخلي': oldPosition.القطاع,
+                'النقطة الداخلية': oldPosition.النقطة,
+                'الوظيفة الداخلية': oldPosition.الوظيفة,
+                'موقع العمل الداخلي': oldPosition.الموقع,
+                'الرتبة': oldPosition.الرتبة,
+                'الراتب': oldPosition.الراتب,
+                'الصرفة': oldPosition.الصرفة,
+                'العلاوة': oldPosition.العلاوة,
+                'اجمالي الصرفة': calcTotal({ الراتب: oldPosition.الراتب, الصرفة: oldPosition.الصرفة, العلاوة: oldPosition
+                        .العلاوة }),
+                'ID': '',
+                'الاسم حسب الهوية': '',
+                'اسم الأم': '',
+                'رقم الهوية': '',
+                'ميلاد': '',
+                'الهاتف': '',
+                'العنوان': '',
+                'ملاحظة': 'شاغر'
+            };
+
+            const newInternal = [];
+            let vacantRemoved = false;
+            internalData.forEach(item => {
+                const itemId = String(item['رقم الهوية'] || item['ID'] || '');
+                const itemName = (item['الاسم حسب الهوية'] || '').trim();
+                const itemId2 = (item['رقم الهوية'] || '').trim();
+                if (itemName === '' && itemId2 === '' && item === vacant) {
+                    vacantRemoved = true;
+                    return;
+                } else if (itemId === moveEmployeeId) {
+                    newInternal.push(emp);
+                } else {
+                    newInternal.push(item);
+                }
+            });
+            newInternal.push(updateTotal(newVacant));
+
+            internalData = newInternal;
+            saveToStorage(STORAGE_INTERNAL, internalData);
+
+            const log = loadFromStorage(STORAGE_LOG, []);
+            log.push({
+                id: moveEmployeeId,
+                date: new Date().toISOString().slice(0, 10),
+                executor: 'المستخدم',
+                changes: {
+                    'القطاع الداخلي': oldPosition.القطاع + ' -> ' + vacantPosition.القطاع,
+                    'النقطة الداخلية': oldPosition.النقطة + ' -> ' + vacantPosition.النقطة,
+                    'الوظيفة الداخلية': oldPosition.الوظيفة + ' -> ' + vacantPosition.الوظيفة,
+                    'موقع العمل الداخلي': oldPosition.الموقع + ' -> ' + vacantPosition.الموقع
+                }
+            });
+            saveToStorage(STORAGE_LOG, log);
+
+            buildFinal();
+            renderTable();
+            document.getElementById('moveModal').classList.remove('active');
+            alert('تم نقل الموظف إلى الوظيفة الشاغرة بنجاح، وأصبح مكانه القديم شاغراً.');
+        });
+
+        // ================================================================
+        // إلغاء التحديد
+        // ================================================================
+
+        document.getElementById('clearSelectionBtn').addEventListener('click', function() {
+            document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+            const selectAll = document.getElementById('selectAll');
+            if (selectAll) selectAll.checked = false;
+        });
+
+        // ================================================================
+        // إغلاق المودالات
+        // ================================================================
+
+        document.querySelectorAll('[data-close]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const modalId = this.dataset.close;
+                document.getElementById(modalId).classList.remove('active');
+            });
+        });
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        // ================================================================
+        // عرض سجل التنقلات
+        // ================================================================
+
+        function showEmployeeLog(empId) {
+            let emp = mainData.find(e => String(e['رقم الهوية'] || e['ID'] || '') === String(empId));
+            if (!emp) {
+                emp = internalData.find(e => String(e['رقم الهوية'] || e['ID'] || '') === String(empId));
+            }
+            if (!emp) {
+                alert('الموظف غير موجود.');
+                return;
+            }
+
+            let msg = 'بيانات الموظف\n\n';
+            const keys = Object.keys(emp);
+            keys.forEach(k => {
+                msg += k + ': ' + (emp[k] || '') + '\n';
+            });
+
+            const log = loadFromStorage(STORAGE_LOG, []);
+            const empLogs = log.filter(entry => String(entry.id) === String(empId));
+            if (empLogs.length > 0) {
+                msg += '\nسجل التنقلات:\n';
+                empLogs.forEach(entry => {
+                    msg += '- ' + entry.date + ' | ' + entry.executor + ': ';
+                    const changes = entry.changes || {};
+                    const details = Object.entries(changes).map(([k, v]) => k + ': ' + v).join('; ');
+                    msg += details || 'لا توجد تفاصيل';
+                    msg += '\n';
+                });
+            } else {
+                msg += '\nلا توجد سجلات تنقلات.';
+            }
+            alert(msg);
+        }
+
+        // ================================================================
+        // تهيئة النظام
+        // ================================================================
+
+        loadAll();
+        renderTable();
+        console.log('نظام الكشوف المتعددة جاهز');
+    </script>
+</body>
+</html>
